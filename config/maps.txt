@@ -22,7 +22,15 @@ map alphacorp
 	votable
 endmap
 
+map deltacorp
+	votable
+endmap
+
 map epsiloncorp
+	votable
+endmap
+
+map etacorp
 	votable
 endmap
 
@@ -31,6 +39,14 @@ map gammacorp
 endmap
 
 map psicorp
+	votable
+endmap
+
+map thetacorp
+	votable
+endmap
+
+map zetacorp
 	votable
 endmap
 
