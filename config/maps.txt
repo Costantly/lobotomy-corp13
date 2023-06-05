@@ -50,5 +50,9 @@ map zetacorp
 	votable
 endmap
 
+map rcorp_test
+	votable
+endmap
+
 map runtimestation
 endmap
