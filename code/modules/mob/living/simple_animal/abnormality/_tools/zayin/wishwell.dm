@@ -77,6 +77,7 @@
 		/obj/item/clothing/under/suit/lobotomy/training,
 		/obj/item/clothing/under/suit/lobotomy/command,
 		/obj/item/clothing/under/suit/lobotomy/discipline,
+		/obj/item/clothing/under/suit/lobotomy/discipline/alternative,
 		/obj/item/clothing/under/suit/lobotomy/welfare,
 		/obj/item/clothing/under/suit/lobotomy/extraction,
 		/obj/item/clothing/under/suit/lobotomy/records,
@@ -127,6 +128,7 @@
 	var/list/dawn = list(
 		/mob/living/simple_animal/hostile/ordeal/green_bot,
 		/mob/living/simple_animal/hostile/ordeal/indigo_dawn,
+		/obj/item/clothing/mask/facehugger/bongy,
 		/mob/living/simple_animal/hostile/ordeal/violet_fruit
 		)
 	var/list/noon = list(

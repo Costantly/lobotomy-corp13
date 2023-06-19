@@ -83,6 +83,16 @@
 	combo += 1
 	force = initial(force)
 
+/obj/item/ego_weapon/despair/attackby(obj/item/I, mob/living/user, params)
+	..()
+	if(!istype(I, /obj/item/nihil/spade))
+		return
+	new /obj/item/ego_weapon/shield/despair_nihil(get_turf(src))
+	to_chat(user,"<span class='warning'>The [I] seems to drain all of the light away as it is absorbed into [src]!</span>")
+	playsound(user, 'sound/abnormalities/nihil/filter.ogg', 15, FALSE, -3)
+	qdel(I)
+	qdel(src)
+
 /obj/item/ego_weapon/totalitarianism
 	name = "totalitarianism"
 	desc = "When one is oppressed, sometimes they try to break free."
@@ -313,8 +323,8 @@
 			dealing_damage = max(dealing_damage * 0.9, special_damage * 0.3)
 
 /obj/item/ego_weapon/thirteen
-	name = "for whom the bell tolls"
-	desc = "There is nothing else than now. There is neither yesterday, certainly, nor is there any tomorrow."
+	name = "dead silence"
+	desc = "Time flows as life does, and life goes as time does."
 	special = "This weapon deals an absurd amount of damage on the 13th hit."
 	icon_state = "thirteen"
 	force = 30
@@ -1047,8 +1057,15 @@
 		if(prob(5))
 			new /obj/effect/gibspawner/generic/silent/wrath_acid(T) // The non-damaging one
 
-/obj/item/ego_weapon/blind_rage/get_clamped_volume()
-	return 50
+/obj/item/ego_weapon/blind_rage/attackby(obj/item/I, mob/living/user, params)
+	..()
+	if(!istype(I, /obj/item/nihil/club))
+		return
+	new /obj/item/ego_weapon/blind_rage/nihil(get_turf(src))
+	to_chat(user,"<span class='warning'>The [I] seems to drain all of the light away as it is absorbed into [src]!</span>")
+	playsound(user, 'sound/abnormalities/nihil/filter.ogg', 15, FALSE, -3)
+	qdel(I)
+	qdel(src)
 
 /obj/item/ego_weapon/mini/heart
 	name = "bleeding heart"

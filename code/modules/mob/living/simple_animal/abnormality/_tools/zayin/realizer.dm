@@ -16,11 +16,12 @@
 		/obj/item/clothing/suit/armor/ego_gear/daredevil = /obj/item/clothing/suit/armor/ego_gear/realization/fear,
 		/obj/item/clothing/suit/armor/ego_gear/wrist = /obj/item/clothing/suit/armor/ego_gear/realization/exsanguination,
 		/obj/item/clothing/suit/armor/ego_gear/match = /obj/item/clothing/suit/armor/ego_gear/realization/ember_matchlight,
+		/obj/item/clothing/suit/armor/ego_gear/blossoms = /obj/item/clothing/suit/armor/ego_gear/realization/sakura_bloom,
 		// HE
 		/obj/item/clothing/suit/armor/ego_gear/grinder = /obj/item/clothing/suit/armor/ego_gear/realization/grinder,
 		/obj/item/clothing/suit/armor/ego_gear/magicbullet = /obj/item/clothing/suit/armor/ego_gear/realization/bigiron,
 		/obj/item/clothing/suit/armor/ego_gear/solemnlament = /obj/item/clothing/suit/armor/ego_gear/realization/eulogy,
-		/obj/item/clothing/suit/armor/ego_gear/unrequited = /obj/item/clothing/suit/armor/ego_gear/realization/maiden,
+		/obj/item/clothing/suit/armor/ego_gear/unrequited = /obj/item/clothing/suit/armor/ego_gear/realization/forever,
 		// WAW
 		/obj/item/clothing/suit/armor/ego_gear/goldrush = /obj/item/clothing/suit/armor/ego_gear/realization/goldexperience,
 		/obj/item/clothing/suit/armor/ego_gear/despair = /obj/item/clothing/suit/armor/ego_gear/realization/quenchedblood,
