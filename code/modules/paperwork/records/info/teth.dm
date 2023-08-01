@@ -243,3 +243,26 @@
 		"Employees working on O-01-19 may experience vivid hallucinations and percieved attempts at one's life during work. Employees are encouraged to ignore them and focus on work.",
 		"When the work result was bad, the employee suddenly fell into a panic.",
 		"Any time work was completed, O-01-19 destroyed all nearby light sources.")
+
+//Pale Horse
+/obj/item/paper/fluff/info/teth/palehorse
+	abno_type = /mob/living/simple_animal/hostile/abnormality/pale_horse
+	abno_code = "T-02-14"
+	abno_info = list(
+		"When the work result was Good, the Qliphoth Counter increased.",
+		"After an employee died within the facility, the Qliphoth Counter decreased.",
+		"While working, the employee endured unavoidable PALE damage until HP fell below 50%.",
+		"During a containment breach, employees are periodically damage by the fog surrounding the abnormality. It makes no attempt to defend itself.",
+		"When an employee was approached by the abnormality during a breach, the employee became vulnerable to PALE damage for a short time.",
+		"When the abnormality found a corpse while breaching, it blessed a small area and destroyed the corpse. In this area, every employee recieved high PALE damage and every abnormality's Qliphoth Counter was lowered by 1.")
+	abno_breach_damage_type = "Pale"
+	abno_breach_damage_count = "Moderate"
+
+//Fairy Gentleman
+/obj/item/paper/fluff/info/teth/fairy_gentleman
+	abno_type = /mob/living/simple_animal/hostile/abnormality/fairy_gentleman
+	abno_code = "F-01-161"
+	abno_info = list(
+		"After getting a good result with the Fairy Gentleman, He gives the employee a bottle of what he calls “Fairy Wine.”",
+		"Drinking the “Fairy Wine” increase the prudence of the agent who drinks it and then heals their sanity. However, drinking this wine also will make the user become drunk incredibly quickly. Employees who drank too much fairy wine felt better after taking a special chemical using a sleeper.",
+		"Doing instinct work with the Fairy Gentleman will also cause the agent to take a drink with the Gentleman.")
