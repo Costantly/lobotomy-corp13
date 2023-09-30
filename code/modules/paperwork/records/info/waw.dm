@@ -50,6 +50,7 @@
 	abno_info = list(
 		"The first employee who completes their work with a Good result will receive The Knight of Despair’s blessing. (From then on, the employee will be referred to as O-01-73-1).",
 		"Thanks to the blessing, RED, WHITE, and BLACK damage dealt to O-01-73-1 was halved. However, PALE damage was doubled.",
+		"The blessing caused O-01-73-1 to lose most of their competence when it comes to working on abnormalities.",
 		"The Knight of Despair’s blessing dissipated when O-01-73-1 died or panicked. After the blessing was gone, a new employee could receive it.",
 		"When O-01-73-1 died or panicked, The Knight of Despair escaped from its Containment Unit.")
 	abno_can_breach = TRUE
@@ -405,7 +406,7 @@
 		"The “Sculptor” will have a higher work success chance with Pygmalion and will have a higher chance of getting the E.G.O gift" ,
 		"Pygmalion breaches when the “Sculptor” has 50% or less sanity or health." ,
 		"When Pygmalion breaches, They will teleport to the “Sculptor” and attack any abnormality in their way and any abnormality near the “Sculptor.”" ,
-		"The “Sculptor” will have their prudence reduced to level 3 while Pygmalion is breaching." ,
+		"The “Sculptor” will have their maximum sanity reduced while Pygmalion is breaching." ,
 		"If the “Sculptor” goes insane or dies, Pygmalion will become enraged and start attacking everyone near them.")
 
 //Parasite Tree
@@ -426,9 +427,9 @@
 	abno_type = /mob/living/simple_animal/hostile/abnormality/black_swan
 	abno_code = "F-02-70"
 	abno_info = list(
-		"When 5 employees died F-02-70-1 eyes suddenly melted.",
-		"When 5 employees panicked F-02-70-2 arms vanished.",
-		"When 3 abnormalities breached F-02-70-3 legs were reduced to a sludge.",
+		"When 2 employees died F-02-70-1 eyes suddenly melted.",
+		"When 2 employees panicked F-02-70-2 arms vanished.",
+		"When 2 abnormalities breached F-02-70-3 legs were reduced to a sludge.",
 		"When work result was bad F-02-70-4 lost their ears and cheeks.",
 		"When work result was normal F-02-70-5 lost the entire lower half of their face.",
 		"When the abnormality had its Qliphoth Counter decreased due to a meltdown or sabotage one of the brothers was wounded.")
@@ -445,3 +446,47 @@
 		"DANGER - When Apex Predator breached, it should be located immediately.")
 	abno_breach_damage_type = "Red"
 	abno_breach_damage_count = "Very High"
+
+//Baba Yaga
+/obj/item/paper/fluff/info/waw/babayaga
+	abno_type = /mob/living/simple_animal/hostile/abnormality/babayaga
+	abno_code = "M-04-166"
+	abno_info = list(
+		"When the work result was Normal, the Qliphoth Counter lowered with a normal probability.",
+		"When the work result was Bad, the Qliphoth Counter lowered. In addition, the employee was attacked by a group of frozen slaves.",
+		"When an employee, who had both Fortitude Levels and Temperance Levels below 4, completed the work process, the Qliphoth Counter lowered. In addition, the employee was attacked by a group of frozen slaves.",
+		"When Baba Yaga breached, it caused incredibly powerful shock-waves, causing nearby employees to take extreme RED damage proportionally to how close they were to the source.",
+		"Every time Baba Yaga landed, a small group of frozen slaves arrived from the scene to attack nearby employees.")
+	abno_breach_damage_type = "Red"
+	abno_breach_damage_count = "Extreme"
+
+//Big and Will be Bad Wolf
+/obj/item/paper/fluff/info/waw/big_wolf
+	abno_type = /mob/living/simple_animal/hostile/abnormality/big_wolf
+	abno_code = "F-02-58"
+	abno_info = list(
+		"When the work result was Bad, the Qliphoth Counter lowered and the employee working on F-02-58 was consumed.",
+		"When the employee had a good result while preforming instinct work F-02-58 vomited all of the previously consumed employees.",
+		"When F-02-58 is below 50% health their howl will weaken the containment of nearby abnormalities."
+		)
+
+//Poor Screenwriter's Note
+/obj/item/paper/fluff/info/waw/screenwriter
+	abno_type = /mob/living/simple_animal/hostile/abnormality/screenwriter
+	abno_code = "O-05-29" //originally O-05-31 in lobotomy corp, but it's taken by TSO.
+	abno_info = list(
+		"Poor Screenwriter's Note prefers that everything goes according to its own scenario. Work will also not be an exception. If you are unsure of what to do, turn the page.",
+		"When the work result was bad, the Qlipthoth Counter lowered.",
+		"When the Qliphoth counter reached 0, several employees were selected to play roles in a \"play\"",
+		"The employee playing the \"Coward\" suffered from lowered power, the \"Broken\" lowered health, and the \"Failed\" lowered sanity.",
+		"The employees chosen to play the \"Victim\" suffered perhaps the most of all, losing in all virtues and being targetted by the actor \"A\".",
+		"When the \"Victim\" died or was not present, another role was picked to play the \"Victim\".",
+		"When the actor \"A\" was defeated, the abnormality was suppressed.")
+	abno_work_rates = list(
+		"Nutrition" = "Low",
+		"Cleanliness" = "Low",
+		"Consensus" = "Low",
+		"Amusement" = "Low",
+		"Violence" = "Low")
+	abno_breach_damage_type = "White"
+	abno_breach_damage_count = "High"

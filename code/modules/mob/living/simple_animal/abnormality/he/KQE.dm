@@ -1,6 +1,6 @@
 /mob/living/simple_animal/hostile/abnormality/kqe
 	name = "KQE-1J-23"
-	desc = "An incomplete robot composed of metal plates, lights, and integrated circuits. Bare wires protrude with its every movement."
+	desc = "A mechanical puppet composed of metal plates, lights, and integrated circuits. Bare wires protrude with its every movement."
 	health = 1500
 	maxHealth = 1500
 	attack_verb_continuous = "whips"
@@ -10,6 +10,7 @@
 	icon_state = "kqe"
 	icon_living = "kqe"
 	icon_dead = "kqe_egg"
+	del_on_death = FALSE
 	melee_damage_type = BLACK_DAMAGE
 	armortype = BLACK_DAMAGE
 	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.2)
@@ -50,12 +51,22 @@
 	var/work_count = 0
 	var/heart = FALSE
 	var/heart_threshold = 700
-	var/heart_list = list()
+
+	//PLAYABLE ATTACKS
+	attack_action_types = list(/datum/action/innate/abnormality_attack/toggle/kqe_grab_toggle)
+
+/datum/action/innate/abnormality_attack/toggle/kqe_grab_toggle
+	name = "Toggle Claw Attack"
+	button_icon_state = "kqe_toggle0"
+	chosen_attack_num = 2
+	chosen_message = "<span class='colossus'>You won't grab visitors anymore.</span>"
+	button_icon_toggle_activated = "kqe_toggle1"
+	toggle_attack_num = 1
+	toggle_message = "<span class='colossus'>You will attempt to grab visitors.</span>"
+	button_icon_toggle_deactivated = "kqe_toggle0"
+
 
 /*** Basic Procs ***/
-/mob/living/simple_animal/hostile/abnormality/kqe/Initialize()
-	. = ..()
-
 /mob/living/simple_animal/hostile/abnormality/kqe/Move()
 	if(!can_act)
 		return FALSE
@@ -73,25 +84,27 @@
 		return
 	if(!heart)
 		revive(full_heal = TRUE, admin_revive = FALSE)//fully heal and spawn a heart
-		say("Please cooperate with confiscation! Lying is bad behavior. Lying is bad behavior. Lying is bad behavior. Lying is bad behavior. Lying is bad behavior.")
-		heart = TRUE
-		var/X = pick(GLOB.department_centers)
-		var/turf/T = get_turf(X)
-		new /mob/living/simple_animal/hostile/kqe_heart(T)
-		var target = /mob/living/simple_animal/hostile/kqe_heart
-		for(target in GLOB.mob_living_list)
-			heart_list += target
+		say("Please cooperate! Please Cooperrr... Csdk..ppra...@#@%!%^#$")
+		if(!LAZYLEN(GLOB.department_centers))
+			heart = TRUE
+		else
+			var/X = pick(GLOB.department_centers)
+			var/mob/living/simple_animal/hostile/kqe_heart/H = new(get_turf(X))
+			heart = H
+			H.abno_host = src
 		Stagger()
-
+		manual_emote("blares random letters on its terminal before turning it off.")
 
 /mob/living/simple_animal/hostile/abnormality/kqe/death()
-	..()
+	if(!heart)
+		return Life()//PRANKED!
 	can_act = FALSE
-	for(var/mob/living/simple_animal/hostile/kqe_heart/H in heart_list)
-		H.apply_damage(5000)//kill the heart of the townsfolk
 	icon_state = icon_dead
 	animate(src, alpha = 0, time = 10 SECONDS)
 	QDEL_IN(src, 10 SECONDS)
+	if(istype(heart, /mob/living/simple_animal/hostile/kqe_heart))
+		qdel(heart)
+	..()
 
 /*** Work Procs ***/
 /mob/living/simple_animal/hostile/abnormality/kqe/WorkComplete(user, work_type, pe, work_time, canceled)
@@ -153,14 +166,16 @@
 	..()
 
 /mob/living/simple_animal/hostile/abnormality/kqe/proc/Stagger()
+	can_act = FALSE
 	icon_state = "kqe_prepare"
 	SLEEP_CHECK_DEATH(10 SECONDS)
 	icon_state = icon_living
+	can_act = TRUE
 
 /mob/living/simple_animal/hostile/abnormality/kqe/AttackingTarget(atom/attacked_target)
 	if(!can_act)
 		return FALSE
-	if ((grab_cooldown <= world.time) && prob(35))
+	if ((grab_cooldown <= world.time) && prob(35) && (!client))//checks for client since you can still use the claw if you click nearby
 		var/turf/target_turf = get_turf(target)
 		return ClawGrab(target_turf)
 	return Whip_Attack()
@@ -182,6 +197,13 @@
 
 /mob/living/simple_animal/hostile/abnormality/kqe/OpenFire()
 	if(!can_act)
+		return
+	if(client)
+		switch (chosen_attack)
+			if (1)
+				ClawGrab(target)
+			if (2)
+				return
 		return
 	if(grab_cooldown <= world.time)
 		ClawGrab(target)
@@ -269,15 +291,8 @@
 	obj_damage = 50
 	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
 	speed = 5
-	del_on_death = TRUE
 	density = TRUE
-	var/list/host = list()
-
-/mob/living/simple_animal/hostile/kqe_heart/Initialize()
-	. = ..()
-	var target = /mob/living/simple_animal/hostile/abnormality/kqe
-	for(target in GLOB.mob_living_list)
-		host += target
+	var/mob/living/simple_animal/hostile/abnormality/kqe/abno_host//This is KQE!
 
 /mob/living/simple_animal/hostile/kqe_heart/Move()
 	return FALSE
@@ -286,9 +301,8 @@
 	return FALSE
 
 /mob/living/simple_animal/hostile/kqe_heart/death()
-	..()
-	for(var/mob/living/simple_animal/hostile/abnormality/kqe/D in host)
-		D.apply_damage(5000)//kill kqe
-		host -= D
+	if(abno_host)
+		abno_host.death()
 	animate(src, alpha = 0, time = 10 SECONDS)
 	QDEL_IN(src, 10 SECONDS)
+	..()

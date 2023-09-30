@@ -23,7 +23,7 @@
 	. = ..()
 	for(var/mob/living/L in view(1, M))
 		var/aoe = 25
-		var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		aoe*=justicemod
 		if(L == user || ishuman(L))
@@ -349,7 +349,7 @@
 	combo_time = world.time + combo_wait
 	if(combo >= 13)
 		combo = 0
-		force = get_attribute_level(user, JUSTICE_ATTRIBUTE)
+		force = get_modified_attribute_level(user, JUSTICE_ATTRIBUTE)
 		new /obj/effect/temp_visual/thirteen(get_turf(M))
 		playsound(src, 'sound/weapons/ego/price_of_silence.ogg', 25, FALSE, 9)
 	..()
@@ -554,7 +554,7 @@
 	for(var/turf/T in orange(1, user)) // Most of this code was jacked from Harvest tbh
 		new /obj/effect/temp_visual/smash_effect(T)
 	var/aoe = special_force * (1 + special_combo_mult * special_combo)
-	var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+	var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 	var/justicemod = 1 + userjust/100
 	aoe*=justicemod
 	for(var/mob/living/L in range(1, user))
@@ -582,7 +582,7 @@
 			new /obj/effect/temp_visual/smash_effect(T)
 			for(var/mob/living/L in T.contents)
 				var/aoe = special_force * 1 + (special_combo_mult * special_combo)
-				var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+				var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 				var/justicemod = 1 + userjust/100
 				aoe*=justicemod
 				if(L == user)
@@ -1076,7 +1076,7 @@
 		if(prob(10))
 			new /obj/effect/gibspawner/generic/silent/wrath_acid(get_turf(M))
 		return
-	var/damage = aoe_damage * (1 + (get_attribute_level(user, JUSTICE_ATTRIBUTE))/100)
+	var/damage = aoe_damage * (1 + (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))/100)
 	if(attacks == 0)
 		damage *= 3
 	for(var/turf/open/T in range(aoe_range, M))
@@ -1167,7 +1167,7 @@
 
 		mark_damage = force*2
 		//I gotta grab  justice here
-		var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		mark_damage *= justicemod
 
@@ -1248,7 +1248,7 @@
 	can_spin = FALSE
 	if(do_after(user, 13, src))
 		var/aoe = force
-		var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		var/firsthit = TRUE //One target takes full damage
 		can_spin = TRUE
@@ -1432,7 +1432,7 @@
 		if(L.z != user.z) // Not on our level
 			continue
 		var/aoe = 25
-		var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		aoe*=justicemod
 		if(L == user || ishuman(L))
@@ -1545,3 +1545,107 @@
 		A.attackby(src,user)
 	playsound(src, 'sound/weapons/fwoosh.ogg', 300, FALSE, 9)
 	to_chat(user, "<span class='warning'>You dash to [A]!")
+
+/obj/item/ego_weapon/cobalt
+	name = "cobalt scar"
+	desc = "Once upon a time, these claws would cut open the bellies of numerous creatures and tear apart their guts."
+	special = "Preform an additional attack of 50% damage when at half health."
+	icon_state = "cobalt"
+	force = 20
+	attack_speed = 0.5
+	damtype = RED_DAMAGE
+	armortype = RED_DAMAGE
+	attack_verb_continuous = list("claws")
+	attack_verb_simple = list("claw")
+	hitsound = 'sound/abnormalities/big_wolf/Wolf_Hori.ogg'
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 60,
+							TEMPERANCE_ATTRIBUTE = 60
+							)
+
+/obj/item/ego_weapon/cobalt/attack(mob/living/target, mob/living/user)
+	if(!..())
+		return
+	var/our_health = 100 * (user.health / user.maxHealth)
+	if(our_health <= 50 && isliving(target) && target.stat != DEAD)
+		FrenzySwipe(user)
+
+//Attack again but with less of the code.
+/obj/item/ego_weapon/cobalt/proc/FrenzySwipe(mob/living/wolf)
+	var/list/killers = list()
+	for(var/mob/living/hunters in oview(get_turf(wolf), 1))
+		//This is placed here as a safety net in the case that the user is in the middle of 30 enemies
+		if(killers.len >= 5)
+			break
+		if(hunters.stat == DEAD)
+			continue
+		killers += hunters
+	if(!killers.len)
+		return FALSE
+	var/mob/living/those_we_rend = pick(killers)
+	if(!those_we_rend)
+		return FALSE
+	if(prob(25))
+		wolf.visible_message("<span class='warning'>[wolf] claws [those_we_rend] in a blind frenzy!</span>", "<span class='warning'>You swipe your claws at [those_we_rend]!</span>")
+	wolf.do_attack_animation(those_we_rend)
+	those_we_rend.apply_damage(10, damtype, null, those_we_rend.run_armor_check(null, damtype), spread_damage = TRUE)
+	those_we_rend.lastattacker = wolf.real_name
+	those_we_rend.lastattackerckey = wolf.ckey
+	playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
+	wolf.log_message(" attacked [those_we_rend] due to the cobalt scar weapon ability.", LOG_ATTACK) //the following attack will log itself
+	return TRUE
+
+/obj/item/ego_weapon/scene
+	name = "as written in the scenario"
+	desc = "The scenario is about a man who was raised in a normal family. \
+	One day, he picks up a mask from the street and goes on to impulsively murder all the people that he knows."
+	special = "This weapon can store damage dealt for later healing."
+	icon_state = "scenario"
+	force = 38
+	damtype = WHITE_DAMAGE
+	armortype = WHITE_DAMAGE
+	attack_verb_continuous = list("disrespects", "sullies")
+	attack_verb_simple = list("disrespect", "sully")
+	hitsound = 'sound/effects/fish_splash.ogg'
+	attribute_requirements = list(
+							PRUDENCE_ATTRIBUTE = 80
+							)
+	var/amount_filled
+	var/amount_max = 30
+
+/obj/item/ego_weapon/scene/update_icon_state()
+	. = ..()
+	if(amount_filled)
+		icon_state = "scenario_filled"
+	else
+		icon_state = "scenario"
+
+/obj/item/ego_weapon/scene/attack(mob/living/target, mob/living/carbon/human/user)
+	if(!CanUseEgo(user))
+		return
+	if(!(target.status_flags & GODMODE) && target.stat != DEAD)
+		var/heal_amt = force*0.05
+		if(isanimal(target))
+			var/mob/living/simple_animal/S = target
+			if(S.damage_coeff[damtype] > 0)
+				heal_amt *= S.damage_coeff[damtype]
+			else
+				heal_amt = 0
+		amount_filled = clamp(amount_filled + heal_amt, 0, amount_max)
+		if(amount_filled >= amount_max)
+			to_chat(user, "<span class='warning'>[src] is full!")
+	update_icon()
+	..()
+
+/obj/item/ego_weapon/scene/attack_self(mob/living/carbon/human/user)
+	..()
+	if(!amount_filled)
+		to_chat(user, "<span class='warning'>[src] is empty!")
+		return
+	if(do_after(user, 12, src))
+		to_chat(user, "<span class='warning'>You take a sip from [src]!")
+		playsound(get_turf(src), 'sound/items/drink.ogg', 50, TRUE) //slurp
+		user.adjustBruteLoss(-amount_filled)
+		user.adjustSanityLoss(-amount_filled)
+		amount_filled = 0
+	update_icon()

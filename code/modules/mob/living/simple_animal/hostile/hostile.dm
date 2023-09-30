@@ -24,6 +24,7 @@
 
 	var/rapid_melee = 1			 //Number of melee attacks between each npc pool tick. Spread evenly.
 	var/melee_queue_distance = 4 //If target is close enough start preparing to hit them if we have rapid_melee enabled
+	var/melee_reach = 1			 // The range at which a mob can make melee attacks
 
 	var/ranged_message = "fires" //Fluff text for ranged mobs
 	var/ranged_cooldown = 0 //What the current cooldown on ranged attacks is, generally world.time + ranged_cooldown_time
@@ -77,8 +78,11 @@
 
 	if(!targets_from)
 		targets_from = src
+	/*Update Speed overrides set speed and sets it
+		to the equivilent of move_to_delay. Basically
+		move_to_delay - 2 = speed. */
+	UpdateSpeed()
 	wanted_objects = typecacheof(wanted_objects)
-
 
 /mob/living/simple_animal/hostile/Destroy()
 	targets_from = null
@@ -130,9 +134,11 @@
 /mob/living/simple_animal/hostile/update_stamina()
 	. = ..()
 	move_to_delay = (initial(move_to_delay) + (staminaloss * 0.06))
+	UpdateSpeed()
 
 /mob/living/simple_animal/hostile/proc/SpeedChange(amount = 0)
 	move_to_delay += amount
+	UpdateSpeed()
 
 /mob/living/simple_animal/hostile/proc/TemporarySpeedChange(amount = 0, time = 0)
 	if(time <= 0)
@@ -170,6 +176,21 @@
 			FindTarget(list(P.firer), 1)
 		Goto(P.starting, move_to_delay, 3)
 	return ..()
+
+/*Used in LC13 abnormality calculations.
+	Moved here so we can use it for all hostiles.
+	So this took me a while to figure out,
+	player controlled mob speed is default
+	2 when in running mode. The "speed" variable
+	isnt actually adding it up from 0. Its a
+	multiplication of a 1 that is added to the 2.
+	move_to_delay is the lag in deciseconds. So
+	to fix this the speed should be move_to_delay -2.
+	Also this doesnt fix Stamina Update since it uses
+	initial - IP*/
+//Also is it frowned upon to make a proc just a single proc but with a unique var
+/mob/living/simple_animal/hostile/proc/UpdateSpeed()
+	set_varspeed(move_to_delay - 2)
 
 //////////////HOSTILE MOB TARGETTING AND AGGRESSION////////////
 
@@ -306,8 +327,13 @@
 		GainPatience()
 
 /mob/living/simple_animal/hostile/proc/CheckAndAttack()
-	if(target && targets_from && isturf(targets_from.loc) && target.Adjacent(targets_from) && !incapacitated())
+	if(!target)
+		return FALSE
+	var/in_range = melee_reach > 1 ? target.Adjacent(targets_from) || (get_dist(src, target) <= melee_reach && (target in view(src, melee_reach))) : target.Adjacent(targets_from)
+	if(targets_from && isturf(targets_from.loc) && in_range && !incapacitated())
 		AttackingTarget()
+		return TRUE
+	return FALSE
 
 /mob/living/simple_animal/hostile/proc/MoveToTarget(list/possible_targets)//Step 5, handle movement between us and our target
 	stop_automated_movement = 1
@@ -320,8 +346,9 @@
 			LoseTarget()
 			return 0
 		var/target_distance = get_dist(targets_from,target)
+		var/in_range = melee_reach > 1 ? target.Adjacent(targets_from) || (get_dist(src, target) <= melee_reach && (target in view(src, melee_reach))) : target.Adjacent(targets_from)
 		if(ranged) //We ranged? Shoot at em
-			if(!target.Adjacent(targets_from) && ranged_cooldown <= world.time) //But make sure they're not in range for a melee attack and our range attack is off cooldown
+			if(!in_range && ranged_cooldown <= world.time) //But make sure they're not in range for a melee attack and our range attack is off cooldown
 				OpenFire(target)
 		if(charger && (target_distance > minimum_distance) && (target_distance <= charge_distance))//Attempt to close the distance with a charge.
 			enter_charge(target)
@@ -337,7 +364,7 @@
 		else
 			Goto(target,move_to_delay,minimum_distance)
 		if(target)
-			if(targets_from && isturf(targets_from.loc) && target.Adjacent(targets_from)) //If they're next to us, attack
+			if(targets_from && isturf(targets_from.loc) && in_range) //If they're next to us, attack
 				MeleeAction()
 			else
 				if(rapid_melee > 1 && target_distance <= melee_queue_distance)
@@ -382,6 +409,10 @@
 /mob/living/simple_animal/hostile/proc/AttackingTarget(atom/attacked_target)
 	SEND_SIGNAL(src, COMSIG_HOSTILE_ATTACKINGTARGET, target)
 	in_melee = TRUE
+	if(ismob(target))
+		changeNext_move(SSnpcpool.wait / rapid_melee)
+		// Wow! that's a really weird variable to base attack speed on! Yes.
+		// It's because mobs typically attack once per this duration, because the subsystem calls handle_automated_movement() which then calls the attacking procs.
 	return target.attack_animal(src)
 
 /mob/living/simple_animal/hostile/proc/Aggro()
@@ -480,6 +511,25 @@
 	else
 		return ..()
 
+/mob/living/simple_animal/hostile/CanAllowThrough(atom/movable/mover, turf/target)
+	. = ..()
+	if(.)
+		return
+	if(target == mover) // "I'm KILLING YOU, I'm KILLING YOU" - Jerma985
+		return FALSE
+	if(ishostile(mover))
+		var/mob/living/simple_animal/hostile/H = mover
+		if(H.target)
+			return
+		if(LAZYLEN(H.patrol_path)) // Don't block patrolling guys
+			return TRUE
+		return
+	if(ishuman(mover))
+		var/mob/living/carbon/human/H = mover
+		if(H.sanity_lost) // Don't block crazy people
+			return TRUE
+	return
+
 /mob/living/simple_animal/hostile/proc/dodge(moving_to,move_direction)
 	//Assuming we move towards the target we want to swerve toward them to get closer
 	var/cdir = turn(move_direction,45)
@@ -546,12 +596,16 @@
 		return 1
 
 
-/mob/living/simple_animal/hostile/RangedAttack(atom/A, params) //Player firing
+/mob/living/simple_animal/hostile/RangedAttack(atom/A, params) //Player firing and Player reach melee handling
+	. = ..()
+	if(!client)
+		return
+	target = A
+	if(CheckAndAttack(A))
+		return
 	if(ranged && ranged_cooldown <= world.time)
-		target = A
 		OpenFire(A)
-	return ..()
-
+	return
 
 ////// AI Status ///////
 /mob/living/simple_animal/hostile/proc/AICanContinue(list/possible_targets)
@@ -705,8 +759,10 @@
 	return TRUE
 
 /mob/living/simple_animal/hostile/proc/patrol_select()
-	//Mobs should stay unpatroled on combat maps.
-	if(SSmaptype.maptype in SSmaptype.combatmaps)
+	//Mobs should stay unpatroled on maps where they're intended to be possessed.
+	if(SSmaptype.maptype in SSmaptype.autopossess)
+		return
+	if(!LAZYLEN(GLOB.department_centers))
 		return
 
 	var/turf/target_center
@@ -719,6 +775,8 @@
 		target_center = pick(potential_centers)
 	else
 		target_center = pick(GLOB.department_centers)
+	SEND_SIGNAL(src, COMSIG_PATROL_START, src, target_center)
+	SEND_GLOBAL_SIGNAL(src, COMSIG_GLOB_PATROL_START, src, target_center)
 	patrol_path = get_path_to(src, target_center, /turf/proc/Distance_cardinal, 0, 200)
 
 /mob/living/simple_animal/hostile/proc/patrol_reset()

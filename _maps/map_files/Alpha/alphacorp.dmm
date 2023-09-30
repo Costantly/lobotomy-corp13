@@ -144,11 +144,8 @@
 /turf/closed/indestructible/rock,
 /area/space)
 "be" = (
-/obj/effect/turf_decal/siding/red{
-	dir = 8
-	},
-/obj/machinery/vending/custom/unbreakable,
-/turf/open/floor/carpet/royalblack,
+/obj/machinery/smartfridge/extraction_storage/ego_weapon,
+/turf/closed/indestructible/reinforced,
 /area/department_main/control)
 "bj" = (
 /obj/effect/turf_decal/siding/yellow,
@@ -727,6 +724,10 @@
 /obj/machinery/camera/autoname,
 /turf/open/floor/plasteel,
 /area/facility_hallway/west)
+"fz" = (
+/obj/structure/chair/office,
+/turf/open/floor/carpet/purple,
+/area/department_main/information)
 "fB" = (
 /obj/effect/turf_decal/siding/brown/corner,
 /turf/open/floor/facility,
@@ -844,8 +845,7 @@
 /obj/machinery/camera/autoname{
 	dir = 1
 	},
-/obj/structure/rack,
-/obj/item/storage/belt/ego,
+/obj/machinery/vending/custom/unbreakable,
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "gR" = (
@@ -1618,6 +1618,7 @@
 /obj/machinery/light,
 /obj/structure/rack,
 /obj/item/storage/belt/ego,
+/obj/item/clothing/suit/armor/vest/alt,
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "mC" = (
@@ -1891,11 +1892,10 @@
 /turf/open/floor/plasteel,
 /area/facility_hallway/north)
 "oM" = (
-/obj/structure/sign/departments/info{
-	pixel_x = -32
+/obj/machinery/door/airlock/vault{
+	name = "Backwards Clock containment zone"
 	},
-/obj/structure/table/glass,
-/turf/open/floor/carpet/purple,
+/turf/open/floor/plasteel/dark,
 /area/department_main/information)
 "oN" = (
 /obj/machinery/camera/autoname{
@@ -2419,7 +2419,7 @@
 "sK" = (
 /obj/structure/sign/poster/official/obey,
 /turf/closed/indestructible/reinforced,
-/area/facility_hallway/south)
+/area/department_main/information)
 "sN" = (
 /obj/item/target/alien,
 /obj/effect/turf_decal/box,
@@ -2667,6 +2667,9 @@
 /obj/structure/table/wood,
 /turf/open/floor/carpet/orange,
 /area/department_main/training)
+"uq" = (
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "uu" = (
 /obj/effect/turf_decal/siding/brown{
 	dir = 4
@@ -2909,12 +2912,10 @@
 /turf/open/floor/carpet/black,
 /area/department_main/records)
 "wf" = (
-/obj/structure/table/glass,
-/obj/item/paper_bin,
 /obj/machinery/status_display{
 	pixel_x = -32
 	},
-/obj/item/pen,
+/obj/structure/table/glass,
 /turf/open/floor/carpet/purple,
 /area/department_main/information)
 "wh" = (
@@ -3057,6 +3058,10 @@
 	},
 /obj/structure/table/glass,
 /turf/open/floor/carpet/purple,
+/area/department_main/information)
+"wX" = (
+/obj/effect/spawner/structure/window/reinforced,
+/turf/open/floor/plasteel/dark,
 /area/department_main/information)
 "wZ" = (
 /obj/effect/turf_decal/box/white,
@@ -3723,11 +3728,16 @@
 /turf/open/floor/plasteel/dark,
 /area/department_main/records)
 "Cn" = (
-/obj/machinery/camera/autoname{
-	dir = 1
+/obj/structure/filingcabinet{
+	pixel_x = -10
 	},
-/obj/structure/rack,
-/obj/item/clothing/suit/armor/vest/alt,
+/obj/structure/filingcabinet,
+/obj/structure/filingcabinet{
+	pixel_x = 10
+	},
+/obj/structure/sign/departments/extraction{
+	pixel_x = 32
+	},
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "Cp" = (
@@ -3938,6 +3948,12 @@
 /obj/item/encryptionkey/headset_information,
 /obj/item/encryptionkey/headset_information,
 /obj/item/encryptionkey/headset_information,
+/turf/open/floor/carpet/purple,
+/area/department_main/information)
+"Ec" = (
+/obj/structure/table/glass,
+/obj/item/paper_bin,
+/obj/item/pen,
 /turf/open/floor/carpet/purple,
 /area/department_main/information)
 "Eg" = (
@@ -4339,6 +4355,9 @@
 /obj/machinery/newscaster{
 	pixel_x = 32
 	},
+/obj/machinery/light{
+	dir = 4
+	},
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "Ib" = (
@@ -4619,6 +4638,7 @@
 /obj/machinery/light,
 /obj/structure/rack,
 /obj/item/clothing/suit/armor/vest/alt,
+/obj/item/storage/belt/ego,
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "JP" = (
@@ -4858,6 +4878,9 @@
 "LI" = (
 /turf/open/floor/plasteel,
 /area/facility_hallway/central)
+"LL" = (
+/turf/closed/indestructible/reinforced,
+/area/space)
 "LN" = (
 /obj/effect/spawner/abnormality_room,
 /turf/closed/indestructible/reinforced,
@@ -4986,6 +5009,10 @@
 /obj/item/storage/belt/ego,
 /turf/open/floor/plasteel,
 /area/facility_hallway/north)
+"MT" = (
+/obj/structure/toolabnormality/clock,
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "Na" = (
 /obj/effect/turf_decal/siding/red{
 	dir = 1
@@ -5382,11 +5409,15 @@
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "Qe" = (
-/obj/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/carpet/red,
+/obj/machinery/smartfridge/extraction_storage/ego_armor,
+/turf/closed/indestructible/reinforced,
 /area/department_main/control)
+"Qg" = (
+/obj/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "Qh" = (
 /obj/effect/turf_decal/siding/purple{
 	dir = 6
@@ -5903,9 +5934,6 @@
 /area/facility_hallway/central)
 "TO" = (
 /obj/machinery/computer/ego_purchase,
-/obj/machinery/newscaster{
-	pixel_y = 32
-	},
 /turf/open/floor/carpet/royalblack,
 /area/department_main/control)
 "TX" = (
@@ -6358,6 +6386,10 @@
 "WW" = (
 /turf/open/floor/wood,
 /area/department_main/command)
+"Xd" = (
+/obj/machinery/camera/autoname,
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "Xe" = (
 /obj/structure/table/glass,
 /obj/machinery/recharger{
@@ -6487,10 +6519,11 @@
 /turf/open/floor/carpet/red,
 /area/department_main/control)
 "Yg" = (
-/obj/structure/sign/departments/extraction{
-	pixel_x = 32
+/obj/effect/turf_decal/siding/red{
+	dir = 8
 	},
-/turf/open/floor/carpet/red,
+/obj/structure/table/reinforced,
+/turf/open/floor/carpet/royalblack,
 /area/department_main/control)
 "Yj" = (
 /obj/structure/curtain,
@@ -36788,11 +36821,11 @@ Kn
 Nn
 Kw
 Uf
-Kn
-Kn
-Kn
-ZL
-ZL
+LX
+LX
+LX
+LX
+LX
 ZL
 ZL
 ZL
@@ -37046,10 +37079,10 @@ Nn
 Kw
 DQ
 sK
-ZL
-ZL
-ZL
-ZL
+Xd
+uq
+uq
+LX
 ZL
 ZL
 ZL
@@ -37302,14 +37335,14 @@ Kn
 Nn
 Kw
 DQ
-Kn
 LX
+Qg
+MT
+uq
 LX
-LX
-ZL
-ZL
-ZL
-ZL
+LL
+LL
+LL
 ZL
 ZL
 ZL
@@ -37559,14 +37592,14 @@ Kn
 DV
 PJ
 ai
-Kn
+LX
+uq
+uq
+uq
+LX
 Dt
 UV
 LX
-ZL
-ZL
-ZL
-ZL
 ZL
 ZL
 ZL
@@ -37816,14 +37849,14 @@ Kn
 Kn
 QP
 Kn
-Kn
+LX
+wX
+oM
+wX
+LX
 bb
 bb
 LX
-ZL
-ZL
-ZL
-ZL
 ZL
 Kn
 Kn
@@ -38074,12 +38107,12 @@ cv
 Sg
 YM
 wf
-bJ
-qD
-LX
-LX
-LX
-LX
+Lz
+YM
+YM
+cv
+pf
+pf
 LX
 Kn
 Kn
@@ -38330,13 +38363,13 @@ YM
 YM
 Sg
 YM
-cP
-Mg
+fz
+Ec
 YM
-oM
-pf
-bb
-SV
+YM
+YM
+fP
+xH
 LX
 Kn
 Mr
@@ -38587,13 +38620,13 @@ pR
 YM
 Sg
 YM
-Lz
+YM
+cP
 YM
 YM
-fP
-xH
-bb
-aB
+YM
+YM
+sf
 LX
 Kn
 bX
@@ -38777,7 +38810,7 @@ Ol
 Ol
 TB
 Mi
-Cn
+gP
 rg
 vs
 yc
@@ -38848,9 +38881,9 @@ YM
 YM
 YM
 YM
-sf
-bb
-KB
+YM
+bJ
+qD
 LX
 Kn
 Bt
@@ -40393,7 +40426,7 @@ YM
 IT
 bb
 Iw
-LX
+SV
 Kn
 Mr
 Zb
@@ -40650,7 +40683,7 @@ YM
 Ur
 bb
 KF
-LX
+aB
 Kn
 bX
 Zb
@@ -40823,12 +40856,12 @@ ZL
 ZL
 ZL
 rg
-ta
+Cn
 FV
 FV
 FV
-Yg
-Qe
+FV
+FV
 Ia
 FV
 xu
@@ -40907,7 +40940,7 @@ Lt
 gv
 bb
 uP
-LX
+KB
 Kn
 Bt
 Zb
@@ -41084,8 +41117,8 @@ rg
 be
 tT
 tT
-rg
-rg
+Yg
+Qe
 rg
 FZ
 fo

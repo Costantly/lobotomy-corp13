@@ -80,7 +80,7 @@
 	SEND_SIGNAL(I, COMSIG_ITEM_ATTACK_ZONE, src, user, affecting)
 	send_item_attack_message(I, user, affecting.name, affecting)
 	if(I.force)
-		var/justice_mod = 1 + (get_attribute_level(user, JUSTICE_ATTRIBUTE)/100)
+		var/justice_mod = 1 + (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE)/100)
 		apply_damage((I.force * justice_mod), I.damtype, affecting, wound_bonus = I.wound_bonus, bare_wound_bonus = I.bare_wound_bonus, sharpness = I.get_sharpness(), white_healable = TRUE)
 		if(I.damtype == BRUTE && affecting.status == BODYPART_ORGANIC)
 			if(prob(33))
@@ -313,11 +313,14 @@
 						directional_blocked = TRUE
 						break
 		if((!target_table && !target_collateral_carbon && !target_disposal_bin) || directional_blocked)
+			log_combat(src, target, "shoved", "knocking them down")
+			if(SSmaptype.maptype == "city")
+				return
 			target.Knockdown(SHOVE_KNOCKDOWN_SOLID)
 			target.visible_message("<span class='danger'>[name] shoves [target.name], knocking [target.p_them()] down!</span>",
 							"<span class='userdanger'>You're knocked down from a shove by [name]!</span>", "<span class='hear'>You hear aggressive shuffling followed by a loud thud!</span>", COMBAT_MESSAGE_RANGE, src)
 			to_chat(src, "<span class='danger'>You shove [target.name], knocking [target.p_them()] down!</span>")
-			log_combat(src, target, "shoved", "knocking them down")
+			
 		else if(target_table)
 			target.Knockdown(SHOVE_KNOCKDOWN_TABLE)
 			target.visible_message("<span class='danger'>[name] shoves [target.name] onto \the [target_table]!</span>",

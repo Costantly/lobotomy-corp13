@@ -11,6 +11,13 @@
 	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/control)
+"ar" = (
+/obj/structure/closet/crate,
+/obj/effect/turf_decal/stripes/line{
+	dir = 5
+	},
+/turf/open/floor/plasteel/dark,
+/area/department_main/discipline)
 "au" = (
 /obj/machinery/regenerator,
 /obj/effect/turf_decal/siding/purple{
@@ -65,6 +72,10 @@
 /obj/machinery/light,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/information)
+"bn" = (
+/obj/machinery/smartfridge/extraction_storage/ego_weapon,
+/turf/closed/indestructible/reinforced,
+/area/department_main/extraction)
 "bo" = (
 /obj/structure/bodycontainer/crematorium{
 	id = "incinerator1"
@@ -482,6 +493,12 @@
 	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/discipline)
+"hJ" = (
+/obj/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "hK" = (
 /obj/structure/closet/crate,
 /obj/machinery/camera/autoname,
@@ -640,6 +657,10 @@
 /obj/machinery/vending/coffee,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/information)
+"jO" = (
+/obj/machinery/vending/custom/unbreakable,
+/turf/open/floor/plasteel/dark,
+/area/department_main/discipline)
 "jZ" = (
 /obj/effect/turf_decal/siding/brown/corner{
 	dir = 4
@@ -925,6 +946,10 @@
 	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/information)
+"od" = (
+/obj/machinery/camera/autoname,
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "of" = (
 /obj/effect/turf_decal/siding/purple{
 	dir = 9
@@ -1488,6 +1513,10 @@
 	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/discipline)
+"xl" = (
+/obj/machinery/smartfridge/extraction_storage/ego_armor,
+/turf/closed/indestructible/reinforced,
+/area/department_main/extraction)
 "xm" = (
 /obj/effect/turf_decal/stripes/line,
 /obj/structure/sign/departments/welfare{
@@ -2247,6 +2276,12 @@
 "IE" = (
 /turf/open/floor/wood,
 /area/department_main/welfare)
+"IU" = (
+/obj/machinery/door/airlock/vault{
+	name = "Backwards Clock containment zone"
+	},
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "IX" = (
 /obj/structure/table/wood,
 /obj/item/clothing/accessory/armband/lobotomy/training,
@@ -2421,6 +2456,10 @@
 "LJ" = (
 /turf/open/floor/plasteel/elevatorshaft,
 /area/facility_hallway/safety)
+"LK" = (
+/obj/effect/spawner/structure/window/reinforced,
+/turf/open/floor/plasteel/dark,
+/area/department_main/information)
 "LR" = (
 /obj/effect/turf_decal/siding/green{
 	dir = 4
@@ -2954,6 +2993,13 @@
 /obj/item/storage/belt/ego,
 /turf/open/floor/carpet/royalblack,
 /area/department_main/extraction)
+"SJ" = (
+/obj/structure/closet/crate,
+/obj/effect/turf_decal/stripes/line{
+	dir = 9
+	},
+/turf/open/floor/plasteel/dark,
+/area/department_main/discipline)
 "SL" = (
 /obj/structure/table/glass,
 /obj/item/clothing/accessory/armband/lobotomy/info,
@@ -3207,6 +3253,10 @@
 "WH" = (
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/welfare)
+"WL" = (
+/obj/structure/toolabnormality/clock,
+/turf/open/floor/plasteel/dark,
+/area/space)
 "WS" = (
 /turf/open/floor/plating,
 /area/facility_hallway/training)
@@ -39836,10 +39886,10 @@ QD
 QD
 QD
 QD
-QD
-QD
-QD
-QD
+Yb
+Yb
+Yb
+Yb
 Yb
 SW
 SW
@@ -40093,10 +40143,10 @@ QD
 QD
 QD
 QD
-QD
-QD
-QD
-QD
+Yb
+od
+Yq
+Yq
 Yb
 SW
 SW
@@ -40350,10 +40400,10 @@ QD
 QD
 QD
 QD
-QD
-QD
-QD
-QD
+Yb
+hJ
+WL
+Yq
 Yb
 SW
 SW
@@ -40607,10 +40657,10 @@ QD
 QD
 QD
 QD
-QD
-QD
-QD
-QD
+Yb
+Yq
+Yq
+Yq
 Yb
 Yb
 Yb
@@ -40865,9 +40915,9 @@ DM
 DM
 DM
 Yb
-Yb
-Yb
-Yb
+LK
+IU
+LK
 Yb
 yb
 fU
@@ -53231,7 +53281,7 @@ My
 My
 My
 My
-Oc
+ar
 XE
 GD
 pw
@@ -53488,7 +53538,7 @@ My
 My
 My
 My
-Oc
+jO
 XE
 XE
 XE
@@ -53745,7 +53795,7 @@ My
 My
 My
 My
-Oc
+SJ
 mh
 BY
 BY
@@ -54254,10 +54304,10 @@ QD
 QD
 XE
 KP
-KP
+xl
 Hz
 Hz
-KP
+bn
 TU
 KP
 mh

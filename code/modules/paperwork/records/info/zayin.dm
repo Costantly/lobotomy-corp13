@@ -51,7 +51,9 @@
 	abno_code = "T-09-85"
 	abno_info = list(
 		"The employee working on We Can Change Anything took continuous RED damage during work.",
-		"Upon successful work completion, the employee received a slight temporary resistance to RED damage.")
+		"Upon successful work completion, the employee received a slight temporary resistance to RED damage.",
+		"Placing an employee inside the machine will produce energy over time, and the RED damage was increased.",
+		"The amount of energy produced this way will increase as time goes by.")
 
 //Sleeping Beauty
 /obj/item/paper/fluff/info/zayin/sleeping
@@ -94,3 +96,14 @@
 	abno_info = list(
 		"When the abnormality was approached outside of work, it suddenly became extremely hostile to that specific employee.",
 		"Employees report the toad's cries having a soothing effect while in containment, recovering SP.")
+
+//Hammer of Light
+/obj/item/paper/fluff/info/zayin/hammer_light
+	abno_type = /mob/living/simple_animal/hostile/abnormality/hammer_light
+	abno_code = "O-05-48"
+	abno_info = list(
+		"Hammer of Light's room cannot be accessed when the facility is in peace, the seal is broken during an emergency.",
+		"When the seal is broken, an employee can simply walk up to the abnormality and pick up the hammer.",
+		"When a level 1 employee tried to pick up the hammer, they were reduced to ashes by its power.",
+		"When agent YumYum picked up the unsealed hammer, they were granted the immense power required to resolve the emergency situation.",
+		"However, once the situation began to settle down, YumYum disappeared.")

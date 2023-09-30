@@ -165,7 +165,7 @@
 
 /obj/structure/slowingmk1/Crossed(atom/movable/AM)
 	. = ..()
-	if(isabnormalitymob(AM))
+	if(ishostile(AM))
 		var/mob/living/simple_animal/hostile/L = AM
 		L.apply_status_effect(/datum/status_effect/qliphothoverload)
 		QDEL_IN(src, 2)
@@ -189,6 +189,10 @@
 
 /obj/item/powered_gadget/teleporter/attack_self(mob/user)
 	..()
+	var/area/turf_area = get_area(get_turf(user))
+	if(istype(turf_area, /area/fishboat))
+		to_chat(user, "<span class='warning'>The machine won't work, it's too damp!.</span>")
+		return
 	if(cell && cell.charge >= batterycost)
 		cell.charge = cell.charge - batterycost
 		icon_state = default_icon
@@ -296,7 +300,7 @@
 		user.visible_message(hit_message)
 		return
 	hit_message = "<span class='userdanger'>[user] smashes the taser into [T].</span>"
-	if(isabnormalitymob(T) && cell.charge >= batterycost_slow)
+	if(ishostile(T) && cell.charge >= batterycost_slow)
 		cell.charge = cell.charge - batterycost_slow
 		user.visible_message(hit_message)
 		T.apply_status_effect(/datum/status_effect/qliphothoverload)

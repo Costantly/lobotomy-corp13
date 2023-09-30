@@ -37,6 +37,7 @@
 	ranged = TRUE
 
 	ego_list = list(
+		/datum/ego_datum/weapon/nihil,
 		/datum/ego_datum/armor/nihil
 		)
 	gift_type = /datum/ego_gifts/nihil
@@ -134,19 +135,19 @@
 	. = ..()
 	if(ishuman(owner))
 		var/mob/living/carbon/human/L = owner
-		L.adjust_attribute_buff(FORTITUDE_ATTRIBUTE, -10 * stacks_added)
-		L.adjust_attribute_buff(PRUDENCE_ATTRIBUTE, -10 * stacks_added)
-		L.adjust_attribute_buff(TEMPERANCE_ATTRIBUTE, -10 * stacks_added)
-		L.adjust_attribute_buff(JUSTICE_ATTRIBUTE, -10 * stacks_added)
+		L.adjust_attribute_bonus(FORTITUDE_ATTRIBUTE, -10 * stacks_added)
+		L.adjust_attribute_bonus(PRUDENCE_ATTRIBUTE, -10 * stacks_added)
+		L.adjust_attribute_bonus(TEMPERANCE_ATTRIBUTE, -10 * stacks_added)
+		L.adjust_attribute_bonus(JUSTICE_ATTRIBUTE, -10 * stacks_added)
 
 /datum/status_effect/stacking/void/on_remove()
 	. = ..()
 	if(ishuman(owner))
 		var/mob/living/carbon/human/L = owner
-		L.adjust_attribute_buff(FORTITUDE_ATTRIBUTE, 10 * stacks)
-		L.adjust_attribute_buff(PRUDENCE_ATTRIBUTE, 10 * stacks)
-		L.adjust_attribute_buff(TEMPERANCE_ATTRIBUTE, 10 * stacks)
-		L.adjust_attribute_buff(JUSTICE_ATTRIBUTE, 10 * stacks)
+		L.adjust_attribute_bonus(FORTITUDE_ATTRIBUTE, 10 * stacks)
+		L.adjust_attribute_bonus(PRUDENCE_ATTRIBUTE, 10 * stacks)
+		L.adjust_attribute_bonus(TEMPERANCE_ATTRIBUTE, 10 * stacks)
+		L.adjust_attribute_bonus(JUSTICE_ATTRIBUTE, 10 * stacks)
 		to_chat(owner, "<span class='nicegreen'>You feel normal again.</span>")
 		if(owner.client)
 			owner.remove_client_colour(/datum/client_colour/monochrome)

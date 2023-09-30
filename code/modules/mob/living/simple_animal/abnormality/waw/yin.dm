@@ -26,8 +26,7 @@
 						ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 40, 40),
 						ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 55),
 						ABNORMALITY_WORK_ATTACHMENT = 0,
-						ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40),
-						"Release" = 0
+						ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40)
 						)
 	max_boxes = 20
 	success_boxes = 16
@@ -271,7 +270,7 @@
 	sound_to_playing_players_on_level("sound/abnormalities/yin/dragon_spawn.ogg", 75, zlevel = src.z)
 	for(var/i = 0 to 7)
 		var/obj/effect/yinyang_dragon/DP
-		var/turf/T = path[8-i]
+		var/turf/T = path[15-(i*2)]
 		var/list/temp_path = getline(T, end_turf)
 		switch(i)
 			if(0)
@@ -303,7 +302,7 @@
 	return
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/DragonFlip(obj/effect/yinyang_dragon/DP)
-	for(var/obj/machinery/computer/abnormality/AC in range(1, DP))
+	for(var/obj/machinery/computer/abnormality/AC in range(2, DP))
 		if(AC in hit_people)
 			continue
 		if(!AC.datum_reference.current)
@@ -314,7 +313,7 @@
 		AC.datum_reference.qliphoth_change(999)
 		AC.datum_reference.qliphoth_change(-qlip)
 		hit_people += AC
-	for(var/mob/living/L in range(1, DP))
+	for(var/mob/living/L in range(2, DP))
 		if(L in hit_people)
 			continue
 		if(L.type in prohibitted_flips)
@@ -341,6 +340,10 @@
 	desc = "All that isn't shall become all that is."
 	icon = 'ModularTegustation/Teguicons/64x64.dmi'
 	icon_state = "dragon_body"
+
+/obj/effect/yinyang_dragon/Initialize(mapload)
+	. = ..()
+	src.transform *= 1.5
 
 /obj/effect/yinyang_dragon/Destroy(force)
 	. = ..()

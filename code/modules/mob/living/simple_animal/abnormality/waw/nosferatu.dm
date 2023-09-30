@@ -1,3 +1,4 @@
+#define NOSFERATU_BANQUET_COOLDOWN (12 SECONDS)
 //Coded by Coxswain, sprited by crabby
 /mob/living/simple_animal/hostile/abnormality/nosferatu
 	name = "Nosferatu"
@@ -59,6 +60,30 @@
 	var/summon_cooldown_time = 60 SECONDS
 	var/bat_spawn_limit = 6
 	var/bat_spawn_number = 3
+
+	//PLAYABLES ATTACKS
+	attack_action_types = list(/datum/action/cooldown/nosferatu_banquet)
+
+//Playables buttons
+/datum/action/cooldown/nosferatu_banquet
+	name = "Banquet"
+	icon_icon = 'icons/mob/actions/actions_abnormality.dmi'
+	button_icon_state = "nosferatu"
+	check_flags = AB_CHECK_CONSCIOUS
+	transparent_when_unavailable = TRUE
+	cooldown_time = NOSFERATU_BANQUET_COOLDOWN //12 seconds
+
+/datum/action/cooldown/nosferatu_banquet/Trigger()
+	if(!..())
+		return FALSE
+	if(!istype(owner, /mob/living/simple_animal/hostile/abnormality/nosferatu))
+		return FALSE
+	var/mob/living/simple_animal/hostile/abnormality/nosferatu/nosferatu = owner
+	if(nosferatu.IsContained()) // No more using cooldowns while contained
+		return FALSE
+	StartCooldown()
+	nosferatu.Banquet()
+	return TRUE
 
 //work code
 /mob/living/simple_animal/hostile/abnormality/nosferatu/FailureEffect(mob/living/carbon/human/user, work_type, pe)
@@ -129,8 +154,7 @@
 	animate(src, transform = matrix()*1.2, color = "#FF0000", time = 10)
 	playsound(get_turf(src), 'sound/abnormalities/nosferatu/transform.ogg', 35, 8)
 	bloodlust_cooldown = clamp(bloodlust_cooldown - 2, 0, 4)
-	move_to_delay -= 1
-	speed -= 1
+	SpeedChange(-1)
 	berzerk = TRUE
 
 /mob/living/simple_animal/hostile/abnormality/nosferatu/add_splatter_floor(turf/T, small_drip) //no spilling blood, it just works.
@@ -140,6 +164,10 @@
 /mob/living/simple_animal/hostile/abnormality/nosferatu/OpenFire()
 	if(!can_act)
 		return
+
+	if(client)
+		return
+
 	if((banquet_cooldown < world.time) && (get_dist(src, target) < 4))
 		Banquet()
 		return
@@ -229,3 +257,5 @@
 			B = new /obj/effect/decal/cleanable/blood(get_turf(src))
 			B.bloodiness = 100
 	return ..()
+
+#undef NOSFERATU_BANQUET_COOLDOWN

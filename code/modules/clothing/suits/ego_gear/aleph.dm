@@ -388,10 +388,23 @@ Any attempt to code risk class armor will result in a 10 day Github ban.*/
 	name = "Pink"
 	desc = "A pink military uniform. Its pockets allow the wearer to carry various types of ammunition. It soothes the wearer; they say pink provides psychological comfort to many people."
 	icon_state = "pink"
-	armor = list(RED_DAMAGE = 50, WHITE_DAMAGE = 70, BLACK_DAMAGE = 60, PALE_DAMAGE = 50)//230
+	armor = list(RED_DAMAGE = 50, WHITE_DAMAGE = 70, BLACK_DAMAGE = 70, PALE_DAMAGE = 50)//240
 	attribute_requirements = list(
 							FORTITUDE_ATTRIBUTE = 80,
 							PRUDENCE_ATTRIBUTE = 80,
 							TEMPERANCE_ATTRIBUTE = 100,
+							JUSTICE_ATTRIBUTE = 80
+							)
+
+/obj/item/clothing/suit/armor/ego_gear/aleph/combust
+	name = "Combusting Courage"
+	desc = "However, that alone won’t purge all evil from the world."
+	icon_state = "combust"
+	flags_inv = null
+	armor = list(RED_DAMAGE = 80, WHITE_DAMAGE = 40, BLACK_DAMAGE = 60, PALE_DAMAGE = 60)
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 100,
+							PRUDENCE_ATTRIBUTE = 80,
+							TEMPERANCE_ATTRIBUTE = 80,
 							JUSTICE_ATTRIBUTE = 80
 							)

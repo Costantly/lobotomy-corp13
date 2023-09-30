@@ -19,7 +19,7 @@
 		return FALSE
 	var/turf/T = get_turf(target)
 	//damage calculations
-	var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+	var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 	var/justicemod = 1 + userjust/100
 	force*=justicemod
 	user.HurtInTurf(T, list(target), force, RED_DAMAGE, hurt_mechs = TRUE, hurt_structure = TRUE)
@@ -70,7 +70,7 @@
 
 		for(var/mob/living/L in range(1, user))
 			var/aoe = 30
-			var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+			var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 			var/justicemod = 1 + userjust/100
 			aoe*=justicemod
 			if(L == user || ishuman(L))
@@ -362,7 +362,7 @@
 		var/list/been_hit = list()
 		for(var/turf/T in area_of_effect)
 			new /obj/effect/temp_visual/smash_effect(T)
-			var/smash_damage = (i > 2 ? 40 : 10)*(1+(get_attribute_level(user, JUSTICE_ATTRIBUTE)/100))
+			var/smash_damage = (i > 2 ? 40 : 10)*(1+(get_modified_attribute_level(user, JUSTICE_ATTRIBUTE)/100))
 			been_hit = user.HurtInTurf(T, been_hit, smash_damage, RED_DAMAGE)
 		if (i > 2)
 			playsound(get_turf(src), 'sound/abnormalities/woodsman/woodsman_strong.ogg', 75, 0, 5) // BAM
@@ -475,7 +475,7 @@
 	var/original_force = force
 	if(M == user && !happy && istype(user))
 		var/mob/living/carbon/human/H = user
-		var/justice_mod = 1 + (get_attribute_level(H, JUSTICE_ATTRIBUTE)/100)
+		var/justice_mod = 1 + (get_modified_attribute_level(H, JUSTICE_ATTRIBUTE)/100)
 		H.adjustSanityLoss(force * justice_mod) //we artificially inflict the justice + force damage so it bypass armor. the sanity damage should always feel like a gamble even with armor.
 		missing_sanity = (1 - (H.sanityhealth / H.maxSanity)) * 40 //the weapon gets 40% of your missing % of sanity as force so 90% missing sanity means +36 force.
 		force = 0
@@ -866,7 +866,7 @@
 			sacrifice = FALSE
 		for(var/mob/living/L in livinginrange(1, target))
 			var/aoe = 50
-			var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+			var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 			var/justicemod = 1 + userjust/100
 			aoe*=justicemod
 			if(L == user || ishuman(L))
@@ -943,7 +943,7 @@
 		if(L.z != user.z) // Not on our level
 			continue
 		var/aoe = 25
-		var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		aoe*=justicemod
 		if(L == user || ishuman(L))
@@ -1074,7 +1074,7 @@
 							JUSTICE_ATTRIBUTE = 40
 							)
 	var/release_message = "You release your charge, opening a rift!"
-	var/charge_effect = "create a temporary two-way portal."
+	var/charge_effect = "teleport and create a temporary two-way portal."
 	var/current_holder
 	var/charge_cost = 10
 	var/charge
@@ -1092,9 +1092,18 @@
 	current_holder = user
 
 /obj/item/ego_weapon/warp/Destroy(mob/user)
+	if(!user)
+		return ..()
 	UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
 	current_holder = null
 	return ..()
+
+/obj/item/ego_weapon/warp/dropped(mob/user)
+	. = ..()
+	if(!user)
+		return
+	UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
+	current_holder = null
 
 /obj/item/ego_weapon/warp/attack_self(mob/user)
 	..()
@@ -1115,10 +1124,13 @@
 
 /obj/item/ego_weapon/warp/afterattack(atom/target, mob/living/user, proximity_flag, clickparams)
 	if(!CanUseEgo(user))
+		to_chat(user, "<span class='notice'>You cannot use this!</span>")
 		return
 	if(!activated)
 		return
-	if(!isliving(target))
+	if(!LAZYLEN(get_path_to(src,target, /turf/proc/Distance, 0, 20)))
+		to_chat(user, "<span class='notice'>Invalid target.</span>")
+		activated = FALSE
 		return
 	if(!proximity_flag)
 		charge -= charge_cost
@@ -1385,7 +1397,7 @@
 		charged = FALSE
 
 /obj/item/ego_weapon/aedd/proc/power_attack(mob/living/target, mob/living/user)
-	var/userjust = (get_attribute_level(user, JUSTICE_ATTRIBUTE))
+	var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 	var/justicemod = 1 + userjust/100
 	target.apply_damage((force * justicemod), BLACK_DAMAGE, null, target.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 	playsound(src, 'sound/abnormalities/thunderbird/tbird_charge.ogg', 50, TRUE)
@@ -1403,11 +1415,14 @@
 	force = 33
 	reach = 2		//Has 2 Square Reach.
 	attack_speed = 1.8// really slow
-	damtype = BLACK_DAMAGE
-	armortype = BLACK_DAMAGE
+	damtype = RED_DAMAGE
+	armortype = RED_DAMAGE
 	attack_verb_continuous = list("stabs", "impales")
 	attack_verb_simple = list("stab", "impale")
 	hitsound = 'sound/weapons/ego/spear1.ogg'
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 40
+							)
 
 /obj/item/ego_weapon/lance/split/LowerLance(mob/user)
 	hitsound = 'sound/abnormalities/helper/attack.ogg'
@@ -1419,3 +1434,236 @@
 
 /obj/item/ego_weapon/lance/split/get_clamped_volume()
 	return 40
+
+/obj/item/ego_weapon/lance/lifestew_lance
+	name = "lifetime stew"
+	desc = "Salutations! I implore thee to try this soup!"
+	icon_state = "lifestew" //placeholder
+	lefthand_file = 'icons/mob/inhands/96x96_lefthand.dmi'
+	righthand_file = 'icons/mob/inhands/96x96_righthand.dmi'
+	inhand_x_dimension = 96
+	inhand_y_dimension = 96
+	force = 35
+	reach = 2		//Has 2 Square Reach.
+	attack_speed = 2.0 // really slow
+	damtype = BLACK_DAMAGE
+	armortype = BLACK_DAMAGE
+	attack_verb_continuous = list("burns", "boils")
+	attack_verb_simple = list("burn", "boil")
+	hitsound = 'sound/weapons/fixer/generic/fire1.ogg'
+	attribute_requirements = list(
+							TEMPERANCE_ATTRIBUTE = 40
+							)
+	charge_speed_cap = 3 //Charges slower, weaker overall while charging, dealing less damage at a full charge. But it has an AOE!
+	force_per_tile = 2
+	pierce_force_cost = 15
+
+/obj/item/ego_weapon/lance/lifestew_lance/UserBump(mob/living/carbon/human/user, atom/A)
+	. = ..()
+	if(charge_speed <= -(charge_speed_cap / 2)) //At a decent charge level, it'll do this once.
+		charge_speed += (2 * pierce_speed_cost)
+		if(isliving(A))
+			SoupBlast(user, A)
+
+/obj/item/ego_weapon/lance/lifestew_lance/proc/SoupBlast(mob/living/carbon/human/user, mob/target)
+	playsound(target, 'sound/abnormalities/bloodbath/Bloodbath_EyeOn.ogg', 80, TRUE, -3) //yes im reusing a sound bite me
+	for(var/turf/T in view(1, target))
+		var/obj/effect/temp_visual/small_smoke/halfsecond/FX =  new(T)
+		FX.color = "#622F22"
+		user.HurtInTurf(T, list(), 40, BLACK_DAMAGE, check_faction = TRUE)
+	return
+
+/obj/item/ego_weapon/lance/lifestew_lance/get_clamped_volume()
+	return 40
+
+/obj/item/ego_weapon/lifestew
+	name = "lifetime stew"
+	desc = "Take a large stone, put it into a sufficient quantity of boiling water; properly season it with pepper and salt... \
+	When the soup is made the stone may be thrown away!"
+	special = "This weapon stores up to 3 projectiles and gains a new projectile on a successful hit."
+	icon_state = "lifetime_stew"
+	lefthand_file = 'icons/mob/inhands/64x64_lefthand.dmi'
+	righthand_file = 'icons/mob/inhands/64x64_righthand.dmi'
+	inhand_x_dimension = 64
+	inhand_y_dimension = 64
+	force = 45	//Low dps. You'll see why later
+	attack_speed = 2
+	damtype = BLACK_DAMAGE
+	armortype = BLACK_DAMAGE
+	attack_verb_continuous = list("burns", "boils")
+	attack_verb_simple = list("burn", "boil")
+	hitsound = 'sound/weapons/fixer/generic/fire2.ogg'
+	attribute_requirements = list(
+							TEMPERANCE_ATTRIBUTE = 40
+							)
+	var/stored_projectiles = 0
+	var/projectile_max = 3
+	var/firing_cooldown = 0
+	var/firing_cooldown_time = 1 SECONDS
+
+/obj/item/ego_weapon/lifestew/update_icon_state(mob/living/user)
+	. = ..()
+	if(stored_projectiles)
+		icon_state = "lifetime_stew_charged"
+	else
+		icon_state = "lifetime_stew"
+	if(user)
+		user.update_inv_hands()
+
+/obj/item/ego_weapon/lifestew/Initialize()
+	RegisterSignal(src, COMSIG_PROJECTILE_ON_HIT, .proc/projectile_hit)
+	..()
+
+/obj/item/ego_weapon/lifestew/attack(mob/living/target, mob/living/carbon/human/user)
+	if(!CanUseEgo(user))
+		return
+	if(!(target.status_flags & GODMODE) && target.stat != DEAD)
+		if(stored_projectiles < projectile_max)
+			stored_projectiles += 1
+		else
+			to_chat(user, "<span class='warning'>[src] is full!")
+	update_icon_state(user)
+	..()
+
+/obj/item/ego_weapon/lifestew/afterattack(atom/target, mob/living/user, proximity_flag, clickparams)
+	if(!CanUseEgo(user))
+		return
+	if(!proximity_flag)
+		var/turf/proj_turf = user.loc
+		if(!isturf(proj_turf))
+			return
+		if(!stored_projectiles)
+			return
+		if(firing_cooldown >= world.time)
+			to_chat(user, "<span class='notice'>[src] is overheated and not ready to fire!</span>")
+			return
+		var/obj/projectile/ego_bullet/lifestew/G = new /obj/projectile/ego_bullet/lifestew(proj_turf)
+		G.fired_from = src //for signal check
+		playsound(user, 'sound/effects/fish_splash.ogg', 100, TRUE) //yes im reusing a sound bite me
+		G.firer = user
+		G.preparePixelProjectile(target, user, clickparams)
+		G.color = "#622F22"
+		G.fire()
+		firing_cooldown = firing_cooldown_time + world.time
+		stored_projectiles -= 1
+		update_icon_state(user)
+		return
+
+/obj/item/ego_weapon/lifestew/proc/projectile_hit(atom/fired_from, atom/movable/firer, atom/target, Angle)
+	SIGNAL_HANDLER
+	return TRUE
+
+/obj/projectile/ego_bullet/lifestew
+	name = "soup projectile"
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "extinguish"
+	hitsound = 'sound/abnormalities/ichthys/jump.ogg'
+	damage = 35
+	damage_type = BLACK_DAMAGE
+	flag = BLACK_DAMAGE
+
+#define STATUS_EFFECT_FAIRYBITE /datum/status_effect/fairybite
+/obj/item/ego_weapon/faelantern
+	name = "midwinter nightmare"
+	desc = "How's about I tell you a tale?"
+	special = "This weapon can fire a projectile that deals damage over time."
+	icon_state = "faelantern"
+	force = 40	//Very low dps. You'll see why later
+	attack_speed = 2
+	damtype = RED_DAMAGE
+	armortype = RED_DAMAGE
+	attack_verb_continuous = list("pokes", "slashes")
+	attack_verb_simple = list("poke", "slash")
+	hitsound = 'sound/weapons/fixer/generic/sword1.ogg'
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 40
+							)
+	var/firing_cooldown = 0
+	var/hit_cooldown_time = 10 SECONDS
+	var/firing_cooldown_time = 1 SECONDS
+
+/obj/item/ego_weapon/faelantern/update_icon_state(mob/living/user)
+	. = ..()
+	if(firing_cooldown < world.time)
+		icon_state = "faelantern"
+	else
+		icon_state = "faelantern_active"
+	if(user)
+		user.update_inv_hands()
+
+/obj/item/ego_weapon/faelantern/Initialize()
+	RegisterSignal(src, COMSIG_PROJECTILE_ON_HIT, .proc/projectile_hit)
+	..()
+
+/obj/item/ego_weapon/faelantern/afterattack(atom/target, mob/living/user, proximity_flag, clickparams)
+	if(!CanUseEgo(user))
+		return
+	if(!proximity_flag)
+		var/turf/proj_turf = user.loc
+		if(!isturf(proj_turf))
+			return
+		if(firing_cooldown >= world.time)
+			to_chat(user, "<span class='notice'>The fairy has yet to return!</span>")
+			return
+		var/obj/projectile/ego_bullet/faelantern/G = new /obj/projectile/ego_bullet/faelantern(proj_turf)
+		G.fired_from = src //for signal check
+		playsound(user, 'sound/abnormalities/orangetree/ding.ogg', 100, TRUE) //yes im reusing a sound bite me
+		G.firer = user
+		G.preparePixelProjectile(target, user, clickparams)
+		G.fire()
+		firing_cooldown = firing_cooldown_time + world.time
+		update_icon_state(user)
+		addtimer(CALLBACK(src, .proc/Reload, user), firing_cooldown_time + 3)
+		return
+
+/obj/item/ego_weapon/faelantern/proc/projectile_hit(atom/fired_from, mob/living/carbon/human/firer, atom/target, Angle)
+	SIGNAL_HANDLER
+	if(isliving(target))
+		firing_cooldown = hit_cooldown_time + world.time
+		addtimer(CALLBACK(src, .proc/Reload, firer), hit_cooldown_time + 3)
+		return TRUE
+	addtimer(CALLBACK(src, .proc/Reload, firer), 3)
+	return TRUE
+
+/obj/item/ego_weapon/faelantern/proc/Reload(mob/living/carbon/human/firer)
+	if(firing_cooldown < world.time)
+		to_chat(firer, "<span class='notice'>The fairy has returned!</span>")
+	update_icon_state(firer)
+
+/obj/projectile/ego_bullet/faelantern
+	name = "fairy"
+	icon = 'ModularTegustation/Teguicons/tegumobs.dmi'
+	icon_state = "fairyswarm"
+	hitsound = 'sound/abnormalities/orangetree/ding.ogg'
+	damage = 25
+	damage_type = RED_DAMAGE
+	flag = RED_DAMAGE
+
+/obj/projectile/ego_bullet/faelantern/on_hit(target)
+	. = ..()
+	var/mob/living/H = target
+	if(!isbot(H) && isliving(H))
+		H.apply_status_effect(STATUS_EFFECT_FAIRYBITE)
+		H.visible_message("<span class='warning'>The [src] latches on [target]!</span>")
+
+/datum/status_effect/fairybite
+	id = "fairybite"
+	status_type = STATUS_EFFECT_MULTIPLE
+	duration = 10 SECONDS
+	tick_interval = 20 //One tick every 2 seconds
+	on_remove_on_mob_delete = TRUE
+	alert_type = null
+	var/damage_amount = 6
+
+/datum/status_effect/fairybite/on_apply()
+	return ..()
+
+/datum/status_effect/fairybite/on_remove()
+	return ..()
+
+/datum/status_effect/fairybite/tick()
+	owner.apply_damage(damage_amount, RED_DAMAGE, null, owner.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+	playsound(owner, 'sound/abnormalities/mountain/bite.ogg', 70, TRUE) //yes im reusing a sound bite me
+	new /obj/effect/temp_visual/beakbite(get_turf(owner))
+
+#undef STATUS_EFFECT_FAIRYBITE

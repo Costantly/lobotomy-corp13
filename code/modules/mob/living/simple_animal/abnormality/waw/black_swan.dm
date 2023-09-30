@@ -46,8 +46,6 @@
 	base_pixel_x = -16
 	pixel_x = -16
 
-	attack_action_types = list(/datum/action/cooldown/blackswan_umbrella)
-
 	ego_list = list(
 		/datum/ego_datum/weapon/swan,
 		/datum/ego_datum/armor/swan
@@ -73,9 +71,12 @@
 	//cooldowns
 	var/umbrella_cooldown = 0
 
+	//PLAYABLES ATTACKS
+	attack_action_types = list(/datum/action/cooldown/blackswan_umbrella)
+
 /datum/action/cooldown/blackswan_umbrella
-	name = "Black Swan Umbrella"
-	icon_icon = 'icons/obj/ego_weapons.dmi'
+	name = "Black Swan's Umbrella"
+	icon_icon = 'icons/mob/actions/actions_abnormality.dmi'
 	button_icon_state = "swan"
 	check_flags = AB_CHECK_CONSCIOUS
 	transparent_when_unavailable = TRUE
@@ -87,9 +88,12 @@
 	if(!istype(owner, /mob/living/simple_animal/hostile/abnormality/black_swan))
 		return FALSE
 	var/mob/living/simple_animal/hostile/abnormality/black_swan/swan = owner
+	if(swan.IsContained()) // No more using cooldowns while contained
+		return FALSE
 	swan.OpenUmbrella()
 	StartCooldown()
 	return TRUE
+
 
 /mob/living/simple_animal/hostile/abnormality/black_swan/Initialize()
 	. = ..()
@@ -277,7 +281,7 @@
 	if(!IsContained() || family_status[3] == TRUE) // If it's breaching right now
 		return FALSE
 	abnos_breached += 1
-	if(abnos_breached > 3)
+	if(abnos_breached > 2)
 		family_status[3] = TRUE
 		BrotherOverlays()
 		abnos_breached = 0
@@ -293,7 +297,7 @@
 	if(died.z != z)
 		return FALSE
 	dead_humans += 1
-	if(dead_humans >= 5)
+	if(dead_humans >= 2)
 		family_status[1] = TRUE
 		BrotherOverlays()
 		dead_humans = 0
@@ -309,7 +313,7 @@
 	if(H.z != z)
 		return FALSE
 	insane_humans += 1
-	if(insane_humans >= 5)
+	if(insane_humans >= 2)
 		family_status[2] = TRUE
 		BrotherOverlays()
 		insane_humans = 0
