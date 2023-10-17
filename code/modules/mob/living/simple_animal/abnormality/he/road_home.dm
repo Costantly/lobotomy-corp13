@@ -28,6 +28,7 @@
 	can_patrol = FALSE
 	deathsound = 'sound/abnormalities/roadhome/House_NormalAtk.ogg'
 	ego_list = list(
+		/datum/ego_datum/weapon/brick_road,
 		/datum/ego_datum/weapon/homing_instinct,
 		/datum/ego_datum/armor/homing_instinct
 		)
@@ -376,6 +377,8 @@
 /atom/movable/screen/alert/status_effect/stay_home
 	name = "stay home"
 	desc = "Everyone must go home eventually, you are no different."
+	icon = 'ModularTegustation/Teguicons/status_sprites.dmi'
+	icon_state = "home"
 
 /datum/status_effect/stay_home/on_apply()
 	. = ..()
