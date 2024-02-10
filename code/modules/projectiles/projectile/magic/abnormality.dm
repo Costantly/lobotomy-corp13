@@ -57,7 +57,7 @@
 
 /obj/projectile/melting_blob/prehit_pierce(atom/A)
 	if(isliving(A) && isliving(firer))
-		var/mob/living/mob_firer
+		var/mob/living/mob_firer = firer
 		var/mob/living/L = A
 		if(mob_firer.faction_check_mob(L))
 			return PROJECTILE_PIERCE_PHASE
@@ -75,7 +75,7 @@
 		if(!isbot(L))
 			L.visible_message("<span class='warning'>[L] is hit by [src], they seem to wither away!</span>")
 			for(var/i = 1 to 10)
-				addtimer(CALLBACK(L, /mob/living/proc/apply_damage, rand(4,6), BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE)), 2 SECONDS * i)
+				addtimer(CALLBACK(L, TYPE_PROC_REF(/mob/living, apply_damage), rand(4,6), BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE)), 2 SECONDS * i)
 			return BULLET_ACT_HIT
 	return ..()
 
@@ -121,7 +121,7 @@
 		return ..()
 	var/mob/living/carbon/human/H = target
 	H.add_movespeed_modifier(/datum/movespeed_modifier/clowned)
-	addtimer(CALLBACK(H, .mob/proc/remove_movespeed_modifier, /datum/movespeed_modifier/clowned), 2 SECONDS, TIMER_UNIQUE | TIMER_OVERRIDE)
+	addtimer(CALLBACK(H, TYPE_PROC_REF(/mob, remove_movespeed_modifier), /datum/movespeed_modifier/clowned), 2 SECONDS, TIMER_UNIQUE | TIMER_OVERRIDE)
 	..()
 
 /datum/movespeed_modifier/clowned
@@ -250,3 +250,47 @@
 	impact_type = /obj/effect/projectile/impact/laser/snapshot
 	wound_bonus = -100
 	bare_wound_bonus = -100
+
+/obj/projectile/hunter_blade
+	name = "hunter's scythe"
+	desc = "A weapon thrown with deadly accuracy."
+	icon_state = "hunter_blade_animated"
+	projectile_piercing = PASSMOB
+	range = 10
+	nondirectional_sprite = TRUE
+	speed = 1
+	pixel_y = 16
+	hitsound = 'sound/abnormalities/redhood/attack_2.ogg'
+
+/obj/projectile/hunter_blade/on_hit(atom/target, blocked = FALSE, pierce_hit)
+	var/living = FALSE
+	if(!isliving(target))
+		return ..()
+	var/mob/living/attacked_mob = target
+	if(attacked_mob.stat != DEAD)
+		living = TRUE
+	..()
+	if(attacked_mob.stat == DEAD && living)
+		var/mob/living/simple_animal/hostile/abnormality/red_hood/red_owner
+		red_owner.ConfirmRangedKill(0.1)
+
+/obj/projectile/red_hollowpoint
+	name = "hollowpoint shell"
+	desc = "A bullet fired from a red-cloaked mercenary's ruthless weapon."
+	icon_state = "loyalty"
+	range = 15
+	speed = 0.6
+	spread = 10
+	pixel_y = 30
+
+/obj/projectile/red_hollowpoint/on_hit(atom/target, blocked = FALSE, pierce_hit)
+	var/living = FALSE
+	if(!isliving(target))
+		return ..()
+	var/mob/living/attacked_mob = target
+	if(attacked_mob.stat != DEAD)
+		living = TRUE
+	..()
+	if(attacked_mob.stat == DEAD && living)
+		var/mob/living/simple_animal/hostile/abnormality/red_hood/red_owner
+		red_owner.ConfirmRangedKill(0.1)

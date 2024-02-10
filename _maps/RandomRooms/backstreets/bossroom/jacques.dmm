@@ -15,9 +15,7 @@
 /obj/effect/turf_decal/siding/thinplating/dark/corner{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "co" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -37,9 +35,7 @@
 /mob/living/simple_animal/hostile/ordeal/indigo_dawn{
 	name = "sweeper scout"
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "en" = (
 /obj/structure/table/wood/fancy/black,
@@ -54,15 +50,11 @@
 /obj/effect/turf_decal/siding/thinplating/dark/corner{
 	dir = 8
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "hK" = (
 /obj/machinery/light/broken,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "iO" = (
 /obj/structure/chair/pew/left,
@@ -74,21 +66,11 @@
 	pixel_x = -5;
 	pixel_y = 10
 	},
-/obj/item/folder/syndicate/red{
-	desc = "A folder belonging to one of the City's corporations.";
-	name = "Corporation Folder";
-	pixel_x = 5;
-	pixel_y = -2
-	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "mN" = (
 /obj/structure/bookcase/random/religion,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "qV" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -104,25 +86,19 @@
 /area/city/backstreets_room)
 "rx" = (
 /mob/living/simple_animal/hostile/ordeal/indigo_noon,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "rD" = (
 /obj/effect/turf_decal/siding/thinplating/dark/corner{
 	dir = 8
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "us" = (
 /obj/structure/chair/pew/right{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "vv" = (
 /obj/effect/spawner/lootdrop/crate_spawner,
@@ -134,25 +110,19 @@
 /obj/structure/chair/pew/left{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "wA" = (
 /obj/machinery/door/airlock/cult/unruned/friendly{
 	name = "cult airlock"
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "xD" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 4
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "xR" = (
 /obj/structure/table/wood/fancy/black,
@@ -176,9 +146,7 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 5
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "An" = (
 /turf/closed/indestructible/reinforced,
@@ -193,34 +161,26 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 9
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Bh" = (
 /obj/effect/turf_decal/siding/thinplating/dark/corner{
 	dir = 4
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "BF" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 6
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "BR" = (
 /obj/structure/closet/crate/necropolis,
 /obj/effect/turf_decal/siding/thinplating/dark/corner{
 	dir = 8
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Ct" = (
 /mob/living/simple_animal/hostile/ordeal/indigo_noon,
@@ -241,34 +201,24 @@
 /obj/structure/chair/pew/left{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Ew" = (
 /obj/structure/closet/crate/large,
 /obj/effect/turf_decal/siding/thinplating/dark/corner,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "EP" = (
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "EQ" = (
 /obj/machinery/door/airlock/cult/friendly,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "EW" = (
 /obj/structure/altar_of_gods,
 /obj/item/clothing/suit/armor/riot/chaplain/clock,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Fy" = (
 /obj/effect/light_emitter{
@@ -277,15 +227,11 @@
 	set_cap = 3;
 	set_luminosity = 24
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Gl" = (
 /obj/structure/destructible/cult/tome,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "GP" = (
 /obj/effect/light_emitter{
@@ -305,9 +251,7 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Jo" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -346,18 +290,14 @@
 /turf/open/indestructible/necropolis/air,
 /area/city/backstreets_room)
 "Kn" = (
-/obj/structure/lootcrate/workshopleaf,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/obj/effect/landmark/cratespawn,
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Ku" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 8
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "LC" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -370,19 +310,14 @@
 /area/city/backstreets_room)
 "LK" = (
 /obj/structure/table/wood,
-/obj/item/documents/ncorporation,
 /obj/item/book_of_babel,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Ns" = (
 /obj/structure/chair/office{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "NJ" = (
 /obj/structure/chair/pew/left,
@@ -415,18 +350,14 @@
 	name = "dead potted plant";
 	pixel_y = 10
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "OJ" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 1
 	},
 /mob/living/simple_animal/hostile/ordeal/indigo_noon,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "OL" = (
 /mob/living/simple_animal/hostile/ordeal/indigo_noon,
@@ -436,14 +367,16 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 7
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "PH" = (
 /obj/structure/table/wood/fancy/black,
 /obj/item/reagent_containers/glass/beaker/unholywater,
 /turf/open/floor/carpet/black,
+/area/city/backstreets_room)
+"PZ" = (
+/obj/structure/lootcrate/money,
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Qj" = (
 /mob/living/simple_animal/hostile/ordeal/indigo_dawn{
@@ -452,17 +385,13 @@
 /obj/structure/chair/pew{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Rb" = (
 /obj/structure/chair/pew{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Rz" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -474,32 +403,24 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 10
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Td" = (
 /obj/structure/destructible/cult/talisman,
 /obj/item/clothing/head/helmet/chaplain/clock,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "TO" = (
 /obj/structure/closet/crate/secure/gear,
 /obj/effect/turf_decal/siding/thinplating/dark/corner,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "TV" = (
 /obj/structure/destructible/cult/forge,
 /obj/machinery/light/red{
 	dir = 5
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "UM" = (
 /obj/effect/turf_decal/siding/thinplating/dark{
@@ -517,9 +438,7 @@
 /obj/effect/turf_decal/siding/thinplating/dark{
 	dir = 7
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Vo" = (
 /obj/structure/table/wood/fancy/black,
@@ -528,18 +447,14 @@
 /area/city/backstreets_room)
 "Wh" = (
 /obj/structure/sacrificealtar,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "Xj" = (
 /mob/living/simple_animal/hostile/ordeal/indigo_noon,
 /obj/structure/chair/pew{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "XV" = (
 /obj/structure/chair/pew/right,
@@ -554,15 +469,11 @@
 	desc = "A laptop with indescribable markings all around. Strangely, it contains medical records of sorts.";
 	name = "Strange Laptop"
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "YH" = (
 /obj/effect/turf_decal/siding/thinplating/dark/corner,
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "YK" = (
 /obj/structure/table/wood/fancy/black,
@@ -576,9 +487,7 @@
 /obj/structure/chair/pew/right{
 	dir = 1
 	},
-/turf/open/indestructible/cult{
-	initial_gas_mix = "o2=22;n2=82;TEMP=293.15"
-	},
+/turf/open/floor/plasteel/cult,
 /area/city/backstreets_room)
 "ZT" = (
 /obj/structure/fluff/divine/convertaltar,
@@ -984,7 +893,7 @@ EP
 EP
 An
 mN
-EP
+PZ
 An
 "}
 (19,1,1) = {"
@@ -1006,7 +915,7 @@ EP
 Or
 An
 mN
-EP
+PZ
 An
 "}
 (20,1,1) = {"

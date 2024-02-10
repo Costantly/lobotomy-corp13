@@ -4,6 +4,7 @@
 	icon = 'ModularTegustation/Teguicons/64x64.dmi'
 	icon_state = "melting_love"
 	icon_living = "melting_love"
+	portrait = "melting_love"
 	pixel_x = -16
 	base_pixel_x = -16
 	speak_emote = list("gurgle")
@@ -14,7 +15,7 @@
 	health = 4000
 	maxHealth = 4000
 	obj_damage = 600
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.8)
 	melee_damage_type = BLACK_DAMAGE
 	melee_damage_lower = 55
 	melee_damage_upper = 60 // AOE damage increases it drastically
@@ -28,17 +29,17 @@
 	start_qliphoth = 3
 	can_breach = TRUE
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(20, 20, 30, 40, 40),
-						ABNORMALITY_WORK_INSIGHT = list(40, 40, 40, 45, 45),
-						ABNORMALITY_WORK_ATTACHMENT = list(20, 30, 40, 50, 55),
-						ABNORMALITY_WORK_REPRESSION = list(0, 0, 0, 0, 0),
-						)
+		ABNORMALITY_WORK_INSTINCT = list(20, 20, 30, 40, 40),
+		ABNORMALITY_WORK_INSIGHT = list(40, 40, 40, 45, 45),
+		ABNORMALITY_WORK_ATTACHMENT = list(20, 30, 40, 50, 55),
+		ABNORMALITY_WORK_REPRESSION = list(0, 0, 0, 0, 0),
+	)
 	work_damage_amount = 14
 	work_damage_type = BLACK_DAMAGE
 	/* Sounds */
 	projectilesound = 'sound/abnormalities/meltinglove/ranged.ogg'
 	attack_sound = 'sound/abnormalities/meltinglove/attack.ogg'
-	deathsound = 'sound/abnormalities/meltinglove/death.ogg'
+	death_sound = 'sound/abnormalities/meltinglove/death.ogg'
 	/*Vars and others */
 	loot = list(/obj/item/reagent_containers/glass/bucket/melting)
 	del_on_death = FALSE
@@ -94,7 +95,7 @@
 	// Consume a slime. Cannot work on the big one, so the check is not istype()
 	if(target.type == /mob/living/simple_animal/hostile/slime)
 		var/mob/living/simple_animal/hostile/slime/S = target
-		visible_message("<span class='warning'>[src] consumes \the [S], restoring its own health.</span>")
+		visible_message(span_warning("[src] consumes \the [S], restoring its own health."))
 		. = ..() // We do a normal attack without AOE and then consume the slime to restore HP
 		adjustBruteLoss(-maxHealth * 0.2)
 		S.adjustBruteLoss(S.maxHealth) // To make sure it dies
@@ -116,27 +117,30 @@
 /mob/living/simple_animal/hostile/abnormality/melting_love/proc/SlimeConvert(mob/living/carbon/human/H)
 	if(!istype(H))
 		return FALSE
-	visible_message("<span class='danger'>[src] glomps on \the [H] as another slime pawn appears!</span>")
+	visible_message(span_danger("[src] glomps on \the [H] as another slime pawn appears!"))
 	new /mob/living/simple_animal/hostile/slime(get_turf(H))
 	H.gib()
 	return TRUE
 
 /* Qliphoth things */
 /mob/living/simple_animal/hostile/abnormality/melting_love/SuccessEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	if(prob(33) && user == gifted_human && pe >= datum_reference?.max_boxes)
 		datum_reference.qliphoth_change(1)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/melting_love/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	if(prob(50))
 		datum_reference.qliphoth_change(-1)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/melting_love/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
-/mob/living/simple_animal/hostile/abnormality/melting_love/BreachEffect(mob/living/carbon/human/user)
+/mob/living/simple_animal/hostile/abnormality/melting_love/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
 	icon = 'ModularTegustation/Teguicons/96x96.dmi'
 	icon_living = "melting_breach"
@@ -146,7 +150,7 @@
 	base_pixel_x = -32
 	desc = "A pink hunched creature with long arms, there are also visible bones coming from insides of the slime."
 	if(istype(gifted_human))
-		to_chat(gifted_human, "<span class='userdanger'>You feel like you are about to burst !</span>")
+		to_chat(gifted_human, span_userdanger("You feel like you are about to burst !"))
 		gifted_human.emote("scream")
 		gifted_human.gib()
 	else
@@ -160,15 +164,15 @@
 		return
 	if(!gifted_human && istype(user) && work_type != ABNORMALITY_WORK_REPRESSION && user.stat != DEAD)
 		gifted_human = user
-		RegisterSignal(user, COMSIG_LIVING_DEATH, .proc/GiftedDeath)
-		RegisterSignal(user, COMSIG_WORK_COMPLETED, .proc/GiftedAnger)
-		to_chat(user, "<span class='nicegreen'>You feel like you received a gift...</span>")
+		RegisterSignal(user, COMSIG_LIVING_DEATH, PROC_REF(GiftedDeath))
+		RegisterSignal(user, COMSIG_WORK_COMPLETED, PROC_REF(GiftedAnger))
+		to_chat(user, span_nicegreen("You feel like you received a gift..."))
 		user.adjust_attribute_buff(TEMPERANCE_ATTRIBUTE, 30)
 		user.add_overlay(mutable_appearance('icons/effects/32x64.dmi', "gift", -HALO_LAYER))
 		playsound(get_turf(user), 'sound/abnormalities/meltinglove/gift.ogg', 50, 0, 2)
 		return
 	if(istype(user) && user == gifted_human)
-		to_chat(gifted_human, "<span class='nicegreen'>Melting Love was happy to see you!</span>")
+		to_chat(gifted_human, span_nicegreen("Melting Love was happy to see you!"))
 		gifted_human.adjustSanityLoss(rand(-25,-35))
 		return
 
@@ -181,7 +185,7 @@
 /mob/living/simple_animal/hostile/abnormality/melting_love/proc/GiftedAnger(datum/source, datum/abnormality/datum_sent, mob/living/carbon/human/user, work_type)
 	SIGNAL_HANDLER
 	if(work_type == ABNORMALITY_WORK_REPRESSION)
-		to_chat(gifted_human, "<span class='userdanger'>[src] didn't like that!</span>")
+		to_chat(gifted_human, span_userdanger("[src] didn't like that!"))
 		datum_reference.qliphoth_change(-1)
 
 /mob/living/simple_animal/hostile/abnormality/melting_love/proc/sanityheal()
@@ -200,7 +204,7 @@
 	Empower()
 	for(var/mob/M in GLOB.player_list)
 		if(M.z == z && M.client)
-			to_chat(M, "<span class='userdanger'>You can hear a gooey cry !</span>")
+			to_chat(M, span_userdanger("You can hear a gooey cry!"))
 			SEND_SOUND(M, 'sound/abnormalities/meltinglove/empower.ogg')
 			flash_color(M, flash_color = "#FF0081", flash_time = 50)
 	return TRUE
@@ -218,7 +222,7 @@
 	gifted_human.gib()
 	gifted_human = null
 	var/mob/living/simple_animal/hostile/slime/big/S = new(T)
-	RegisterSignal(S, COMSIG_LIVING_DEATH, .proc/SlimeDeath)
+	RegisterSignal(S, COMSIG_LIVING_DEATH, PROC_REF(SlimeDeath))
 
 
 /* Slimes (HE) */
@@ -235,7 +239,7 @@
 	health = 400
 	maxHealth = 400
 	obj_damage = 200
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 2, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 2, PALE_DAMAGE = 1)
 	melee_damage_type = BLACK_DAMAGE
 	melee_damage_lower = 20
 	melee_damage_upper = 25
@@ -243,7 +247,7 @@
 	speed = 2
 	move_to_delay = 2.5
 	/* Sounds */
-	deathsound = 'sound/abnormalities/meltinglove/pawn_death.ogg'
+	death_sound = 'sound/abnormalities/meltinglove/pawn_death.ogg'
 	attack_sound = 'sound/abnormalities/meltinglove/pawn_attack.ogg'
 	/* Vars and others */
 	robust_searching = TRUE
@@ -277,7 +281,7 @@
 /mob/living/simple_animal/hostile/slime/proc/SlimeConvert(mob/living/carbon/human/H)
 	if(!istype(H))
 		return FALSE
-	visible_message("<span class='danger'>[src] glomps on \the [H] as another slime pawn appears!</span>")
+	visible_message(span_danger("[src] glomps on \the [H] as another slime pawn appears!"))
 	new /mob/living/simple_animal/hostile/slime(get_turf(H))
 	H.gib()
 	return TRUE

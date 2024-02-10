@@ -5,6 +5,7 @@
 	icon = 'ModularTegustation/Teguicons/96x96.dmi'
 	icon_state = "babayaga"
 	icon_living = "babayaga"
+	portrait = "baba_yaga"
 	var/icon_aggro = "babayaga_breach"
 	faction = list("hostile", "babayaga")
 	speak_emote = list("intones")
@@ -21,17 +22,17 @@
 	can_breach = TRUE
 	start_qliphoth = 2
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(0, 0, 45, 45, 50),
-						ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 60),
-						ABNORMALITY_WORK_ATTACHMENT = 0,
-						ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40)
-						)
+		ABNORMALITY_WORK_INSTINCT = list(0, 0, 45, 45, 50),
+		ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 60),
+		ABNORMALITY_WORK_ATTACHMENT = 0,
+		ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40),
+	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
 	ego_list = list(
 		/datum/ego_datum/weapon/rimeshank,
-		/datum/ego_datum/armor/rimeshank
-		)
+		/datum/ego_datum/armor/rimeshank,
+	)
 	gift_type =  /datum/ego_gifts/rimeshank
 
 	var/jump_cooldown = 0
@@ -46,11 +47,13 @@
 		SpawnMobs()
 
 /mob/living/simple_animal/hostile/abnormality/babayaga/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	if(prob(40))
 		datum_reference.qliphoth_change(-1)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/babayaga/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	SpawnMobs()
 	return
@@ -64,11 +67,11 @@
 		if(client)
 			return
 		if(jump_cooldown <= world.time)
-			INVOKE_ASYNC(src, .proc/TryJump)
+			INVOKE_ASYNC(src, PROC_REF(TryJump))
 		return
 
-/mob/living/simple_animal/hostile/abnormality/babayaga/BreachEffect(mob/living/carbon/human/user)//copied my code from crumbling armor
-	..()
+/mob/living/simple_animal/hostile/abnormality/babayaga/BreachEffect(mob/living/carbon/human/user, breach_type)//copied my code from crumbling armor
+	. = ..()
 	icon_state = icon_aggro
 	pixel_x = -16
 	base_pixel_x = -16
@@ -130,7 +133,7 @@
 	animate(src, pixel_z = 0, alpha = 255, time = 10)
 	SLEEP_CHECK_DEATH(10)
 	density = TRUE
-	visible_message("<span class='danger'>[src] drops down from the ceiling!</span>")
+	visible_message(span_danger("[src] drops down from the ceiling!"))
 	playsound(get_turf(src), 'sound/abnormalities/babayaga/land.ogg', 100, FALSE, 20)
 	var/obj/effect/temp_visual/decoy/D = new(get_turf(src), src)
 	animate(D, alpha = 0, transform = matrix()*2, time = 5)
@@ -242,7 +245,7 @@
 /obj/effect/temp_visual/ice_turf/proc/BumpEffect(mob/living/carbon/human/H)
 	if(icon_state == "ice")
 		if(prob(25))
-			to_chat(H, "<span class='warning'>You slip on the ice!</span>")
+			to_chat(H, span_warning("You slip on the ice!"))
 			H.slip(0, null, SLIDE_ICE, 0, FALSE)
 			H.Immobilize(0.5 SECONDS)
 

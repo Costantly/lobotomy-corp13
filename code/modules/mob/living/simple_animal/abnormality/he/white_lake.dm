@@ -7,6 +7,7 @@
 	icon = 'ModularTegustation/Teguicons/tegumobs.dmi'
 	icon_state = "white_lake"
 	icon_living = "white_lake"
+	portrait = "white_lake"
 	maxHealth = 600
 	health = 600
 	threat_level = HE_LEVEL
@@ -14,20 +15,18 @@
 		ABNORMALITY_WORK_INSTINCT = 0,
 		ABNORMALITY_WORK_INSIGHT = 60,
 		ABNORMALITY_WORK_ATTACHMENT = 50,
-		ABNORMALITY_WORK_REPRESSION = 40
+		ABNORMALITY_WORK_REPRESSION = 40,
 	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
-	/// Grab her champion
-	var/champion
 	//Has the weapon been given out?
 	var/sword = FALSE
 	start_qliphoth = 3
 
 	ego_list = list(
 		/datum/ego_datum/weapon/wings,
-		/datum/ego_datum/armor/wings
-		)
+		/datum/ego_datum/armor/wings,
+	)
 	gift_type = /datum/ego_gifts/waltz
 	gift_chance = 0
 	abnormality_origin = ABNORMALITY_ORIGIN_WONDERLAB
@@ -40,44 +39,52 @@
 	return chance
 
 /mob/living/simple_animal/hostile/abnormality/whitelake/SuccessEffect(mob/living/carbon/human/user, work_type, pe)
-	if(get_attribute_level(user, FORTITUDE_ATTRIBUTE) < 60)		//Doesn't like these people
-		champion = user
+	. = ..()
+	if(get_attribute_level(user, FORTITUDE_ATTRIBUTE) < 60)		//Right in the zone
+		user.Apply_Gift(new gift_type)	//It's a gift now! Free shit! And there are absolutely, positively no downsides, nope!
+		to_chat(user, span_nicegreen("A cute crown appears on your head!"))
 
 /mob/living/simple_animal/hostile/abnormality/whitelake/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
-
 	if(get_attribute_level(user, FORTITUDE_ATTRIBUTE) >= 60)	//Lower it again.
 		datum_reference.qliphoth_change(-1)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/whitelake/ZeroQliphoth(mob/living/carbon/human/user)
 	datum_reference.qliphoth_change(3)
-	if(!champion)	//no champion? Fuck you.
-		for(var/mob/living/L in GLOB.player_list)
-			if(faction_check_mob(L, FALSE) || L.z != z || L.stat == DEAD)
-				continue
-			new /obj/effect/temp_visual/whitelake(get_turf(L))
-			L.apply_damage(50, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
-		return
-	var/mob/living/carbon/human/H = champion
-	H.Apply_Gift(new gift_type)	//It's a gift now! Free shit! Oh wait you- oh god you just stabbed that man.
+	for(var/mob/living/carbon/human/H in GLOB.player_list)
+		if(faction_check_mob(H, FALSE) || H.z != z || H.stat == DEAD)
+			continue
+		if(istype(H.ego_gift_list[HELMET], /datum/ego_gifts/waltz)) // You're still wearing the gift? Pitiable fool...
+			TurnChampion(H)
+			return
+		BreachAttack(H)
+	return
+
+/mob/living/simple_animal/hostile/abnormality/whitelake/proc/BreachAttack(mob/living/carbon/human/H)
+	set waitfor = FALSE
+	new /obj/effect/temp_visual/whitelake(get_turf(H))
+	var/userfort = (get_attribute_level(H, FORTITUDE_ATTRIBUTE))
+	var/damage_dealt = clamp((0 + (userfort / 2)), 30, 65)//deals between 30 and 60 white damage depending on your fortitude attribute when applied.
+	H.apply_damage(damage_dealt, WHITE_DAMAGE, null, H.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+
+/mob/living/simple_animal/hostile/abnormality/whitelake/proc/TurnChampion(mob/living/carbon/human/H)
 	H.apply_status_effect(STATUS_EFFECT_CHAMPION)
 	if(!sword)
 		waltz(H)
 	//Replaces AI with murder one
-	if (!H.sanity_lost)
+	if(!H.sanity_lost)
 		H.adjustSanityLoss(500)
 	QDEL_NULL(H.ai_controller)
 	H.ai_controller = /datum/ai_controller/insane/murder/whitelake
 	H.InitializeAIController()
-	champion = null
-	return
 
 /mob/living/simple_animal/hostile/abnormality/whitelake/proc/waltz(mob/living/carbon/human/H)
 	var/obj/item/held = H.get_active_held_item()
 	var/obj/item/wep = new /obj/item/ego_weapon/flower_waltz(H)
 	H.dropItemToGround(held) //Drop weapon
-	RegisterSignal(H, COMSIG_LIVING_DEATH, .proc/Champion_Death_Sword)
+	RegisterSignal(H, COMSIG_LIVING_DEATH, PROC_REF(Champion_Death_Sword))
 	ADD_TRAIT(wep, TRAIT_NODROP, wep)
 	H.put_in_hands(wep) 		//Time for pale
 	sword = TRUE
@@ -143,10 +150,10 @@
 
 /datum/ai_behavior/say_line/insanity_whitelake
 	lines = list(
-				"I will protect her!!",
-				"You're in the way!",
-				"I will dance with her forever!"
-				)
+		"I will protect her!!",
+		"You're in the way!",
+		"I will dance with her forever!",
+	)
 //CHAMPION
 //Sets the defenses of the champion
 /datum/status_effect/champion

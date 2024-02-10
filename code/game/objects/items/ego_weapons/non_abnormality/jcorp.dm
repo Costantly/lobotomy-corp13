@@ -3,7 +3,7 @@
 /obj/item/ego_weapon/city/ting_tang
 	name = "ting tang shank"
 	desc = "A twisted piece of metal. The shape makes very open wounds."
-	special = "This deals a random damage amount between 10% of max damage and max damage. Chances scale with sanity with a max of 50% instead of 10%."
+	special = "This deals a random damage amount between 50% and 100% of max damage. Untreated sanity damage will lower the minimum down to 10% depending on severity."
 	icon_state = "tingtang_shank"
 	inhand_icon_state = "tingtang_shank"
 	force = 27
@@ -86,7 +86,7 @@
 	//Crit itself.
 	if(prob(poise*2))
 		force*=3
-		to_chat(user, "<span class='userdanger'>Critical!</span>")
+		to_chat(user, span_userdanger("Critical!"))
 		poise = 0
 	..()
 	force = initial(force)
@@ -94,10 +94,10 @@
 /obj/item/ego_weapon/city/mariachi/attack_self(mob/user)
 	var/obj/item/clothing/suit/armor/ego_gear/city/mariachi/aida/Y = user.get_item_by_slot(ITEM_SLOT_OCLOTHING)
 	if(istype(Y))
-		to_chat(user,"<span class='notice'>You shake the maracas. Your performance is beautiful.</span>")
+		to_chat(user,span_notice("You shake the maracas. Your performance is beautiful."))
 		playsound(src, 'sound/weapons/fixer/generic/maracas_shake.ogg', 50, TRUE)
 	else
-		to_chat(user,"<span class='warning'>Someone as uninspiring as you? You are not worthy to shake the maracas.</span>")
+		to_chat(user,span_warning("Someone as uninspiring as you? You are not worthy to shake the maracas."))
 
 //Sp healing for jobbers
 /obj/item/ego_weapon/city/mariachi_blades

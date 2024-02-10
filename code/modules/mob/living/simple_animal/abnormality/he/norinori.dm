@@ -6,6 +6,7 @@
 	icon_state = "norinori"
 	icon_living = "norinori"
 	var/icon_aggro = "norinori_breach"
+	portrait = "norinori"
 	speak_emote = list("meows")
 	ranged = TRUE
 	maxHealth = 1200
@@ -17,7 +18,7 @@
 	rapid_melee = 1 //we change this later
 	melee_reach = 1
 	ranged = TRUE
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	see_in_dark = 10
 	stat_attack = HARD_CRIT
 	move_to_delay = 7
@@ -25,18 +26,18 @@
 	can_breach = TRUE
 	start_qliphoth = 5
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 40,
-						ABNORMALITY_WORK_INSIGHT = 60,
-						ABNORMALITY_WORK_ATTACHMENT = -80,
-						ABNORMALITY_WORK_REPRESSION = 35
-						)
+		ABNORMALITY_WORK_INSTINCT = 40,
+		ABNORMALITY_WORK_INSIGHT = 60,
+		ABNORMALITY_WORK_ATTACHMENT = -80,
+		ABNORMALITY_WORK_REPRESSION = 35,
+	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/split,
-		/datum/ego_datum/armor/split
-		)
+		/datum/ego_datum/armor/split,
+	)
 	gift_type =  /datum/ego_gifts/split
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
 
@@ -50,9 +51,7 @@
 	var/split_cooldown_time = 8 SECONDS
 
 //PLAYABLES ATTACKS
-	attack_action_types = list(
-		/datum/action/cooldown/norisplit
-	)
+	attack_action_types = list(/datum/action/cooldown/norisplit)
 
 /datum/action/cooldown/norisplit
 	name = "Split"
@@ -81,7 +80,7 @@
 //Init
 /mob/living/simple_animal/hostile/abnormality/norinori/Initialize()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, .proc/On_Mob_Death) // Hell
+	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(On_Mob_Death)) // Hell
 
 /mob/living/simple_animal/hostile/abnormality/norinori/Destroy()
 	UnregisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH)
@@ -128,7 +127,7 @@
 	SLEEP_CHECK_DEATH(0.2 SECONDS)
 	user.attack_animal(src)
 	SLEEP_CHECK_DEATH(0.5 SECONDS)
-	user.visible_message("<span class='warning'>[src] mutilates [user]!</span>", "<span class='userdanger'>[src] mutilates you!</span>")
+	user.visible_message(span_warning("[src] mutilates [user]!"), span_userdanger("[src] mutilates you!"))
 	user.apply_damage(3000, RED_DAMAGE, null, user.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 	playsound(user, 'sound/abnormalities/helper/attack.ogg', 100, FALSE, 4)
 	attack_sound = initial(attack_sound)
@@ -141,12 +140,13 @@
 		icon_state = icon_aggro
 
 /mob/living/simple_animal/hostile/abnormality/norinori/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
 //Breach
-/mob/living/simple_animal/hostile/abnormality/norinori/BreachEffect(mob/living/carbon/human/user)
-	..()
+/mob/living/simple_animal/hostile/abnormality/norinori/BreachEffect(mob/living/carbon/human/user, breach_type)
+	. = ..()
 	icon_state = icon_aggro
 	icon = 'ModularTegustation/Teguicons/48x48.dmi'
 	pixel_x = -8
@@ -165,10 +165,7 @@
 	playsound(src, 'sound/effects/blobattack.ogg', 150, FALSE, 4)
 	playsound(src, 'sound/weapons/chainsawhit.ogg', 250, FALSE, 4)
 	attack_sound = 'sound/abnormalities/helper/attack.ogg'
-	for(var/damtype in src.damage_coeff)
-		if(damtype == BRUTE)
-			continue
-		damage_coeff[damtype] -= 0.4
+	ChangeResistances(list(RED_DAMAGE = 0.1, WHITE_DAMAGE = 1.1, BLACK_DAMAGE = 0.6, PALE_DAMAGE = 1.6))
 	can_act = TRUE
 	rapid_melee = 3
 	melee_reach = 3
@@ -182,17 +179,14 @@
 	icon_state = icon_aggro
 	attack_sound = 'sound/weapons/slashmiss.ogg'
 	SLEEP_CHECK_DEATH(10)
-	for(var/damtype in src.damage_coeff)
-		if(damtype == BRUTE)
-			continue
-		damage_coeff[damtype] += 0.4
+	ChangeResistances(list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2))
 	can_act = TRUE
 	rapid_melee = 1
 	melee_reach = 1
 
 /mob/living/simple_animal/hostile/abnormality/norinori/bullet_act(obj/projectile/P)
 	if(transformed) //guns are ineffective on the split form
-		visible_message("<span class='userdanger'>[src] swiftly dodges [P]!</span>")
+		visible_message(span_userdanger("[src] swiftly dodges [P]!"))
 		P.Destroy()
 		return
 	..()

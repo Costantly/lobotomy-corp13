@@ -2,18 +2,19 @@
 GLOBAL_LIST_EMPTY(army)
 /mob/living/simple_animal/hostile/abnormality/army
 	name = "Army in Black"
-	desc = "The color of the human heart is pink, and by wearing the same color, we can blend in with people’s minds."
+	desc = "The color of the human heart is pink, and by wearing the same color, we can blend in with people's minds."
 	icon = 'ModularTegustation/Teguicons/64x64.dmi'
 	icon_state = "armyinpink"
 	icon_living = "armyinpink"
 	icon_dead = "armyinpink_heart"
+	portrait = "army_in_black"
 	pixel_x = -16
 	base_pixel_x = -16
 
 	//*--Suppression info--*
 	maxHealth = 450
 	health = 450
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 1.0, PALE_DAMAGE = 0.8)//the same as hostile mobs, ez records
+	damage_coeff = list(RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 1.0, PALE_DAMAGE = 0.8)//the same as hostile mobs, ez records
 	speed = 1//unused
 	generic_canpass = FALSE
 	del_on_death = TRUE
@@ -29,21 +30,27 @@ GLOBAL_LIST_EMPTY(army)
 	can_breach = TRUE
 	start_qliphoth = 3
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 0,
-						ABNORMALITY_WORK_INSIGHT = list(40, 40, 40, 50, 50),
-						ABNORMALITY_WORK_ATTACHMENT = list(50, 50, 50, 55, 55),
-						ABNORMALITY_WORK_REPRESSION = 30,
-						"Protection" = 0//shouldn't attempt to generate any PE
-						)
+		ABNORMALITY_WORK_INSTINCT = 0,
+		ABNORMALITY_WORK_INSIGHT = list(40, 40, 40, 50, 50),
+		ABNORMALITY_WORK_ATTACHMENT = list(50, 50, 50, 55, 55),
+		ABNORMALITY_WORK_REPRESSION = 30,
+		"Protection" = 0, //shouldn't attempt to generate any PE
+	)
 	work_damage_amount = 17
 	work_damage_type = WHITE_DAMAGE
 
 	//E.G.O list
 	ego_list = list(
 		/datum/ego_datum/weapon/pink,
-		/datum/ego_datum/armor/pink
-		)
+		/datum/ego_datum/armor/pink,
+	)
 	gift_type =  /datum/ego_gifts/pink
+
+	grouped_abnos = list(
+		/mob/living/simple_animal/hostile/abnormality/quiet_day = 1.5,
+		/mob/living/simple_animal/hostile/abnormality/khz = 1.5,
+		/mob/living/simple_animal/hostile/abnormality/mhz = 1.5,
+	)
 
 	//Unique variables
 	var/death_counter = 0
@@ -58,7 +65,7 @@ GLOBAL_LIST_EMPTY(army)
 //checks for deaths
 /mob/living/simple_animal/hostile/abnormality/army/Initialize()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, .proc/OnMobDeath)
+	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(OnMobDeath))
 	adds_max = clamp((LAZYLEN(GLOB.player_list)/ 2),2, 5)//between 2 and 5 mooks on breach, one for every 2 people.
 
 //stops the previous snippet from destroying the server
@@ -95,7 +102,7 @@ GLOBAL_LIST_EMPTY(army)
 				return FALSE
 			protected_targets += user
 			user.apply_status_effect(STATUS_EFFECT_PROTECTION)
-			to_chat(user, "<span class='nicegreen'>You feel like you're in good company.</span>")
+			to_chat(user, span_nicegreen("You feel like you're in good company."))
 			playsound(get_turf(user), 'sound/abnormalities/armyinblack/pink_heal.ogg', 50, 0, 2)
 		return FALSE
 	return TRUE
@@ -107,6 +114,7 @@ GLOBAL_LIST_EMPTY(army)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/army/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
@@ -131,7 +139,7 @@ GLOBAL_LIST_EMPTY(army)
 	return TRUE
 
 //*--Combat Mechanics--*
-/mob/living/simple_animal/hostile/abnormality/army/BreachEffect(mob/living/carbon/human/user)
+/mob/living/simple_animal/hostile/abnormality/army/BreachEffect(mob/living/carbon/human/user, breach_type)
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_ABNORMALITY_BREACH, src)
 	FearEffect()
 	Blackify()
@@ -141,6 +149,7 @@ GLOBAL_LIST_EMPTY(army)
 	density = FALSE
 	alpha = 0
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	return TRUE
 
 /mob/living/simple_animal/hostile/abnormality/army/proc/SpawnAdds()
 	var/list/spawns = shuffle(GLOB.xeno_spawn)
@@ -148,7 +157,7 @@ GLOBAL_LIST_EMPTY(army)
 		for(var/turf/T in spawns)//this picks the first few shuffled xeno spawns. Maybe change it to a different type of loop
 			var/mob/living/simple_animal/hostile/army_enemy/E = new(get_turf(T))
 			summoned_army += E//the actual army list
-			RegisterSignal(E, COMSIG_PARENT_QDELETING, .proc/ArmyDeath)
+			RegisterSignal(E, COMSIG_PARENT_QDELETING, PROC_REF(ArmyDeath))
 			spawns -= T
 			break
 
@@ -187,7 +196,7 @@ GLOBAL_LIST_EMPTY(army)
 	health = 900
 	maxHealth = 900
 	obj_damage = 50
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 1.0, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 1.0, PALE_DAMAGE = 0.8)
 	ranged = TRUE
 	minimum_distance = 2
 	speed = 2
@@ -224,7 +233,7 @@ GLOBAL_LIST_EMPTY(army)
 
 /mob/living/simple_animal/hostile/army_enemy/Initialize()
 	..()
-	addtimer(CALLBACK(src, .proc/Explode), 120 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(Explode)), 120 SECONDS)
 	var/list/depts = shuffle(GLOB.department_centers)
 	var/list/depts_far = list()
 	if(!LAZYLEN(depts))
@@ -238,7 +247,7 @@ GLOBAL_LIST_EMPTY(army)
 		var/obj/effect/pink_beacon/P = new(get_turf(T))//beacon
 		targetted_beacon = P
 		P.targetted_army = src
-		INVOKE_ASYNC(src, .proc/SetSpeed)
+		INVOKE_ASYNC(src, PROC_REF(SetSpeed))
 		break
 	if(!targetted_beacon)//if none of the above are picked, grab one that's further away
 		for(var/turf/T in depts_far)
@@ -247,7 +256,7 @@ GLOBAL_LIST_EMPTY(army)
 			var/obj/effect/pink_beacon/P = new(get_turf(T))//beacon
 			targetted_beacon = P
 			P.targetted_army = src
-			INVOKE_ASYNC(src, .proc/SetSpeed)
+			INVOKE_ASYNC(src, PROC_REF(SetSpeed))
 			break
 
 /mob/living/simple_animal/hostile/army_enemy/death()
@@ -273,7 +282,7 @@ GLOBAL_LIST_EMPTY(army)
 		fear_affected += H
 		if(H.sanity_lost)
 			continue
-		to_chat(H, "<span class='warning'>Oh dear.</span>")
+		to_chat(H, span_warning("Oh dear."))
 	return
 
 //explosion definition
@@ -281,7 +290,7 @@ GLOBAL_LIST_EMPTY(army)
 	if(QDELETED(src))
 		return
 	playsound(get_turf(src), 'sound/abnormalities/armyinblack/black_explosion.ogg', 125, 0, 8)
-	visible_message("<span class='danger'>[src] suddenly explodes!</span>")
+	visible_message(span_danger("[src] suddenly explodes!"))
 	for(var/mob/living/simple_animal/hostile/abnormality/P in range(20, src))
 		if(!P.datum_reference)//Prevents a runtime if the abno lacks datums, such as those spawned by contract
 			continue
@@ -365,7 +374,7 @@ GLOBAL_LIST_EMPTY(army)
 		H.physiology.pale_mod /= 0.8
 		H.cut_overlay(mutable_appearance('ModularTegustation/Teguicons/tegu_effects10x10.dmi', "pink", -MUTATIONS_LAYER))
 		H.vis_contents -= army_bud
-		to_chat(H, "<span class='notice'>The pink soldier assigned to you returns to its containment cell.</span>")
+		to_chat(H, span_notice("The pink soldier assigned to you returns to its containment cell."))
 	if(!boom)
 		return
 	for(var/mob/living/carbon/human/H in view(7, owner))

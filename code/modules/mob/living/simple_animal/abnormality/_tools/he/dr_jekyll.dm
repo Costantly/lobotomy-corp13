@@ -7,8 +7,8 @@
 
 	ego_list = list(
 		/datum/ego_datum/weapon/hyde,
-		/datum/ego_datum/armor/hyde
-		)
+		/datum/ego_datum/armor/hyde,
+	)
 
 /obj/structure/toolabnormality/dr_jekyll/attack_hand(mob/living/carbon/human/user)
 	..()
@@ -16,11 +16,11 @@
 		return
 
 	if((user in users))
-		to_chat(user, "<span class='notice'>There's none left.</span>")
+		to_chat(user, span_notice("There's none left."))
 		return //You don't need any more.
 
 	users += user
-	to_chat(user, "<span class='userdanger'>You take a sip, it's lukewarm.</span>")
+	to_chat(user, span_userdanger("You take a sip, it's lukewarm."))
 	user.apply_status_effect(STATUS_EFFECT_DR_JEKYLL)
 	playsound(user.loc, 'sound/items/drink.ogg', rand(10,50), TRUE)
 
@@ -41,8 +41,8 @@
 	var/level_mod
 
 /datum/status_effect/dr_jekyll/on_apply()
-	RegisterSignal(owner, COMSIG_MOB_APPLY_DAMGE, .proc/HydeDam)
-	RegisterSignal(owner, COMSIG_FEAR_EFFECT, .proc/HydeDam)
+	RegisterSignal(owner, COMSIG_MOB_APPLY_DAMGE, PROC_REF(HydeDam))
+	RegisterSignal(owner, COMSIG_FEAR_EFFECT, PROC_REF(HydeDam))
 	return ..()
 
 /datum/status_effect/dr_jekyll/on_remove()
@@ -59,7 +59,7 @@
 
 /datum/status_effect/dr_jekyll/proc/HydeDam()
 	SIGNAL_HANDLER
-	addtimer(CALLBACK(src, .proc/SanityCheck), 1) //Gives sanity time to update
+	addtimer(CALLBACK(src, PROC_REF(SanityCheck)), 1) //Gives sanity time to update
 
 /datum/status_effect/dr_jekyll/proc/SanityCheck()
 	var/mob/living/carbon/human/H = owner
@@ -83,7 +83,7 @@
 
 /datum/status_effect/dr_jekyll/proc/HydeTakeover()
 	var/mob/living/carbon/human/H = owner
-	to_chat(H, "<span class='notice'>You feel strange... Yet... Free?</span>")
+	to_chat(H, span_notice("You feel strange... Yet... Free?"))
 	takeover = TRUE
 	level = get_user_level(owner) // we only update when the debuff is inflicted
 	level_mod = (level * 5)
@@ -118,7 +118,7 @@
 
 /datum/status_effect/dr_jekyll/proc/ReturnToNormal()
 	var/mob/living/carbon/human/H = owner
-	to_chat(H, "<span class='nicegreen'>The strange feeling goes away.</span>")
+	to_chat(H, span_nicegreen("The strange feeling goes away."))
 	takeover = FALSE
 	H.adjust_attribute_bonus(lowest, -2 * level_mod)
 	H.adjust_attribute_bonus(low, -1 * level_mod)
@@ -137,13 +137,13 @@
 
 /datum/ai_behavior/say_line/insanity_hyde
 	lines = list(
-				"If I am the chief of sinners, I am the chief of sufferers too.",
-				"I incline to Cain's heresy!",
-				"Finally, you've given in! This body is mine!",
-				"Now, let's see what this body is good for.",
-				"Hark! I'll put an end to your pitiful squealing!",
-				"O, my poor old soul!"
-				)
+		"If I am the chief of sinners, I am the chief of sufferers too.",
+		"I incline to Cain's heresy!",
+		"Finally, you've given in! This body is mine!",
+		"Now, let's see what this body is good for.",
+		"Hark! I'll put an end to your pitiful squealing!",
+		"O, my poor old soul!",
+	)
 
 /datum/status_effect/panicked_type/hyde
 	icon = "hyde"

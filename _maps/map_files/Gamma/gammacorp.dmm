@@ -126,10 +126,6 @@
 	},
 /turf/open/floor/facility/white,
 /area/facility_hallway/architecture)
-"bb" = (
-/obj/structure/chair/stool,
-/turf/closed/indestructible/rock,
-/area/space)
 "bd" = (
 /obj/structure/disposalpipe/segment{
 	dir = 4
@@ -137,14 +133,18 @@
 /turf/open/floor/facility/white,
 /area/department_main/command)
 "be" = (
+/obj/effect/turf_decal/tile/brown{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/brown,
 /obj/effect/turf_decal/siding/brown{
 	dir = 1
 	},
-/obj/machinery/light{
-	dir = 1
+/obj/machinery/camera/autoname{
+	dir = 5
 	},
 /turf/open/floor/plasteel,
-/area/facility_hallway/training)
+/area/department_main/training)
 "bh" = (
 /obj/structure/disposalpipe/segment{
 	dir = 5
@@ -475,9 +475,9 @@
 	dir = 1
 	},
 /turf/open/floor/facility{
+	dir = 4;
 	icon = 'icons/turf/floors.dmi';
-	icon_state = "stairs-old";
-	dir = 4
+	icon_state = "stairs-old"
 	},
 /area/department_main/training)
 "dG" = (
@@ -2013,12 +2013,12 @@
 /obj/structure/table/wood,
 /obj/item/paper/guides/jobs/teth/lore/spiderbud,
 /obj/item/folder/yellow{
-	pixel_y = -6;
-	pixel_x = -5
+	pixel_x = -5;
+	pixel_y = -6
 	},
 /obj/item/paper/guides/jobs/zayin/lore/wellcheers{
-	pixel_y = -4;
-	pixel_x = 4
+	pixel_x = 4;
+	pixel_y = -4
 	},
 /turf/open/floor/carpet/orange,
 /area/department_main/training)
@@ -2195,8 +2195,8 @@
 /obj/structure/table/reinforced,
 /obj/machinery/reagentgrinder{
 	desc = "Used to grind things up into raw materials and liquids.";
-	pixel_y = 11;
-	pixel_x = -1
+	pixel_x = -1;
+	pixel_y = 11
 	},
 /obj/item/reagent_containers/glass/beaker/large{
 	pixel_x = 7;
@@ -2808,10 +2808,8 @@
 /turf/open/floor/plasteel/dark,
 /area/department_main/welfare)
 "sP" = (
-/obj/effect/turf_decal/siding/brown{
-	dir = 1
-	},
-/obj/machinery/camera/autoname,
+/obj/effect/turf_decal/siding/brown,
+/obj/machinery/light,
 /turf/open/floor/plasteel,
 /area/facility_hallway/training)
 "sQ" = (
@@ -3263,6 +3261,9 @@
 /obj/effect/turf_decal/siding/brown{
 	dir = 5
 	},
+/obj/machinery/camera/autoname{
+	dir = 9
+	},
 /turf/open/floor/plasteel,
 /area/facility_hallway/training)
 "vF" = (
@@ -3571,8 +3572,8 @@
 "xB" = (
 /obj/structure/table/wood,
 /obj/item/folder/yellow{
-	pixel_y = 3;
-	pixel_x = 5
+	pixel_x = 5;
+	pixel_y = 3
 	},
 /obj/item/paper/guides/jobs/waw,
 /obj/item/paper/guides/jobs/aleph{
@@ -3782,6 +3783,9 @@
 /obj/machinery/computer/crew,
 /obj/structure/sign/ordealmonitor{
 	pixel_y = 32
+	},
+/obj/machinery/light{
+	dir = 1
 	},
 /turf/open/floor/plasteel,
 /area/department_main/control)
@@ -4140,9 +4144,6 @@
 	},
 /turf/open/floor/facility/white,
 /area/department_main/command)
-"AW" = (
-/turf/closed/indestructible/rock,
-/area/facility_hallway/training)
 "AZ" = (
 /obj/effect/turf_decal/siding/purple/corner,
 /obj/effect/turf_decal/siding/purple/corner{
@@ -4183,11 +4184,17 @@
 /obj/effect/turf_decal/siding/brown,
 /obj/machinery/light,
 /turf/open/floor/facility{
+	dir = 4;
 	icon = 'icons/turf/floors.dmi';
-	icon_state = "stairs-old";
-	dir = 4
+	icon_state = "stairs-old"
 	},
 /area/department_main/training)
+"Bp" = (
+/obj/machinery/light{
+	dir = 8
+	},
+/turf/open/floor/carpet,
+/area/department_main/control)
 "Br" = (
 /obj/machinery/camera/autoname{
 	dir = 5
@@ -4437,6 +4444,10 @@
 	},
 /turf/open/floor/facility/white,
 /area/department_main/safety)
+"Dt" = (
+/obj/effect/spawner/xmastree,
+/turf/open/floor/carpet/orange,
+/area/department_main/training)
 "Dw" = (
 /obj/effect/turf_decal/plaque{
 	alpha = 230;
@@ -5015,6 +5026,9 @@
 	pixel_y = 32
 	},
 /obj/structure/table/reinforced,
+/obj/machinery/light{
+	dir = 1
+	},
 /turf/open/floor/plasteel,
 /area/department_main/control)
 "HB" = (
@@ -6102,6 +6116,9 @@
 /obj/effect/turf_decal/siding/brown{
 	dir = 8
 	},
+/obj/machinery/camera/autoname{
+	dir = 4
+	},
 /turf/open/floor/plasteel,
 /area/facility_hallway/training)
 "Oc" = (
@@ -6134,8 +6151,8 @@
 /obj/structure/table/reinforced,
 /obj/item/reagent_containers/glass/bowl,
 /obj/item/kitchen/rollingpin{
-	pixel_y = -3;
-	pixel_x = 4
+	pixel_x = 4;
+	pixel_y = -3
 	},
 /obj/item/kitchen/knife{
 	pixel_x = -3;
@@ -7133,6 +7150,12 @@
 	},
 /turf/open/floor/plasteel,
 /area/facility_hallway/east)
+"Uv" = (
+/obj/machinery/light{
+	dir = 4
+	},
+/turf/open/floor/carpet,
+/area/department_main/control)
 "Uy" = (
 /turf/closed/indestructible/reinforced,
 /area/department_main/architecture)
@@ -29132,7 +29155,7 @@ SV
 Tg
 sB
 Fy
-xL
+sP
 Tg
 PD
 PD
@@ -29901,7 +29924,7 @@ Tg
 Tg
 Tg
 FP
-be
+sB
 Fy
 xL
 Tg
@@ -30158,7 +30181,7 @@ SV
 SV
 SV
 Tg
-sP
+sB
 Fy
 xL
 Tg
@@ -30674,7 +30697,7 @@ SV
 Tg
 sB
 Fy
-xL
+sP
 Tg
 PD
 PD
@@ -31702,7 +31725,7 @@ In
 JP
 Wm
 YP
-ry
+be
 WL
 rE
 ZQ
@@ -31938,7 +31961,7 @@ HD
 Vz
 iF
 We
-eH
+Bp
 XP
 EV
 tv
@@ -33245,7 +33268,7 @@ YP
 zz
 Zq
 Rs
-YP
+Dt
 pk
 YP
 YP
@@ -34508,7 +34531,7 @@ Rr
 Vz
 iF
 We
-eH
+Uv
 XZ
 DB
 tv
@@ -34535,7 +34558,7 @@ GU
 pb
 iW
 ZQ
-PD
+ZQ
 PD
 PD
 Tg
@@ -34794,7 +34817,7 @@ ZQ
 ZQ
 PD
 PD
-bb
+PD
 PD
 Tg
 Tg
@@ -35048,6 +35071,7 @@ Pm
 FY
 ZQ
 BH
+ZQ
 PD
 PD
 PD
@@ -35058,9 +35082,8 @@ PD
 PD
 PD
 PD
-AW
-AW
-AW
+PD
+PD
 Tg
 SV
 SV
@@ -35315,9 +35338,9 @@ PD
 PD
 PD
 PD
-AW
-AW
-AW
+PD
+PD
+PD
 Tg
 SV
 SV

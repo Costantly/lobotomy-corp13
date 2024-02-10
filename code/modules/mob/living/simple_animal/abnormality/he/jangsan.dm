@@ -6,13 +6,14 @@
 	icon_state = "jangsan_idle"
 	icon_living = "jangsan_idle"
 	var/icon_aggro = "jangsan"
+	portrait = "jangsan"
 	speak_emote = list("growls")
 	pixel_x = -16
 	base_pixel_x = -16
 	ranged = TRUE
 	maxHealth = 1200
 	health = 1200
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 2)
 	see_in_dark = 10
 	stat_attack = HARD_CRIT
 	move_to_delay = 7
@@ -20,11 +21,11 @@
 	can_breach = TRUE
 	start_qliphoth = 3
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 60,
-						ABNORMALITY_WORK_INSIGHT = 60,
-						ABNORMALITY_WORK_ATTACHMENT = 60,
-						ABNORMALITY_WORK_REPRESSION = 60
-						)
+		ABNORMALITY_WORK_INSTINCT = 60,
+		ABNORMALITY_WORK_INSIGHT = 60,
+		ABNORMALITY_WORK_ATTACHMENT = 60,
+		ABNORMALITY_WORK_REPRESSION = 60,
+	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
 
@@ -36,8 +37,8 @@
 
 	ego_list = list(
 		/datum/ego_datum/weapon/maneater,
-		/datum/ego_datum/armor/maneater
-		)
+		/datum/ego_datum/armor/maneater,
+	)
 	gift_type =  /datum/ego_gifts/maneater
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
 
@@ -47,10 +48,12 @@
 	var/strong_counter
 	var/weak_counter
 	pet_bonus = "meows" //saves a few lines of code by allowing funpet() to be called by attack_hand()
-	var/list/stats = list(FORTITUDE_ATTRIBUTE,
-			PRUDENCE_ATTRIBUTE,
-			TEMPERANCE_ATTRIBUTE,
-			JUSTICE_ATTRIBUTE)
+	var/list/stats = list(
+		FORTITUDE_ATTRIBUTE,
+		PRUDENCE_ATTRIBUTE,
+		TEMPERANCE_ATTRIBUTE,
+		JUSTICE_ATTRIBUTE,
+	)
 //attack vars
 	var/bite_cooldown
 	var/bite_cooldown_time = 8 SECONDS
@@ -60,15 +63,21 @@
 	var/lure_cooldown_time = 120 SECONDS
 
 //speak_list + location + speak_list2
-	var/list/speak_list = list(";Hey guys im at ",
-			";Over here at ", ";Im in ")
-	var/list/speak_list2 = list(", let's have a pizza party!",
-			", i'll protect you!", ", let's work together!")
+	var/list/speak_list = list(
+		";Hey guys im at ",
+		";Over here at ",
+		";Im in ",
+	)
+	var/list/speak_list2 = list(
+		", let's have a pizza party!",
+		", i'll protect you!",
+		", let's work together!",
+	)
 
 //Init
 /mob/living/simple_animal/hostile/abnormality/jangsan/Initialize()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, .proc/On_Mob_Death) // Hell
+	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(On_Mob_Death)) // Hell
 
 /mob/living/simple_animal/hostile/abnormality/jangsan/Destroy()
 	UnregisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH)
@@ -134,11 +143,11 @@
 	KillCheck(petter)
 
 //Breach
-/mob/living/simple_animal/hostile/abnormality/jangsan/BreachEffect(mob/living/carbon/human/user)
-	..()
+/mob/living/simple_animal/hostile/abnormality/jangsan/BreachEffect(mob/living/carbon/human/user, breach_type)
+	. = ..()
 	if(!datum_reference.abno_radio)
 		AbnoRadio()
-	addtimer(CALLBACK(src, .proc/TryTeleport), 5)
+	addtimer(CALLBACK(src, PROC_REF(TryTeleport)), 5)
 
 /mob/living/simple_animal/hostile/abnormality/jangsan/proc/TryTeleport() //stolen from knight of despair
 	dir = 2
@@ -175,7 +184,12 @@
 		Players += H
 
 	if(!Players.len)
-		name = pick("Unassuming Friendly Guy","Zeta 123","Bong Bong","John Lobotomy")
+		name = pick(
+			"Unassuming Friendly Guy",
+			"Zeta 123",
+			"Bong Bong",
+			"John Lobotomy",
+		)
 	else
 		var/Sucker = pick(Players)
 		name = "[Sucker]"
@@ -216,7 +230,7 @@
 		head.dismember()
 		QDEL_NULL(head)
 		H.regenerate_icons()
-		visible_message("<span class='danger'>\The [src] bites [H]'s head off!</span>")
+		visible_message(span_danger("\The [src] bites [H]'s head off!"))
 		new /obj/effect/gibspawner/generic/silent(get_turf(H))
 		new /obj/effect/halo(get_turf(H))
 		playsound(get_turf(src), 'sound/abnormalities/bigbird/bite.ogg', 50, 1, 2)
@@ -226,7 +240,7 @@
 	H.apply_status_effect(/datum/status_effect/panicked_lvl_4)
 	H.adjustSanityLoss(-50)
 	H.Stun(5 SECONDS)
-	to_chat(target, "<span class='warning'>Is that what it really looks like? It's over... I can’t even move my legs...</span>")
+	to_chat(target, span_warning("Is that what it really looks like? It's over... I can’t even move my legs..."))
 	return
 
 //targetting
@@ -266,7 +280,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/jangsan/bullet_act(obj/projectile/P)
 	if(P.damage <= 40)
-		visible_message("<span class='userdanger'>[P] is caught in [src]'s thick fur!</span>")
+		visible_message(span_userdanger("[P] is caught in [src]'s thick fur!"))
 		P.Destroy()
 		return
 	..()

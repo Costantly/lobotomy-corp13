@@ -278,12 +278,6 @@
 	name = "Spinward Hub Armory"
 	},
 /area/centcom/hub)
-"aS" = (
-/obj/machinery/camera/autoname{
-	dir = 4
-	},
-/turf/open/floor/facility/dark,
-/area/facility_hallway/manager)
 "aU" = (
 /obj/structure/closet/secure_closet/security,
 /obj/item/clothing/under/rank/security/officer/spacepol,
@@ -468,11 +462,9 @@
 /turf/open/floor/plasteel,
 /area/centcom/supply)
 "bK" = (
-/obj/machinery/light,
-/obj/machinery/camera/autoname{
-	dir = 10
-	},
-/turf/open/floor/facility/dark,
+/obj/structure/rack,
+/obj/item/toy/plush/qoh,
+/turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "bM" = (
 /obj/item/kirbyplants{
@@ -696,6 +688,9 @@
 /obj/structure/sign/ordealmonitor{
 	pixel_y = 32
 	},
+/obj/machinery/camera/autoname{
+	dir = 6
+	},
 /turf/open/floor/wood,
 /area/department_main/manager)
 "cM" = (
@@ -834,12 +829,18 @@
 /turf/open/floor/plasteel/white,
 /area/facility_hallway/manager)
 "dr" = (
-/obj/item/jammer/self_activated{
-	alpha = 0;
-	range = 20
+/obj/effect/turf_decal/weather/snow/corner,
+/obj/effect/radiojammer{
+	range = 14
 	},
-/turf/open/water/deep/saltwater/extradeep,
-/area/fishboat)
+/turf/open/floor/plasteel/dark{
+	icon = 'icons/turf/snow.dmi';
+	icon_state = "snow-ice";
+	name = "ice";
+	initial_gas_mix = "o2=22;n2=82;TEMP=270.15";
+	base_icon_state = "snow-ice"
+	},
+/area/snowqueen)
 "dv" = (
 /obj/structure/flora/iceshards{
 	pixel_y = -12;
@@ -895,6 +896,15 @@
 	name = "Spinward Hub Corridor"
 	},
 /area/centcom/hub)
+"dG" = (
+/obj/effect/landmark/custom_office/poster{
+	pixel_x = -32
+	},
+/obj/structure/chair/sofa/corp/right{
+	dir = 4
+	},
+/turf/open/floor/facility/dark,
+/area/facility_hallway/manager)
 "dK" = (
 /obj/machinery/door/poddoor{
 	id = "thunderdomegen";
@@ -943,6 +953,10 @@
 	dir = 10
 	},
 /obj/machinery/light/cold/no_nightlight,
+/obj/machinery/facility_holomap{
+	dir = 1;
+	forced_zLevel = 2
+	},
 /turf/open/floor/carpet/black,
 /area/department_main/manager)
 "dW" = (
@@ -1103,8 +1117,7 @@
 /turf/open/floor/shelter,
 /area/shelter)
 "eO" = (
-/obj/machinery/light,
-/obj/machinery/camera/autoname{
+/obj/structure/chair/sofa/corp/right{
 	dir = 1
 	},
 /turf/open/floor/facility/dark,
@@ -1117,10 +1130,7 @@
 /turf/open/floor/carpet/black,
 /area/facility_hallway/manager)
 "eR" = (
-/obj/structure/rack,
-/obj/item/flashlight/seclite,
-/obj/item/flashlight/seclite,
-/obj/item/melee/classic_baton,
+/obj/structure/table/reinforced,
 /turf/open/floor/plasteel/white,
 /area/facility_hallway/manager)
 "eS" = (
@@ -1171,7 +1181,7 @@
 	id = "managerlockdown";
 	name = "Manager's Office Lockdown Blast Door"
 	},
-/obj/machinery/door/airlock/wood/glass{
+/obj/machinery/door/airlock/wood{
 	name = "Manager's Office"
 	},
 /turf/open/floor/facility/dark,
@@ -1248,9 +1258,6 @@
 "ft" = (
 /obj/structure/sign/ordealmonitor{
 	pixel_y = -32
-	},
-/obj/machinery/camera/autoname{
-	dir = 10
 	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
@@ -2416,9 +2423,6 @@
 /obj/effect/turf_decal/siding/wood{
 	dir = 6
 	},
-/obj/machinery/camera/autoname{
-	dir = 10
-	},
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
 "iZ" = (
@@ -2771,16 +2775,13 @@
 /obj/item/kirbyplants{
 	icon_state = "plant-04"
 	},
-/obj/machinery/camera/autoname{
-	dir = 3
-	},
 /turf/open/floor/wood,
 /area/department_main/manager)
 "kB" = (
 /obj/machinery/light{
 	dir = 8
 	},
-/obj/effect/spawner/randomsnackvend,
+/obj/machinery/roulette,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "kC" = (
@@ -2935,10 +2936,10 @@
 	dir = 1;
 	light_color = "#333333"
 	},
-/obj/effect/spawner/randomarcade,
 /obj/effect/turf_decal/siding/wood{
 	dir = 1
 	},
+/obj/machinery/vending/coffee,
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
 "lo" = (
@@ -2965,14 +2966,13 @@
 /turf/open/floor/plasteel/dark,
 /area/centcom/ferry)
 "ls" = (
-/obj/machinery/light{
-	dir = 1
+/obj/effect/turf_decal/siding/white{
+	dir = 8
 	},
-/obj/structure/chair/sofa/corp,
-/obj/machinery/camera/autoname{
-	dir = 6
+/obj/structure/chair/comfy/lime{
+	dir = 4
 	},
-/turf/open/floor/facility/dark,
+/turf/open/floor/carpet/black,
 /area/facility_hallway/manager)
 "lt" = (
 /obj/machinery/door/airlock/centcom{
@@ -3002,6 +3002,9 @@
 "lx" = (
 /obj/effect/landmark/custom_office/poster{
 	pixel_x = -32
+	},
+/obj/structure/chair/sofa/corp/left{
+	dir = 4
 	},
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
@@ -3080,13 +3083,6 @@
 	dir = 1
 	},
 /area/tdome/tdomeobserve)
-"lW" = (
-/obj/item/jammer/self_activated{
-	alpha = 0;
-	range = 20
-	},
-/turf/open/space/basic,
-/area/space)
 "lX" = (
 /turf/closed/indestructible/abductor{
 	icon_state = "alien10"
@@ -3288,17 +3284,10 @@
 /turf/open/floor/wood,
 /area/department_main/manager)
 "mY" = (
-/obj/effect/turf_decal/tile{
-	color = "#111111";
-	light_color = "#333333"
+/obj/structure/chair/sofa/corp{
+	dir = 1
 	},
-/obj/effect/turf_decal/tile{
-	color = "#111111";
-	dir = 1;
-	light_color = "#333333"
-	},
-/obj/structure/chair/stool,
-/turf/open/floor/wood,
+/turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "mZ" = (
 /obj/structure/chair/comfy/beige,
@@ -3388,12 +3377,6 @@
 	},
 /turf/open/floor/plasteel/dark,
 /area/centcom/evac)
-"ns" = (
-/obj/item/jammer/self_activated{
-	alpha = 0
-	},
-/turf/open/water/deep/saltwater/extradeep,
-/area/fishboat)
 "nx" = (
 /obj/structure/flora/bush,
 /turf/open/floor/plating/asteroid/snow/airless,
@@ -3533,6 +3516,9 @@
 /obj/machinery/light,
 /obj/effect/turf_decal/siding/wood{
 	dir = 7
+	},
+/obj/machinery/computer/camera_advanced{
+	dir = 1
 	},
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
@@ -3842,8 +3828,8 @@
 /turf/open/floor/plasteel,
 /area/centcom/supply)
 "pl" = (
-/obj/machinery/camera/autoname{
-	dir = 6
+/obj/structure/sign/poster/official/soft_cap_pop_art{
+	pixel_y = 32
 	},
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
@@ -3986,16 +3972,10 @@
 /turf/closed/mineral/snowmountain/cavern,
 /area/snowqueen)
 "pQ" = (
-/obj/effect/turf_decal/siding/wood/corner{
+/obj/structure/chair/sofa/corp{
 	dir = 4
 	},
-/obj/effect/turf_decal/siding/wood{
-	dir = 8
-	},
-/obj/machinery/camera/autoname{
-	dir = 5
-	},
-/turf/open/floor/wood,
+/turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "pR" = (
 /obj/machinery/mech_bay_recharge_port,
@@ -4470,9 +4450,8 @@
 	dir = 8
 	},
 /obj/effect/turf_decal/tile/neutral,
-/obj/structure/table/wood,
-/obj/item/kirbyplants/random{
-	pixel_y = 10
+/obj/structure/displaycase/trophy{
+	alert = 0
 	},
 /turf/open/floor/plasteel/dark,
 /area/department_main/manager)
@@ -4513,11 +4492,6 @@
 	dir = 6
 	},
 /obj/structure/table/wood/fancy/green,
-/obj/item/refiner_filter/green,
-/obj/item/reagent_containers/food/drinks/beer{
-	pixel_x = 5;
-	pixel_y = -2
-	},
 /obj/effect/turf_decal/siding/green{
 	dir = 6
 	},
@@ -4732,9 +4706,8 @@
 	dir = 4
 	},
 /obj/machinery/light/floor,
-/obj/structure/table/wood,
-/obj/item/kirbyplants/random{
-	pixel_y = 10
+/obj/structure/displaycase/trophy{
+	alert = 0
 	},
 /turf/open/floor/plasteel/dark,
 /area/department_main/manager)
@@ -4947,10 +4920,10 @@
 	dir = 1;
 	light_color = "#333333"
 	},
-/obj/effect/spawner/randomsnackvend,
 /obj/effect/turf_decal/siding/wood{
 	dir = 1
 	},
+/obj/effect/spawner/randomsnackvend,
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
 "tl" = (
@@ -5083,8 +5056,9 @@
 /turf/open/floor/carpet/black,
 /area/facility_hallway/manager)
 "tJ" = (
-/obj/machinery/camera/autoname{
-	dir = 8
+/obj/machinery/facility_holomap{
+	dir = 4;
+	forced_zLevel = 2
 	},
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
@@ -5338,12 +5312,7 @@
 /turf/open/floor/engine,
 /area/tdome/arena)
 "uN" = (
-/obj/effect/spawner/randomarcade{
-	dir = 4
-	},
-/obj/machinery/camera/autoname{
-	dir = 4
-	},
+/obj/machinery/vending/coffee,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "uP" = (
@@ -5530,9 +5499,6 @@
 "vp" = (
 /obj/structure/rack,
 /obj/item/toy/plush/mosb,
-/obj/item/toy/plush/kog{
-	pixel_x = 15
-	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "vs" = (
@@ -5888,9 +5854,8 @@
 /obj/item/reagent_containers/food/drinks/waterbottle/large,
 /obj/item/reagent_containers/food/drinks/waterbottle/large,
 /obj/item/reagent_containers/food/drinks/waterbottle/large,
-/obj/item/reagent_containers/food/drinks/waterbottle/large,
-/obj/structure/closet/crate/pcorp,
 /obj/effect/shelter_forcefield,
+/obj/structure/closet/crate/pcorp/shelter,
 /turf/open/floor/shelter,
 /area/shelter)
 "wu" = (
@@ -6278,12 +6243,6 @@
 "xR" = (
 /obj/structure/rack,
 /obj/item/toy/plush/scorched,
-/obj/item/toy/plush/qoh{
-	pixel_x = 15
-	},
-/obj/item/toy/plush/sow{
-	pixel_x = -10
-	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "xS" = (
@@ -6689,9 +6648,6 @@
 /obj/machinery/status_display{
 	pixel_x = -32
 	},
-/obj/structure/displaycase/trophy{
-	alert = 0
-	},
 /turf/open/floor/plasteel/dark,
 /area/department_main/manager)
 "zh" = (
@@ -6998,8 +6954,8 @@
 /turf/open/floor/plasteel,
 /area/centcom/supplypod/loading/three)
 "Aa" = (
-/obj/machinery/camera/autoname{
-	dir = 7
+/obj/structure/chair/sofa/corp/left{
+	dir = 1
 	},
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
@@ -7027,9 +6983,6 @@
 "Ao" = (
 /obj/structure/rack,
 /obj/item/toy/plush/bigbird,
-/obj/item/toy/plush/nihil{
-	pixel_x = 15
-	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "Ap" = (
@@ -7355,7 +7308,6 @@
 	dir = 1
 	},
 /obj/structure/chair/sofa/corp,
-/obj/machinery/camera/autoname,
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "BG" = (
@@ -7715,6 +7667,12 @@
 "Di" = (
 /turf/closed/indestructible/riveted,
 /area/ai_multicam_room)
+"Dk" = (
+/obj/structure/sign/poster/official/high_class_martini{
+	pixel_y = 32
+	},
+/turf/open/floor/facility/dark,
+/area/facility_hallway/manager)
 "Dm" = (
 /obj/structure/flora/icestalagmite{
 	layer = 3;
@@ -7842,9 +7800,6 @@
 /obj/effect/turf_decal/tile/neutral,
 /obj/machinery/status_display{
 	pixel_x = 32
-	},
-/obj/structure/displaycase/trophy{
-	alert = 0
 	},
 /turf/open/floor/plasteel/dark,
 /area/department_main/manager)
@@ -8038,7 +7993,6 @@
 	},
 /area/tdome/tdomeobserve)
 "Es" = (
-/obj/structure/chair/sofa/corp/left,
 /obj/structure/sign/departments/restroom{
 	pixel_y = 32
 	},
@@ -8189,13 +8143,10 @@
 /turf/open/floor/wood,
 /area/centcom/holding)
 "Ff" = (
-/obj/structure/rack,
 /obj/machinery/light{
 	dir = 4
 	},
-/obj/item/flashlight/seclite,
-/obj/item/flashlight/seclite,
-/obj/item/melee/classic_baton,
+/obj/structure/table/reinforced,
 /turf/open/floor/plasteel/white,
 /area/facility_hallway/manager)
 "Fg" = (
@@ -8251,6 +8202,7 @@
 /obj/item/encryptionkey/heads/manager,
 /obj/item/radio/headset/heads/manager,
 /obj/machinery/light/cold/no_nightlight,
+/obj/item/food/grown/star_cactus,
 /turf/open/floor/facility/dark,
 /area/department_main/manager)
 "Fr" = (
@@ -8389,10 +8341,6 @@
 	},
 /turf/closed/mineral/snowmountain/cavern,
 /area/snowqueen)
-"Gh" = (
-/obj/item/jammer/self_activated,
-/turf/closed/indestructible/rock,
-/area/shelter)
 "Gj" = (
 /obj/effect/turf_decal/siding/white/corner{
 	dir = 8
@@ -8656,9 +8604,6 @@
 /obj/effect/turf_decal/siding/brown{
 	dir = 4
 	},
-/obj/machinery/camera/autoname{
-	dir = 8
-	},
 /obj/machinery/computer/camera_advanced/manager/sephirah{
 	dir = 8
 	},
@@ -8711,16 +8656,11 @@
 	},
 /area/snowqueen)
 "HL" = (
-/obj/effect/turf_decal/siding/wood/corner{
-	dir = 5
+/obj/machinery/facility_holomap{
+	dir = 1;
+	forced_zLevel = 2
 	},
-/obj/effect/turf_decal/siding/wood{
-	dir = 8
-	},
-/obj/machinery/camera/autoname{
-	dir = 4
-	},
-/turf/open/floor/wood,
+/turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "HM" = (
 /obj/effect/turf_decal/tile/brown{
@@ -9564,7 +9504,6 @@
 /obj/effect/turf_decal/siding/green{
 	dir = 1
 	},
-/obj/machinery/camera/autoname,
 /obj/machinery/computer/camera_advanced/manager/sephirah,
 /turf/open/floor/carpet/green,
 /area/facility_hallway/manager)
@@ -10171,13 +10110,9 @@
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "MC" = (
-/obj/machinery/cryopod{
-	dir = 1
-	},
-/obj/machinery/camera/autoname{
-	dir = 4
-	},
-/turf/open/floor/plasteel/white,
+/obj/structure/rack,
+/obj/item/toy/plush/kod,
+/turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "MD" = (
 /obj/effect/light_emitter{
@@ -10278,13 +10213,12 @@
 /turf/open/floor/plasteel/cafeteria,
 /area/centcom/holding)
 "MU" = (
-/obj/machinery/cryopod{
-	dir = 1
+/obj/structure/rack,
+/obj/item/toy/plush/kog,
+/obj/item/toy/plush/nihil{
+	pixel_x = 15
 	},
-/obj/machinery/camera/autoname{
-	dir = 5
-	},
-/turf/open/floor/plasteel/white,
+/turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "MY" = (
 /obj/effect/turf_decal/tile/blue{
@@ -10320,6 +10254,9 @@
 /turf/open/floor/carpet/green,
 /area/facility_hallway/manager)
 "Nk" = (
+/obj/effect/radiojammer{
+	range = 15
+	},
 /turf/closed/indestructible/wood,
 /area/fishboat)
 "Nm" = (
@@ -10687,9 +10624,6 @@
 /area/department_main/manager)
 "OS" = (
 /obj/structure/table/wood/fancy/royalblack,
-/obj/item/records{
-	desc = "Looks like a records sephirah left this here."
-	},
 /obj/effect/turf_decal/siding/brown/corner{
 	dir = 4
 	},
@@ -10738,13 +10672,11 @@
 /obj/machinery/light{
 	dir = 1
 	},
-/obj/machinery/vending/coffee,
 /obj/effect/turf_decal/siding/wood{
 	dir = 1
 	},
-/obj/machinery/camera/autoname{
-	dir = 7
-	},
+/obj/effect/turf_decal/bot,
+/obj/structure/closet/crate/bin,
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
 "Pd" = (
@@ -10815,12 +10747,6 @@
 /obj/item/book/manual/chef_recipes,
 /turf/open/floor/plasteel/cafeteria,
 /area/centcom/holding)
-"Ps" = (
-/obj/structure/chair/sofa/corp/left{
-	dir = 4
-	},
-/turf/open/floor/facility/dark,
-/area/facility_hallway/manager)
 "Pv" = (
 /obj/effect/turf_decal/tile/brown{
 	dir = 8
@@ -11073,9 +10999,7 @@
 	},
 /area/snowqueen)
 "Qn" = (
-/obj/structure/chair/sofa/corp/right{
-	dir = 4
-	},
+/obj/machinery/vending/coffee,
 /turf/open/floor/facility/dark,
 /area/facility_hallway/manager)
 "Qq" = (
@@ -11131,6 +11055,9 @@
 /area/centcom/holding)
 "QG" = (
 /obj/effect/landmark/snowqueen_playerspawn,
+/obj/effect/radiojammer{
+	range = 6
+	},
 /turf/open/floor/plasteel/dark{
 	icon = 'icons/turf/snow.dmi';
 	icon_state = "snow-ice";
@@ -11466,9 +11393,6 @@
 "RX" = (
 /obj/structure/rack,
 /obj/item/toy/plush/melt,
-/obj/item/toy/plush/kod{
-	pixel_x = 15
-	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "RY" = (
@@ -11504,12 +11428,12 @@
 /turf/open/floor/plasteel,
 /area/centcom/supplypod/loading/two)
 "Sf" = (
-/obj/structure/closet/crate/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/effect/shelter_forcefield,
+/obj/structure/closet/crate/pcorp/shelter,
 /turf/open/floor/shelter,
 /area/shelter)
 "Sg" = (
@@ -11782,6 +11706,10 @@
 	dir = 6
 	},
 /obj/machinery/light/cold/no_nightlight,
+/obj/machinery/facility_holomap{
+	dir = 1;
+	forced_zLevel = 2
+	},
 /turf/open/floor/carpet/black,
 /area/department_main/manager)
 "Tq" = (
@@ -11887,9 +11815,6 @@
 /obj/effect/turf_decal/siding{
 	color = "#7D6521"
 	},
-/obj/machinery/camera/autoname{
-	dir = 1
-	},
 /obj/machinery/computer/camera_advanced/manager/sephirah{
 	dir = 1
 	},
@@ -11951,10 +11876,11 @@
 /obj/item/toy/plush/netzach,
 /obj/structure/railing,
 /obj/structure/table/wood/fancy/green,
-/obj/item/reagent_containers/food/drinks/colocup/lean{
-	pixel_x = -5
-	},
 /obj/effect/turf_decal/siding/green,
+/obj/item/reagent_containers/food/drinks/beer{
+	pixel_x = 5;
+	pixel_y = -2
+	},
 /turf/open/floor/carpet/green,
 /area/facility_hallway/manager)
 "Uh" = (
@@ -12409,9 +12335,6 @@
 /obj/machinery/status_display{
 	pixel_y = -32
 	},
-/obj/machinery/camera/autoname{
-	dir = 1
-	},
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "Wh" = (
@@ -12567,12 +12490,12 @@
 /obj/machinery/light/small{
 	dir = 8
 	},
-/obj/structure/closet/crate/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/effect/shelter_forcefield,
+/obj/structure/closet/crate/pcorp/shelter,
 /turf/open/floor/shelter,
 /area/shelter)
 "WQ" = (
@@ -12591,9 +12514,6 @@
 	},
 /obj/item/kirbyplants{
 	icon_state = "plant-04"
-	},
-/obj/machinery/camera/autoname{
-	dir = 6
 	},
 /turf/open/floor/wood,
 /area/department_main/manager)
@@ -12659,12 +12579,7 @@
 /turf/open/floor/wood,
 /area/facility_hallway/manager)
 "Xb" = (
-/obj/effect/spawner/randomarcade{
-	dir = 8
-	},
-/obj/machinery/camera/autoname{
-	dir = 8
-	},
+/obj/effect/spawner/randomcolavend,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "Xc" = (
@@ -12843,6 +12758,9 @@
 "XJ" = (
 /obj/structure/toolabnormality/shelter/exit,
 /obj/effect/shelter_forcefield,
+/obj/effect/radiojammer{
+	range = 8
+	},
 /turf/open/floor/shelter,
 /area/shelter)
 "XL" = (
@@ -13017,7 +12935,7 @@
 /obj/machinery/light{
 	dir = 4
 	},
-/obj/effect/spawner/randomcolavend,
+/obj/machinery/roulette,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "Yt" = (
@@ -13032,7 +12950,6 @@
 /turf/open/floor/plasteel/cafeteria,
 /area/centcom/holding)
 "Yw" = (
-/obj/structure/closet/crate/pcorp,
 /obj/machinery/light/small{
 	dir = 4
 	},
@@ -13041,6 +12958,7 @@
 /obj/item/storage/box/pcorp,
 /obj/item/storage/box/pcorp,
 /obj/effect/shelter_forcefield,
+/obj/structure/closet/crate/pcorp/shelter,
 /turf/open/floor/shelter,
 /area/shelter)
 "YA" = (
@@ -13318,6 +13236,7 @@
 /area/facility_hallway/manager)
 "ZM" = (
 /obj/structure/rack,
+/obj/item/toy/plush/sow,
 /turf/open/floor/plasteel/dark,
 /area/facility_hallway/manager)
 "ZN" = (
@@ -15218,9 +15137,9 @@ aa
 qp
 eR
 dk
-MC
 cx
-MU
+cx
+cx
 dk
 eR
 qp
@@ -16504,7 +16423,7 @@ eB
 qp
 Xc
 Xc
-AK
+tJ
 Xc
 PG
 qp
@@ -16767,7 +16686,7 @@ Xc
 HT
 sA
 sA
-ZI
+sA
 ZI
 sA
 MQ
@@ -17029,7 +16948,7 @@ sA
 sA
 Dc
 qp
-ZM
+bK
 sA
 vp
 qp
@@ -17281,12 +17200,12 @@ Xc
 HT
 sA
 sA
-ZI
+sA
 ZI
 sA
 YP
 qp
-ZM
+MC
 sA
 Ao
 qp
@@ -17543,7 +17462,7 @@ VY
 jw
 Ia
 qp
-ZM
+MU
 sA
 pN
 qp
@@ -17791,7 +17710,7 @@ BF
 pE
 OX
 ew
-eO
+qT
 qp
 qp
 qp
@@ -19593,11 +19512,11 @@ ew
 Xc
 Xc
 lx
+pQ
+pQ
+pQ
+dG
 Xc
-Ps
-Qn
-lx
-aS
 nk
 qp
 qp
@@ -20870,7 +20789,7 @@ qB
 PB
 Ds
 VR
-Aa
+Dk
 eg
 JS
 OX
@@ -20883,7 +20802,7 @@ sA
 sA
 sA
 sA
-Xc
+HL
 qp
 eS
 jX
@@ -21139,7 +21058,7 @@ Xc
 Xc
 Xc
 Xc
-tJ
+Xc
 Xc
 qp
 qp
@@ -21646,7 +21565,7 @@ Yl
 pE
 OX
 ew
-Xc
+eO
 qp
 xa
 So
@@ -21903,10 +21822,10 @@ Hc
 pE
 OX
 ew
-Xc
-qp
-ln
 mY
+qp
+tk
+sN
 sN
 sN
 sN
@@ -22160,10 +22079,10 @@ SJ
 pE
 OX
 ew
-Xc
+Aa
 qp
 ln
-mY
+sN
 sN
 sN
 Dp
@@ -22670,7 +22589,7 @@ aa
 aa
 aa
 qp
-Fg
+Qn
 pE
 OX
 ew
@@ -22927,11 +22846,11 @@ qp
 qp
 qp
 qp
-ls
+Cb
 pE
 OX
 ew
-bK
+qT
 qp
 Pb
 sN
@@ -23702,7 +23621,7 @@ Xc
 pE
 OX
 ew
-Xc
+HL
 qp
 cD
 BM
@@ -24212,9 +24131,9 @@ qp
 qp
 qp
 qp
-Xc
-Xc
 AK
+Xc
+Xc
 Xc
 PG
 qp
@@ -24725,13 +24644,13 @@ As
 Td
 ZP
 GO
-HL
+qS
 ZP
 oM
 ZP
 zw
 ZP
-pQ
+GO
 qS
 ZP
 Oz
@@ -24985,7 +24904,7 @@ Dt
 oN
 rM
 rx
-rx
+ls
 rx
 pb
 Dt
@@ -64088,7 +64007,7 @@ Sg
 Sg
 Sg
 Sg
-ns
+Sg
 Sg
 Sg
 Sg
@@ -66647,7 +66566,7 @@ aa
 tF
 Sg
 Sg
-ns
+Sg
 Sg
 Sg
 Sg
@@ -66670,7 +66589,7 @@ CH
 Sg
 Sg
 Sg
-dr
+Sg
 Sg
 Sg
 tF
@@ -69228,7 +69147,7 @@ Sg
 Sg
 Sg
 Sg
-ns
+Sg
 Sg
 Sg
 Sg
@@ -70490,7 +70409,7 @@ aa
 aa
 aa
 aa
-lW
+aa
 aa
 aa
 aa
@@ -74331,7 +74250,7 @@ aa
 aa
 aa
 aa
-lW
+aa
 qu
 qu
 rB
@@ -74346,7 +74265,7 @@ rB
 rB
 Ho
 TF
-Ow
+dr
 rB
 rB
 tl
@@ -74379,7 +74298,7 @@ eM
 XJ
 sI
 wU
-Gh
+FI
 FI
 aa
 aa
@@ -75644,7 +75563,7 @@ rB
 Yb
 qu
 qu
-lW
+aa
 qu
 qu
 qu
@@ -78200,7 +78119,7 @@ aa
 aa
 aa
 aa
-lW
+aa
 aa
 aa
 aa

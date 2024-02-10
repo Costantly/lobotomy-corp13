@@ -10,6 +10,7 @@
 	icon = 'ModularTegustation/Teguicons/128x128.dmi'
 	icon_state = "parasitetreeshine"
 	icon_living = "parasitetreeshine"
+	portrait = "parasite_tree"
 	pixel_x = -48
 	base_pixel_x = -48
 	pixel_y = -10
@@ -22,15 +23,15 @@
 		ABNORMALITY_WORK_INSTINCT = 45,
 		ABNORMALITY_WORK_INSIGHT = list(40, 40, 40, 45, 45),
 		ABNORMALITY_WORK_ATTACHMENT = list(50, 50, 50, 50, 55),
-		ABNORMALITY_WORK_REPRESSION = 20
-		)
+		ABNORMALITY_WORK_REPRESSION = 20,
+	)
 	work_damage_amount = 12
 	work_damage_type = WHITE_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/hypocrisy,
-		/datum/ego_datum/armor/hypocrisy
-		)
+		/datum/ego_datum/armor/hypocrisy,
+	)
 
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 	gift_type =  /datum/ego_gifts/hypocrisy
@@ -41,7 +42,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/parasite_tree/Initialize()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_ABNORMALITY_BREACH, .proc/dropLeaf)
+	RegisterSignal(SSdcs, COMSIG_GLOB_ABNORMALITY_BREACH, PROC_REF(dropLeaf))
 
 /mob/living/simple_animal/hostile/abnormality/parasite_tree/PostWorkEffect(mob/living/carbon/human/user, work_type, pe, work_time, canceled)
 	if(work_type != ABNORMALITY_WORK_REPRESSION && user.stat != DEAD)
@@ -49,17 +50,17 @@
 			var/mob/living/carbon/human/witness = locate(/mob/living/carbon/human) in livinginview(1, src) //included mostly for lore since you encourage people to use it.
 			if(witness && !witness.has_status_effect(THE_LIARS_BLESSING))
 				witness.apply_status_effect(THE_LIARS_BLESSING)
-				to_chat(witness, "<span class='notice'>The air around [src] makes you feel at peace.</span>")
+				to_chat(witness, span_notice("The air around [src] makes you feel at peace."))
 		else if(datum_reference.qliphoth_meter <= 0)
 			user.apply_status_effect(THE_TREE_CURSE)
 		else
 			user.apply_status_effect(THE_LIARS_BLESSING)
 			if(prob(5))
-				to_chat(user, "<span class='notice'>You hear a voice telling you to bring anyone who needs help here.</span>")
+				to_chat(user, span_notice("You hear a voice telling you to bring anyone who needs help here."))
 		return
 	if(datum_reference.qliphoth_meter <= 4)
 		if(canceled || pe < datum_reference.neutral_boxes)
-			to_chat(user, "<span class='notice'>You feel refreshed after being near [src].</span>")
+			to_chat(user, span_notice("You feel refreshed after being near [src]."))
 			if(datum_reference.qliphoth_meter >= 1)
 				user.apply_status_effect(THE_LIARS_BLESSING)
 			else
@@ -69,9 +70,9 @@
 			resetQliphoth()
 			for(var/datum/status_effect/display/parasite_tree_curse/curse in blessed)
 				qdel(curse)
-			to_chat(user, "<span class='nicegreen'>The scarlet red eye closes as you smash apart [src]'s flowers.</span>")
+			to_chat(user, span_nicegreen("The scarlet red eye closes as you smash apart [src]'s flowers."))
 			return ..()
-		to_chat(user, "<span class='notice'>[src] stands silently as you finish destroying the buds.</span>")
+		to_chat(user, span_notice("[src] stands silently as you finish destroying the buds."))
 		resetQliphoth()
 	return ..()
 
@@ -130,7 +131,7 @@
 					potentialFollowers[L] += (L.health - 1) + (L.sanityhealth - 1)
 		if(potentialFollowers.len)
 			var/mob/living/carbon/human/chosen_agent = pickweight(potentialFollowers)
-			to_chat(chosen_agent, "<span class='nicegreen'>A large leaf lands nearby.</span>")
+			to_chat(chosen_agent, span_nicegreen("A large leaf lands nearby."))
 			var/list/possibleleafturf = list()
 			for(var/turf/T in oview(3, chosen_agent))
 				if(!T.density && !locate(/obj/structure/window || /obj/machinery/door) in T.contents)
@@ -149,14 +150,14 @@
 	health = 800
 	can_patrol = FALSE
 	wander = 0
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
 	ranged = TRUE
 	ranged_cooldown_time = 1 SECONDS
 	obj_damage = 0
 	del_on_death = TRUE
 	environment_smash = ENVIRONMENT_SMASH_NONE
-	deathmessage = "shatters into numerous spongy splinters."
-	deathsound = 'sound/creatures/venus_trap_death.ogg'
+	death_message = "shatters into numerous spongy splinters."
+	death_sound = 'sound/creatures/venus_trap_death.ogg'
 	attacked_sound = 'sound/creatures/venus_trap_hurt.ogg'
 	projectilesound = 'sound/machines/clockcult/steam_whoosh.ogg'
 	var/mob/living/simple_animal/hostile/abnormality/parasite_tree/connected_abno
@@ -233,7 +234,7 @@
 	if(C.has_status_effect(THE_TREE_CURSE)) //If you have the status effect already dont mess with them.
 		return FALSE
 	C.smoke_delay++
-	addtimer(CALLBACK(src, .proc/remove_smoke_delay, C), 10)
+	addtimer(CALLBACK(src, PROC_REF(remove_smoke_delay), C), 10)
 	return smoke_mob_effect(C)
 
 
@@ -311,7 +312,7 @@
 	connected_abno = locate(/mob/living/simple_animal/hostile/abnormality/parasite_tree) in GLOB.abnormality_mob_list
 	if(connected_abno)
 		connected_abno.blessed += src
-	to_chat(owner, "<span class='warning'>You feel something sprouting under your skin! Its time to be reborn with the tree.</span>")
+	to_chat(owner, span_warning("You feel something sprouting under your skin! Its time to be reborn with the tree."))
 
 /datum/status_effect/display/parasite_tree_curse/tick()
 	. = ..()
@@ -377,7 +378,7 @@
 			L.apply_status_effect(THE_LIARS_BLESSING)
 		L.adjustBruteLoss(heal_amount)
 		new /obj/effect/temp_visual/cloud_swirl(get_turf(L)) //placeholder
-		to_chat(L, "<span class='nicegreen'>Your wounds quickly close after touching the [src].</span>")
+		to_chat(L, span_nicegreen("Your wounds quickly close after touching the [src]."))
 		qdel(src)
 
 #undef THE_LIARS_BLESSING

@@ -20,19 +20,29 @@
 		/obj/item/toy/plush/sinclair,
 		/obj/item/toy/plush/outis,
 		/obj/item/toy/plush/gregor,
-		/obj/item/toy/plush/yuri)
+		/obj/item/toy/plush/yuri,
+	)
 
-	var/rareloot =	list(/obj/item/toy/plush/dante,)
+	var/rareloot =	list(/obj/item/toy/plush/dante)
 	var/veryrareloot =	list()	//Only Kcorp uses these atm, because It's important that they have 3 tiers of weapons
 	var/rarechance = 20
 	var/veryrarechance
 
+/obj/structure/lootcrate/Initialize()
+	..()
+	if(SSmaptype.maptype in SSmaptype.citymaps)	//Also can't drag it out to open it. Open it on spot, bitch
+		anchored = TRUE
 
 /obj/structure/lootcrate/attackby(obj/item/I, mob/living/user, params)
 	..()
 	var/loot
 	if(I.tool_behaviour != TOOL_CROWBAR)
 		return
+
+	if(SSmaptype.maptype in SSmaptype.citymaps)	//Fuckers shouldn't loot like this
+		if(!do_after(user, 7 SECONDS, src))
+			return
+
 	if(veryrarechance && prob(veryrarechance))
 		loot = pick(veryrareloot)
 
@@ -42,6 +52,6 @@
 	else
 		loot = pick(lootlist)
 
-	to_chat(user, "<span class='notice'>You open the crate!</span>")
+	to_chat(user, span_notice("You open the crate!"))
 	new loot(get_turf(src))
 	qdel(src)

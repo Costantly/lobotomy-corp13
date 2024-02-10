@@ -137,7 +137,7 @@
 
 /obj/projectile/ego_bullet/ego_praetorian/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, .proc/fireback), 3)
+	addtimer(CALLBACK(src, PROC_REF(fireback)), 3)
 
 /obj/projectile/ego_bullet/ego_praetorian/proc/fireback()
 	var/list/targetslist = list()
@@ -237,9 +237,9 @@
 	. = ..()
 	if(isliving(target))
 		var/mob/living/simple_animal/M = target
-		if(!ishuman(M) && !M.has_status_effect(/datum/status_effect/sunder_red))
+		if(!ishuman(M) && !M.has_status_effect(/datum/status_effect/rend_red))
 			new /obj/effect/temp_visual/cult/sparks(get_turf(M))
-			M.apply_status_effect(/datum/status_effect/sunder_red)
+			M.apply_status_effect(/datum/status_effect/rend_red)
 
 //feather of valor
 /obj/projectile/ego_bullet/ego_warring
@@ -251,12 +251,11 @@
 /obj/projectile/ego_bullet/ego_warring/on_hit(atom/target, blocked = FALSE)
 	. = ..()
 	var/obj/item/gun/ego_gun/warring/bow = fired_from
-	var/mob/living/user = firer
-	var/mob/living/carbon/human/H = target
+	var/mob/living/L = target
 	if(!isliving(target))
 		return
-	if(user.faction_check_mob(H))//player faction
-		return
+	if((L.stat == DEAD) || L.status_flags & GODMODE)//if the target is dead or godmode
+		return FALSE
 	bow.Build_Charge()
 	return
 

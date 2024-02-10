@@ -12,9 +12,10 @@ SUBSYSTEM_DEF(cityevents)
 	var/list/total_events = list()
 	var/list/distortions_available = list()
 	var/helpful_events = list("chickens", "money", "tresmetal", "hppens", "sppens")
-	var/harmful_events = list("drones", "beaks", "shrimp")
-	var/ordeal_events = list("sweepers", "scouts", "bots")
+	var/harmful_events = list("drones", "beaks", "shrimps", "lovetowneasy", "lovetownhard")
+	var/ordeal_events = list("sweepers", "scouts", "bots", "gbugs", "gcorporals")
 	var/neutral_events = list("swag")
+	var/boss_events = list("sweeper", "lovetown", "factory", "gcorp")
 	var/list/generated = list()	//Which ckeys have generated stats
 	var/wavetime 		//How many waves have spawned? each wave increases the # of enemies by about 5%. One wave is every 5 minutes
 
@@ -25,9 +26,9 @@ SUBSYSTEM_DEF(cityevents)
 	InitializeEvents()
 	if(!can_fire)
 		return
-	addtimer(CALLBACK(src, .proc/Event), 15 MINUTES)	//Start doing events in 15 minutes
-	addtimer(CALLBACK(src, .proc/Distort), 20 MINUTES)		//Distortions start in 20
-	addtimer(CALLBACK(src, .proc/Daynight), 10 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(Event)), 15 MINUTES)	//Start doing events in 15 minutes
+	addtimer(CALLBACK(src, PROC_REF(Distort)), 20 MINUTES)		//Distortions start in 20
+	addtimer(CALLBACK(src, PROC_REF(Daynight)), 10 SECONDS)
 
 ///Ran on initialize, slap these puppies in a new list.
 /datum/controller/subsystem/cityevents/proc/InitializeLandmarks()
@@ -68,12 +69,12 @@ SUBSYSTEM_DEF(cityevents)
 
 //Events
 /datum/controller/subsystem/cityevents/proc/Event()
-	addtimer(CALLBACK(src, .proc/Event), 5 MINUTES)
-	var/chosen_event = pick(total_events)
+	addtimer(CALLBACK(src, PROC_REF(Event)), 5 MINUTES)
+	var/chosen_event
 	if(wavetime == 10 && wavetime !=0)	//after 50 minutes
-		Boss()
-		wavetime+=1
-		return
+		chosen_event = Boss()
+	else
+		chosen_event = pick(total_events)
 
 	switch (chosen_event)
 		if("sweepers")
@@ -82,14 +83,24 @@ SUBSYSTEM_DEF(cityevents)
 			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/indigo_dawn, 40)
 		if("bots")
 			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/green_bot, 10)
+		if("gbugs")
+			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/steel_dawn, 30)
+		if("gcorporals")
+			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon, 10)
 
 		//Harmful events
-		if("shrimp")
+		if("shrimps")
 			spawnatlandmark(/mob/living/simple_animal/hostile/shrimp, 20)
 		if("beaks")
 			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/bigBirdEye, 10)
 		if("drones")
 			spawnatlandmark(/mob/living/simple_animal/hostile/kcorp/drone, -10)//extremely low chance
+		if("lovetowneasy")
+			spawnatlandmark(pick(/mob/living/simple_animal/hostile/lovetown/slasher,
+			/mob/living/simple_animal/hostile/lovetown/stabber), 25)
+		if("lovetownhard")
+			spawnatlandmark(pick(/mob/living/simple_animal/hostile/lovetown/shambler,
+			/mob/living/simple_animal/hostile/lovetown/slumberer), 5)
 
 		//Good events
 		if("chickens")
@@ -130,9 +141,24 @@ SUBSYSTEM_DEF(cityevents)
 /datum/controller/subsystem/cityevents/proc/Boss()
 	minor_announce("Warning, large hostile detected. Suppression required.", "Local Activity Alert:", TRUE)
 	var/T = pick(spawners)
+	var/chosen_boss = pick(boss_events)
+	var/chosen_event
 	new /obj/effect/bloodpool(get_turf(T))
 	sleep(10)
-	new /mob/living/simple_animal/hostile/ordeal/indigo_dusk/red (get_turf(T))
+	switch(chosen_boss)
+		if ("lovetown")
+			new	/mob/living/simple_animal/hostile/lovetown/abomination (get_turf(T))
+			chosen_event = "lovetowneasy"
+		if ("sweeper")
+			new /mob/living/simple_animal/hostile/ordeal/indigo_dusk/red (get_turf(T))
+			chosen_event = "scouts"
+		if ("factory")
+			new /mob/living/simple_animal/hostile/ordeal/green_dusk (get_turf(T))
+			chosen_event = "bots"
+		if ("gcorp")
+			new /mob/living/simple_animal/hostile/ordeal/steel_dusk (get_turf(T))
+			chosen_event = "gbugs"
+	return chosen_event
 
 //Distortions
 /datum/controller/subsystem/cityevents/proc/Distort()
@@ -142,7 +168,7 @@ SUBSYSTEM_DEF(cityevents)
 	sleep(10)
 	var/spawning = pick(distortions_available)
 	new spawning (get_turf(T))
-	addtimer(CALLBACK(src, .proc/Distort), 20 MINUTES)
+	addtimer(CALLBACK(src, PROC_REF(Distort)), 20 MINUTES)
 
 //Daynight stuff
 /datum/controller/subsystem/cityevents/proc/Daynight()
@@ -150,20 +176,20 @@ SUBSYSTEM_DEF(cityevents)
 		L.set_light(25, globalillumination)
 
 	if(globalillumination <= -0.2)	//Go back up
-		addtimer(CALLBACK(src, .proc/Daynight), 5 MINUTES)
+		addtimer(CALLBACK(src, PROC_REF(Daynight)), 5 MINUTES)
 		daystatus = FALSE
 		globalillumination = -0.18	//Ship it back up
 		return
 
 	if(globalillumination >= 1.1)	//Go back down.
-		addtimer(CALLBACK(src, .proc/Daynight), 5 MINUTES)
+		addtimer(CALLBACK(src, PROC_REF(Daynight)), 5 MINUTES)
 		daystatus = TRUE
 		globalillumination = 1.08	//Ship it back down
 		return
 
 	if(daystatus)	//After noon
 		globalillumination -= 0.02
-		addtimer(CALLBACK(src, .proc/Daynight), 10 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(Daynight)), 10 SECONDS)
 	else		//before noon
 		globalillumination += 0.02
-		addtimer(CALLBACK(src, .proc/Daynight), 10 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(Daynight)), 10 SECONDS)

@@ -1,5 +1,7 @@
 //Just some map-related things and comments for the develeoper
 
+//portrait = "snow_queen"
+
 /obj/effect/landmark/snowqueen_teleport
 	name = "snow queen teleport"
 	icon_state = "x2"
@@ -37,7 +39,7 @@
 	. = ..()
 	if(THESWORD)
 		user.put_in_hands(THESWORD)
-		to_chat(user, "<span class='notice'>You pull out [THESWORD]!.</span>")
+		to_chat(user, span_notice("You pull out [THESWORD]!."))
 		src.add_fingerprint(user)
 		empty = TRUE
 		update_icon()

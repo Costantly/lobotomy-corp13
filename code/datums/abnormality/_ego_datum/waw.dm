@@ -217,10 +217,12 @@
 	cost = 50
 
 /datum/ego_datum/weapon/warring
+	item_category = "Weapon (Bow)"
 	item_path = /obj/item/gun/ego_gun/warring
 	cost = 50
 
 /datum/ego_datum/weapon/warring2
+	item_category = "Weapon (Axe)"
 	item_path = /obj/item/ego_weapon/charge/warring
 	cost = 50
 
@@ -453,3 +455,26 @@
 /datum/ego_datum/weapon/scene
 	item_path = /obj/item/ego_weapon/scene
 	cost = 50
+
+//Sign of Roses - Flore sicut rosa
+/datum/ego_datum/armor/rosa
+	item_path = /obj/item/clothing/suit/armor/ego_gear/waw/rosa
+	cost = 50
+
+/datum/ego_datum/weapon/rosa
+	item_path = /obj/item/ego_weapon/rosa
+	cost = 50
+
+//Dream-Devouring Siltcurrent - Blind Obsession/Abyssal-Route
+/datum/ego_datum/armor/blind_obsession
+	item_path = /obj/item/clothing/suit/armor/ego_gear/waw/blind_obsession
+	cost = 50
+
+/datum/ego_datum/weapon/blind_obsession
+	item_path = /obj/item/ego_weapon/blind_obsession
+	cost = 50
+
+/datum/ego_datum/weapon/abyssal_route
+	item_path = /obj/item/ego_weapon/abyssal_route
+	cost = 50
+

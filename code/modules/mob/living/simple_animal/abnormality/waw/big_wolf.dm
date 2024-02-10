@@ -9,6 +9,7 @@
 	icon_state = "big_wolf"
 	icon_living = "big_wolf"
 	icon_dead = "big_wolf_slain"
+	portrait = "big_wolf"
 	faction = list("hostile")
 	speak_emote = list("growls")
 
@@ -32,11 +33,11 @@
 	can_breach = TRUE
 	start_qliphoth = 2
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(40, 40, 45, 45, 50),
-						ABNORMALITY_WORK_INSIGHT = list(30, 30, 30, 20, 20),
-						ABNORMALITY_WORK_ATTACHMENT = list(45, 50, 50, 55, 55),
-						ABNORMALITY_WORK_REPRESSION = 0
-						)
+		ABNORMALITY_WORK_INSTINCT = list(40, 40, 45, 45, 50),
+		ABNORMALITY_WORK_INSIGHT = list(30, 30, 30, 20, 20),
+		ABNORMALITY_WORK_ATTACHMENT = list(45, 50, 50, 55, 55),
+		ABNORMALITY_WORK_REPRESSION = 0,
+	)
 	work_damage_amount = 16
 	work_damage_type = RED_DAMAGE
 	melee_damage_type = RED_DAMAGE
@@ -46,13 +47,13 @@
 
 	attack_action_types = list(
 		/datum/action/innate/abnormality_attack/toggle/wolf_dash_toggle,
-		/datum/action/cooldown/wolf_howl
-		)
+		/datum/action/cooldown/wolf_howl,
+	)
 
 	ego_list = list(
 		/datum/ego_datum/weapon/cobalt,
-		/datum/ego_datum/armor/cobalt
-		)
+		/datum/ego_datum/armor/cobalt,
+	)
 	gift_type =  /datum/ego_gifts/cobalt
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 
@@ -71,11 +72,11 @@
 	name = "Toggle Dash"
 	desc = "Prepare to dash at the enemy dealing 50 RED damage to all in your way."
 	button_icon_state = "wolf_toggle0"
-	chosen_message = "<span class='notice'>You won't dash anymore.</span>"
+	chosen_message = span_notice("You won't dash anymore.")
 	chosen_attack_num = 2
 	button_icon_toggle_activated = "wolf_toggle1"
 	toggle_attack_num = 1
-	toggle_message = "<span class='colossus'>You prepare your dash.</span>"
+	toggle_message = span_colossus("You prepare your dash.")
 	button_icon_toggle_deactivated = "wolf_toggle0"
 
 /datum/action/cooldown/wolf_howl
@@ -98,17 +99,19 @@
 	return TRUE
 
 /mob/living/simple_animal/hostile/abnormality/big_wolf/SuccessEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	if(work_type == ABNORMALITY_WORK_INSTINCT && user.stat != DEAD && locate(/mob/living) in contents)
 		flick("wolf_sad", src)
 		SpewStomach()
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/big_wolf/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	EatWorker(user)
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/big_wolf/BreachEffect(mob/living/carbon/human/user)
+/mob/living/simple_animal/hostile/abnormality/big_wolf/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
 	update_icon()
 
@@ -186,7 +189,7 @@
 			if(1)
 				if(ranged_cooldown > world.time)
 					var/time_left =  (ranged_cooldown - world.time) / 10
-					to_chat(src, "<span class='userdanger'>You must wait [time_left] seconds to regain your strength...</span>")
+					to_chat(src, span_userdanger("You must wait [time_left] seconds to regain your strength..."))
 					return
 				ScratchDash(A)
 		return
@@ -229,7 +232,7 @@
 		patrol_to(target_center)
 		//Used to be in patrol_reset until i learned that patrol reset is inside patrol_to.
 		update_icon()
-		addtimer(CALLBACK(src, .proc/StopFleeing), 3 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(StopFleeing)), 3 SECONDS)
 		return
 	StopFleeing()
 

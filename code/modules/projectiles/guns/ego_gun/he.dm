@@ -128,7 +128,7 @@
 		jam_noticed = FALSE
 		fire_delay = 2
 		burst_size = 5
-		addtimer(CALLBACK(src, .proc/ResetDelay), 15 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(ResetDelay)), 15 SECONDS)
 		to_chat(user,"<span class='notice'>You succesfully unjammed [src]!</span>")
 		jam_cooldown_time = rand(1, 5) MINUTES
 		jam_cooldown = jam_cooldown_time + world.time
@@ -212,7 +212,7 @@
 	inhand_icon_state = "deagleg"
 	lefthand_file = 'icons/mob/inhands/weapons/guns_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/weapons/guns_righthand.dmi'
-	special = "This weapon fires tiny dice that deal varying amounts of damage."
+	special = "This weapon fires dice that deal varying amounts of damage."
 	ammo_type = /obj/item/ammo_casing/caseless/ego_swindle
 	weapon_weight = WEAPON_HEAVY
 	fire_delay = 10
@@ -241,7 +241,7 @@
 /obj/item/gun/ego_gun/ringing/equipped(mob/M, slot)//megaphone code
 	. = ..()
 	if (slot == ITEM_SLOT_HANDS && !HAS_TRAIT(M, TRAIT_SIGN_LANG))
-		RegisterSignal(M, COMSIG_MOB_SAY, .proc/handle_speech)
+		RegisterSignal(M, COMSIG_MOB_SAY, PROC_REF(handle_speech))
 	else
 		UnregisterSignal(M, COMSIG_MOB_SAY)
 

@@ -10,9 +10,10 @@
 	icon_state = "kqe"
 	icon_living = "kqe"
 	icon_dead = "kqe_egg"
+	portrait = "KQE"
 	del_on_death = FALSE
 	melee_damage_type = BLACK_DAMAGE
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.2)
+	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.2)
 	melee_damage_lower = 20
 	melee_damage_upper = 25
 	move_to_delay = 3
@@ -24,23 +25,29 @@
 	threat_level = HE_LEVEL
 	start_qliphoth = 2
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 25,
-						ABNORMALITY_WORK_INSIGHT = list(30, 30, 50, 55, 55),
-						ABNORMALITY_WORK_ATTACHMENT = 55,
-						ABNORMALITY_WORK_REPRESSION = list(30, 35, 40, 45, 50),
-						"Write HELLO" = 0,
-						"Write GOODBYE" = 0
-						)
+		ABNORMALITY_WORK_INSTINCT = 25,
+		ABNORMALITY_WORK_INSIGHT = list(30, 30, 50, 55, 55),
+		ABNORMALITY_WORK_ATTACHMENT = 55,
+		ABNORMALITY_WORK_REPRESSION = list(30, 35, 40, 45, 50),
+		"Write HELLO" = 0,
+		"Write GOODBYE" = 0,
+	)
 	work_damage_amount = 10
 	work_damage_type = BLACK_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/replica,
-		/datum/ego_datum/armor/replica
-		)
+		/datum/ego_datum/armor/replica,
+	)
 	gift_type =  /datum/ego_gifts/replica
 	gift_message = "The abnormality hands you a pendant made from circuits and sinews."
 	abnormality_origin = ABNORMALITY_ORIGIN_LIMBUS
+
+	grouped_abnos = list(
+		/mob/living/simple_animal/hostile/abnormality/nothing_there = 1.5,
+		/mob/living/simple_animal/hostile/abnormality/nobody_is = 1.5,
+	)
+
 	var/can_act = TRUE
 	var/grab_cooldown
 	var/grab_cooldown_time = 15 SECONDS
@@ -58,10 +65,10 @@
 	name = "Toggle Claw Attack"
 	button_icon_state = "kqe_toggle0"
 	chosen_attack_num = 2
-	chosen_message = "<span class='colossus'>You won't grab visitors anymore.</span>"
+	chosen_message = span_colossus("You won't grab visitors anymore.")
 	button_icon_toggle_activated = "kqe_toggle1"
 	toggle_attack_num = 1
-	toggle_message = "<span class='colossus'>You will attempt to grab visitors.</span>"
+	toggle_message = span_colossus("You will attempt to grab visitors.")
 	button_icon_toggle_deactivated = "kqe_toggle0"
 
 
@@ -87,7 +94,7 @@
 		if(!LAZYLEN(GLOB.department_centers))
 			heart = TRUE
 		else
-			damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.3, WHITE_DAMAGE = 0.2, BLACK_DAMAGE = 0.2, PALE_DAMAGE = 0.2)//In regular gamemodes you are now esentially forced to suppress the heart
+			damage_coeff = list(RED_DAMAGE = 0.3, WHITE_DAMAGE = 0.2, BLACK_DAMAGE = 0.2, PALE_DAMAGE = 0.2)//In regular gamemodes you are now esentially forced to suppress the heart
 			var/X = pick(GLOB.department_centers)
 			var/mob/living/simple_animal/hostile/kqe_heart/H = new(get_turf(X))
 			heart = H
@@ -114,7 +121,7 @@
 		work_penalty = FALSE
 		return
 	manual_emote("turns its terminal on.")
-	to_chat(user, "<span class='notice'>A terminal on the chest of the abnormality flashes to life! You should write something on it.</span>")
+	to_chat(user, span_notice("A terminal on the chest of the abnormality flashes to life! You should write something on it."))
 	question = TRUE
 	return
 
@@ -122,10 +129,10 @@
 	if((work_type != "Write HELLO") && (work_type != "Write GOODBYE") && !question)
 		return TRUE
 	if(((work_type == "Write HELLO") || (work_type == "Write GOODBYE")) && !question)
-		to_chat(user, "<span class='notice'>The terminal is blank.</span>")
+		to_chat(user, span_notice("The terminal is blank."))
 		return FALSE
 	if((work_type != "Write HELLO") && (work_type != "Write GOODBYE") && question)
-		to_chat(user, "<span class='notice'>Looks like you can write something.</span>")
+		to_chat(user, span_notice("Looks like you can write something."))
 		return FALSE
 	if(work_type == "Write HELLO")
 		if(!GiftUser(user, 18, 100))//always gives a gift
@@ -133,14 +140,14 @@
 			datum_reference.qliphoth_change(-2)
 			return FALSE
 		say("Have you enjoyed the town tour? We’d like you to have a souvenir. :-)")
-		to_chat(user, "<span class='notice'>A smile is displayed on the terminal, but the abnormality appears to be distressed.</span>")
+		to_chat(user, span_notice("A smile is displayed on the terminal, but the abnormality appears to be distressed."))
 		datum_reference.qliphoth_change(-1)
 		question = FALSE
 		work_count = 0
 	if(work_type == "Write GOODBYE")
 		if(get_attribute_level(user, JUSTICE_ATTRIBUTE) < 60)//instant breach if below 3 justice
 			datum_reference.qliphoth_change(-2)//instant breach
-			to_chat(user, "<span class='notice'>The terminal’s light goes red, and warnings start to blare.</span>")
+			to_chat(user, span_notice("The terminal’s light goes red, and warnings start to blare."))
 			say("Farewell. Farewell, FarewellFarewellFarewellFarewellFarewellFarewellFarewellFarewellFarewell.")
 			return FALSE
 		work_penalty = TRUE
@@ -156,14 +163,15 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/kqe/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
 /*** Breach Procs ***/
-/mob/living/simple_animal/hostile/abnormality/kqe/BreachEffect(mob/living/carbon/human/user)
+/mob/living/simple_animal/hostile/abnormality/kqe/BreachEffect(mob/living/carbon/human/user, breach_type)
 	if(!(status_flags & GODMODE)) // Already breaching
-		return
-	..()
+		return FALSE
+	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/kqe/proc/Stagger()
 	can_act = FALSE
@@ -242,12 +250,14 @@
 
 /obj/effect/kqe_claw/Initialize()
 	..()
-	addtimer(CALLBACK(src, .proc/GrabAttack), 3 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(GrabAttack)), 3 SECONDS)
 
 /obj/effect/kqe_claw/proc/GrabAttack()
 	playsound(get_turf(src), 'sound/abnormalities/kqe/load2.ogg', 75, 0, 3)
 	new /obj/effect/temp_visual/approaching_claw(get_turf(src))
 	alpha = 1
+	for(var/obj/vehicle/sealed/mecha/M in view(1, src))
+		M.ejectall()
 	for(var/mob/living/carbon/human/H in view(1, src))
 		grabbed = TRUE
 		H.apply_damage(boom_damage*1, BLACK_DAMAGE, null, H.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
@@ -260,7 +270,7 @@
 /obj/effect/kqe_claw/proc/GrabStun(mob/living/carbon/human/target)
 	animate(target, pixel_x = 0, pixel_z = 12, time = 5)
 	target.Stun(6 SECONDS)
-	addtimer(CALLBACK(src, .proc/AnimateBack,target), 6 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(AnimateBack),target), 6 SECONDS)
 
 /obj/effect/kqe_claw/proc/AnimateBack(mob/living/carbon/human/target)
 	animate(target, pixel_x = 0, pixel_z = 0, time = 1 SECONDS)
@@ -289,7 +299,7 @@
 	health = 1000
 	maxHealth = 1000
 	obj_damage = 50
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
 	speed = 5
 	density = TRUE
 	var/mob/living/simple_animal/hostile/abnormality/kqe/abno_host//This is KQE!

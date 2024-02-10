@@ -11,11 +11,11 @@
 	attack_verb_simple = list("purge", "purify")
 	hitsound = 'sound/weapons/ego/paradise.ogg'
 	attribute_requirements = list(
-							FORTITUDE_ATTRIBUTE = 100,
-							PRUDENCE_ATTRIBUTE = 100,
-							TEMPERANCE_ATTRIBUTE = 100,
-							JUSTICE_ATTRIBUTE = 100
-							)
+		FORTITUDE_ATTRIBUTE = 100,
+		PRUDENCE_ATTRIBUTE = 100,
+		TEMPERANCE_ATTRIBUTE = 100,
+		JUSTICE_ATTRIBUTE = 100,
+	)
 	var/ranged_cooldown
 	var/ranged_cooldown_time = 0.8 SECONDS
 	var/ranged_damage = 70
@@ -35,11 +35,12 @@
 	ranged_cooldown = world.time + ranged_cooldown_time
 	playsound(target_turf, 'sound/weapons/ego/paradise_ranged.ogg', 50, TRUE)
 	var/damage_dealt = 0
+	var/modified_damage = (ranged_damage*force_multiplier)
 	for(var/turf/open/T in range(target_turf, 1))
 		new /obj/effect/temp_visual/paradise_attack(T)
-		for(var/mob/living/L in user.HurtInTurf(T, list(), ranged_damage, PALE_DAMAGE, hurt_mechs = TRUE))
+		for(var/mob/living/L in user.HurtInTurf(T, list(), modified_damage, PALE_DAMAGE, hurt_mechs = TRUE))
 			if((L.stat < DEAD) && !(L.status_flags & GODMODE))
-				damage_dealt += ranged_damage
+				damage_dealt += modified_damage
 	if(damage_dealt > 0)
 		H.adjustStaminaLoss(-damage_dealt*0.2)
 		H.adjustBruteLoss(-damage_dealt*0.1)
@@ -182,8 +183,8 @@
 		var/heal_amt = force*0.15
 		if(isanimal(target))
 			var/mob/living/simple_animal/S = target
-			if(S.damage_coeff[damtype] > 0)
-				heal_amt *= S.damage_coeff[damtype]
+			if(S.damage_coeff.getCoeff(damtype) > 0)
+				heal_amt *= S.damage_coeff.getCoeff(damtype)
 			else
 				heal_amt = 0
 		user.adjustBruteLoss(-heal_amt)
@@ -221,7 +222,9 @@
 	damtype = initial(damtype)
 
 /obj/item/ego_weapon/twilight/EgoAttackInfo(mob/user)
-	return "<span class='notice'>It deals [force * 4] red, white, black and pale damage combined.</span>"
+	if(force_multiplier != 1)
+		return span_notice("It deals [round((force * 4) * force_multiplier)] red, white, black and pale damage combined. (+ [(force_multiplier - 1) * 100]%)")
+	return span_notice("It deals [force * 4] red, white, black and pale damage combined.")
 
 /obj/item/ego_weapon/goldrush
 	name = "gold rush"
@@ -248,14 +251,15 @@
 		return
 	if(do_after(user, 5, target))
 
-		target.visible_message("<span class='danger'>[user] rears up and slams into [target]!</span>", \
-						"<span class='userdanger'>[user] punches you with everything you got!!</span>", COMBAT_MESSAGE_RANGE, user)
-		to_chat(user, "<span class='danger'>You throw your entire body into this punch!</span>")
+		target.visible_message(span_danger("[user] rears up and slams into [target]!"), \
+						span_userdanger("[user] punches you with everything you got!!"), COMBAT_MESSAGE_RANGE, user)
+		to_chat(user, span_danger("You throw your entire body into this punch!"))
 		goldrush_damage = force
 		//I gotta regrab  justice here
 		var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
 		var/justicemod = 1 + userjust/100
 		goldrush_damage *= justicemod
+		goldrush_damage *= force_multiplier
 
 		if(ishuman(target))
 			goldrush_damage = 50
@@ -276,7 +280,7 @@
 	if(!istype(I, /obj/item/nihil/diamond))
 		return
 	new /obj/item/ego_weapon/goldrush/nihil(get_turf(src))
-	to_chat(user,"<span class='warning'>The [I] seems to drain all of the light away as it is absorbed into [src]!</span>")
+	to_chat(user,span_warning("The [I] seems to drain all of the light away as it is absorbed into [src]!"))
 	playsound(user, 'sound/abnormalities/nihil/filter.ogg', 15, FALSE, -3)
 	qdel(I)
 	qdel(src)
@@ -341,7 +345,7 @@
 			damtype = RED_DAMAGE
 			force = 80
 			icon_state = "rosered"
-	to_chat(user, "<span class='notice'>\[src] will now deal [force] [damtype] damage.</span>")
+	to_chat(user, span_notice("\[src] will now deal [force] [damtype] damage."))
 	playsound(src, 'sound/items/screwdriver2.ogg', 50, TRUE)
 
 /obj/item/ego_weapon/censored
@@ -376,9 +380,9 @@
 		return
 	special_attack = !special_attack
 	if(special_attack)
-		to_chat(user, "<span class='notice'>You prepare special attack.</span>")
+		to_chat(user, span_notice("You prepare special attack."))
 	else
-		to_chat(user, "<span class='notice'>You decide to not use special attack.</span>")
+		to_chat(user, span_notice("You decide to not use special attack."))
 
 /obj/item/ego_weapon/censored/afterattack(atom/A, mob/living/user, proximity_flag, params)
 	if(!CanUseEgo(user))
@@ -401,6 +405,7 @@
 	playsound(user, 'sound/weapons/ego/censored3.ogg', 75)
 	var/turf/MT = get_turf(user)
 	MT.Beam(target_turf, "censored", time=5)
+	var/modified_damage = (special_damage * force_multiplier)
 	for(var/turf/T in turfs_to_hit)
 		if(T.density)
 			break
@@ -412,7 +417,7 @@
 						continue
 				else
 					continue
-			L.apply_damage(special_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
+			L.apply_damage(modified_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 			new /obj/effect/temp_visual/dir_setting/bloodsplatter(get_turf(L), pick(GLOB.alldirs))
 
 /obj/item/ego_weapon/censored/get_clamped_volume()
@@ -447,7 +452,7 @@
 	var/mark_cooldown_time = 15 SECONDS
 
 /obj/item/ego_weapon/soulmate/Initialize()
-	RegisterSignal(src, COMSIG_PROJECTILE_ON_HIT, .proc/projectile_hit)
+	RegisterSignal(src, COMSIG_PROJECTILE_ON_HIT, PROC_REF(projectile_hit))
 	..()
 	AddElement(/datum/element/update_icon_updates_onmob)
 
@@ -462,7 +467,7 @@
 			update_icon()
 			attack_speed = 0.4
 			gunmark_cooldown = world.time + mark_cooldown_time
-			addtimer(CALLBACK(src, .proc/BladeRevert), 50)
+			addtimer(CALLBACK(src, PROC_REF(BladeRevert)), 50)
 			return
 		if(!(bladebuff) && blademark_cooldown <= world.time)
 			blademark_targets += target
@@ -485,6 +490,7 @@
 		G.firer = user
 		G.preparePixelProjectile(target, user, clickparams)
 		G.fire()
+		G.damage *= force_multiplier
 		gun_cooldown = world.time + gun_cooldown_time
 		return
 
@@ -498,7 +504,7 @@
 			update_icon_state()
 			update_icon()
 			blademark_cooldown = world.time + mark_cooldown_time
-			addtimer(CALLBACK(src, .proc/GunRevert), 80)
+			addtimer(CALLBACK(src, PROC_REF(GunRevert)), 80)
 			return TRUE
 		if(!(gunbuff) && gunmark_cooldown <= world.time)
 			gunmark_targets += target
@@ -577,7 +583,10 @@
 	..()
 	if(!CanUseEgo(user))
 		return
-	target.apply_damage(force, BLACK_DAMAGE, null, target.run_armor_check(null, BLACK_DAMAGE), spread_damage = FALSE)
+	var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
+	var/justicemod = 1 + userjust/100
+	var/damage = force * justicemod * force_multiplier
+	target.apply_damage(damage, BLACK_DAMAGE, null, target.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 
 	if(!canaoe)
 		return
@@ -588,9 +597,8 @@
 
 		for(var/mob/living/L in range(3, user))
 			var/aoe = force
-			var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
-			var/justicemod = 1 + userjust/100
 			aoe*=justicemod
+			aoe*=force_multiplier
 			if(L == user || ishuman(L))
 				continue
 			L.apply_damage(aoe, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
@@ -600,7 +608,9 @@
 	canaoe = FALSE
 
 /obj/item/ego_weapon/space/EgoAttackInfo(mob/user)
-	return "<span class='notice'>It deals [force] of both white and black damage.</span>"
+	if(force_multiplier != 1)
+		return span_notice("It deals [round(force * force_multiplier)] of both white and black damage. (+ [(force_multiplier - 1) * 100]%)")
+	return span_notice("It deals [force] of both white and black damage.")
 
 /obj/item/ego_weapon/seasons
 	name = "Seasons Greetings"
@@ -635,7 +645,7 @@
 /obj/item/ego_weapon/seasons/Initialize()
 	. = ..()
 	AddElement(/datum/element/update_icon_updates_onmob)
-	RegisterSignal(SSdcs, COMSIG_GLOB_SEASON_CHANGE, .proc/Transform)
+	RegisterSignal(SSdcs, COMSIG_GLOB_SEASON_CHANGE, PROC_REF(Transform))
 	Transform()
 
 /obj/item/ego_weapon/seasons/equipped(mob/living/carbon/human/user, slot)
@@ -651,12 +661,12 @@
 /obj/item/ego_weapon/seasons/attack_self(mob/user)
 	..()
 	if(transforming)
-		to_chat(user,"<span class='warning'>[src] will no longer transform to match the seasons.</span>")
+		to_chat(user,span_warning("[src] will no longer transform to match the seasons."))
 		transforming = FALSE
 		special = "This E.G.O. will not transform to match the seasons."
 		return
 	if(!transforming)
-		to_chat(user,"<span class='warning'>[src] will now transform to match the seasons.</span>")
+		to_chat(user,span_warning("[src] will now transform to match the seasons."))
 		transforming = TRUE
 		special = "This E.G.O. will transform to match the seasons."
 		return
@@ -678,7 +688,7 @@
 		inhand_y_dimension = 32
 	update_icon_state()
 	if(current_holder)
-		to_chat(current_holder,"<span class='notice'>[src] suddenly transforms!</span>")
+		to_chat(current_holder,span_notice("[src] suddenly transforms!"))
 		current_holder.update_inv_hands()
 		playsound(current_holder, "sound/abnormalities/seasons/[current_season]_change.ogg", 50, FALSE)
 	force = season_list[current_season][1]
@@ -709,8 +719,8 @@
 	desc = "The fragile human mind is fated to twist and distort."
 	special = "This weapon requires two hands to use and always blocks ranged attacks."
 	icon_state = "distortion"
-	force = 180 //Just make sure you don't hit anyone!
-	attack_speed = 3
+	force = 35 //Twilight but lower in terms of damage
+	attack_speed = 1.8
 	damtype = RED_DAMAGE
 	attack_verb_continuous = list("pulverizes", "bashes", "slams", "blockades")
 	attack_verb_simple = list("pulverize", "bash", "slam", "blockade")
@@ -722,26 +732,34 @@
 	block_sound = 'sound/weapons/ego/heavy_guard.ogg'
 	attribute_requirements = list(
 							FORTITUDE_ATTRIBUTE = 100,
-							PRUDENCE_ATTRIBUTE = 80,
-							TEMPERANCE_ATTRIBUTE = 80,
-							JUSTICE_ATTRIBUTE = 80
+							PRUDENCE_ATTRIBUTE = 100,
+							TEMPERANCE_ATTRIBUTE = 100,
+							JUSTICE_ATTRIBUTE = 100
 							)
 
 	attacking = TRUE //ALWAYS blocking ranged attacks
+
+
+/obj/item/ego_weapon/shield/distortion/EgoAttackInfo(mob/user)
+	return span_notice("It deals [force * 4] red, white, black and pale damage combined.")
 
 /obj/item/ego_weapon/shield/distortion/attack(mob/living/target, mob/living/user)
 	. = ..()
 	if(!.)
 		return FALSE
+	for(var/damage_type in list(WHITE_DAMAGE, BLACK_DAMAGE, PALE_DAMAGE))
+		damtype = damage_type
+		target.attacked_by(src, user)
+	damtype = initial(damtype)
 	var/atom/throw_target = get_edge_target_turf(target, user.dir)
 	if(!target.anchored)
-		var/whack_speed = (prob(60) ? 4 : 8)
-		target.throw_at(throw_target, rand(3, 4), whack_speed, user)
+		var/whack_speed = (prob(60) ? 3 : 6)
+		target.throw_at(throw_target, rand(2, 3), whack_speed, user)
 
 /obj/item/ego_weapon/shield/distortion/CanUseEgo(mob/living/user)
 	. = ..()
 	if(user.get_inactive_held_item())
-		to_chat(user, "<span class='notice'>You cannot use [src] with only one hand!</span>")
+		to_chat(user, span_notice("You cannot use [src] with only one hand!"))
 		return FALSE
 
 /obj/item/ego_weapon/shield/distortion/AnnounceBlock(mob/living/carbon/human/source, damage, damagetype, def_zone)
@@ -795,7 +813,7 @@
 		playsound(src, 'sound/weapons/ego/farmwatch_tree.ogg', 200, 1)
 		user.adjustBruteLoss(-10)
 		user.adjustSanityLoss(-15)
-		to_chat(user, "<span class='notice'>You reap the fruits of your labor!</span>")
+		to_chat(user, span_notice("You reap the fruits of your labor!"))
 		..()
 		return
 	..()
@@ -805,7 +823,7 @@
 	if(!CanUseEgo(user))
 		return
 	if(ability_cooldown > world.time)
-		to_chat(user, "<span class='warning'>You have used this ability too recently!</span>")
+		to_chat(user, span_warning("You have used this ability too recently!"))
 		return FALSE
 	playsound(src, 'sound/effects/ordeals/white/white_reflect.ogg', 50, TRUE)
 	to_chat(user, "You cultivate seeds of desires.")
@@ -849,9 +867,9 @@
 	if(!CanUseEgo(user))
 		return
 	if(ability_cooldown > world.time)
-		to_chat(user, "<span class='warning'>You have used this ability too recently!</span>")
+		to_chat(user, span_warning("You have used this ability too recently!"))
 		return FALSE
-	if(do_after(user, 20))
+	if(do_after(user, 20, src))
 		playsound(src, 'sound/weapons/ego/spicebush_special.ogg', 50, FALSE)
 		to_chat(user, "You plant some flower buds.")
 		spawn_plant(user, EAST, NORTH)//spawns one spicebush plant 2 tiles away in each corner
@@ -891,7 +909,7 @@
 		return
 	playsound(src, 'sound/weapons/ego/spicebush_openfan.ogg', 50, TRUE)
 	icon_state = "spicebush_2a"
-	addtimer(CALLBACK(src, .proc/ResetIcons), 30 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(ResetIcons)), 30 SECONDS)
 	..()
 
 /obj/item/ego_weapon/spicebush/fan/afterattack(atom/A, mob/living/user, proximity_flag, params)
@@ -908,13 +926,14 @@
 	ranged_cooldown = world.time + ranged_cooldown_time
 	playsound(target_turf, 'sound/weapons/ego/spicebush_fan.ogg', 50, TRUE)
 	var/damage_dealt = 0
+	var/modified_damage = (ranged_damage * force_multiplier)
 	if(do_after(user, 5))
 		for(var/turf/open/T in range(target_turf, 1))
 			new /obj/effect/temp_visual/spicebloom(T)
 			for(var/mob/living/L in T.contents)
-				L.apply_damage(ranged_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+				L.apply_damage(modified_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
 				if((L.stat < DEAD) && !(L.status_flags & GODMODE))
-					damage_dealt += ranged_damage
+					damage_dealt += modified_damage
 
 /obj/effect/temp_visual/spicebloom
 	icon = 'ModularTegustation/Teguicons/tegu_effects.dmi'
@@ -1021,7 +1040,7 @@
 /obj/item/ego_weapon/shield/combust/CanUseEgo(mob/living/user)
 	. = ..()
 	if(user.get_inactive_held_item())
-		to_chat(user, "<span class='notice'>You cannot use [src] with only one hand!</span>")
+		to_chat(user, span_notice("You cannot use [src] with only one hand!"))
 		return FALSE
 
 /obj/item/ego_weapon/shield/combust/attack_self(mob/user)
@@ -1032,7 +1051,7 @@
 
 	if (block && !special_attack && special_cooldown < world.time)
 		special_attack = TRUE
-		to_chat(user, "<span class='notice'>You prepare to perform a blazing strike.</span>")
+		to_chat(user, span_notice("You prepare to perform a blazing strike."))
 	..()
 
 // Counter
@@ -1084,7 +1103,7 @@
 			break
 		for(var/obj/machinery/door/D in T.contents)
 			if(D.density)
-				addtimer(CALLBACK (D, .obj/machinery/door/proc/open))
+				addtimer(CALLBACK (D, TYPE_PROC_REF(/obj/machinery/door, open)))
 		target_turf = T
 		line_turfs += T
 	user.dir = get_dir(user, A)
@@ -1100,7 +1119,7 @@
 					continue
 				if(L in been_hit || L == user)
 					continue
-				user.visible_message("<span class='boldwarning'>[user] blazes through [L]!</span>")
+				user.visible_message(span_boldwarning("[user] blazes through [L]!"))
 				L.apply_damage((special_damage + extra_damage), RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 				been_hit += L
 
@@ -1134,7 +1153,7 @@
 		"whip" = list(35, 0.5, 3, list("lacerates", "disciplines"), list("lacerate", "discipline"), 'sound/weapons/whip.ogg'),
 		"sword" = list(80, 1, 1, list("tears", "slices", "mutilates"), list("tear", "slice","mutilate"), 'sound/weapons/fixer/generic/blade4.ogg'),
 		"hammer" = list(40, 1.4, 1, list("crushes"), list("crush"), 'sound/weapons/fixer/generic/baton2.ogg'),
-		"bat" = list(120, 1.4, 1, list("bludgeons", "bashes"), list("bludgeon", "bash"), 'sound/weapons/fixer/generic/gen1.ogg')
+		"bat" = list(120, 1.6, 1, list("bludgeons", "bashes"), list("bludgeon", "bash"), 'sound/weapons/fixer/generic/gen1.ogg')
 		)
 
 /obj/item/ego_weapon/mockery/Initialize()
@@ -1190,7 +1209,7 @@
 		"bat"  = image(icon = src.icon, icon_state = "mockery_bat")
 	)
 	armament_icons = sortList(armament_icons)
-	var/choice = show_radial_menu(user, src , armament_icons, custom_check = CALLBACK(src, .proc/CheckMenu, user), radius = 42, require_near = TRUE)
+	var/choice = show_radial_menu(user, src , armament_icons, custom_check = CALLBACK(src, PROC_REF(CheckMenu), user), radius = 42, require_near = TRUE)
 	if(!choice || !CheckMenu(user))
 		return
 	form = choice
@@ -1209,7 +1228,7 @@
 	icon_state = "mockery_[form]"
 	update_icon_state()
 	if(current_holder)
-		to_chat(current_holder,"<span class='notice'>[src] suddenly transforms!</span>")
+		to_chat(current_holder,span_notice("[src] suddenly transforms!"))
 		current_holder.update_inv_hands()
 		current_holder.playsound_local(current_holder, 'sound/effects/blobattack.ogg', 75, FALSE)
 	force = weapon_list[form][1]
@@ -1218,3 +1237,33 @@
 	attack_verb_continuous = weapon_list[form][4]
 	attack_verb_simple = weapon_list[form][5]
 	hitsound = weapon_list[form][6]
+
+/obj/item/ego_weapon/ultimate_christmas
+	name = "ultimate christmas"
+	desc = "The Santa's bag is very heavy, capable of carrying a gift for everyone in the world. This one is no exception."
+	special = "This weapon has absurd knockback."
+	icon_state = "ultimate_christmas"
+	lefthand_file = 'icons/mob/inhands/64x64_lefthand.dmi'
+	righthand_file = 'icons/mob/inhands/64x64_righthand.dmi'
+	inhand_x_dimension = 64
+	inhand_y_dimension = 64
+	force = 160
+	attack_speed = 1.6
+	damtype = RED_DAMAGE
+	attack_verb_continuous = list("bashes", "clubs")
+	attack_verb_simple = list("bashes", "clubs")
+	hitsound = 'sound/abnormalities/rudolta_buff/onrush1.ogg'
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 120,
+							PRUDENCE_ATTRIBUTE = 80,
+							TEMPERANCE_ATTRIBUTE = 80,
+							JUSTICE_ATTRIBUTE = 80
+							)
+
+/obj/item/ego_weapon/ultimate_christmas/attack(mob/living/target, mob/living/user)
+	. = ..()
+	if(!.)
+		return FALSE
+	var/atom/throw_target = get_edge_target_turf(target, user.dir)
+	if(!target.anchored)
+		target.throw_at(throw_target, 7, 7, user)

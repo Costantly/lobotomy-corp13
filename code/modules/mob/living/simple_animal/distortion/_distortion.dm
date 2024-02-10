@@ -9,7 +9,7 @@
 	layer = LARGE_MOB_LAYER
 	a_intent = INTENT_HARM
 	del_on_death = TRUE
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
 	atmos_requirements = list("min_oxy" = 0, "max_oxy" = 0, "min_tox" = 0, "max_tox" = 0, "min_co2" = 0, "max_co2" = 0, "min_n2" = 0, "max_n2" = 0)
 	minbodytemp = 0
 	see_in_dark = 7
@@ -73,12 +73,6 @@
 	var/obj/item/implant/radio/slime/imp = new(src)
 	imp.implant(src, src) //acts as if the abno is both the implanter and the one being implanted, which is technically true I guess?
 
-// Is it currently a combat gamemode? Used to check if somethings can teleport.
-/mob/living/simple_animal/hostile/distortion/proc/CheckCombat()
-	if(SSmaptype.maptype in SSmaptype.combatmaps)
-		return TRUE
-	return FALSE
-
 // Applies fear damage to everyone in range
 /mob/living/simple_animal/hostile/distortion/proc/FearEffect()
 	if(fear_level <= 0)
@@ -99,24 +93,24 @@
 		switch(sanity_result)
 			if(-INFINITY to 0)
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_0)
-				to_chat(H, "<span class='notice'>[result_text]</span>")
+				to_chat(H, span_notice("[result_text]"))
 				continue
 			if(1)
 				sanity_damage = H.maxSanity*0.1
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_1)
-				to_chat(H, "<span class='warning'>[result_text]</span>")
+				to_chat(H, span_warning("[result_text]"))
 			if(2)
 				sanity_damage = H.maxSanity*0.3
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_2)
-				to_chat(H, "<span class='danger'>[result_text]</span>")
+				to_chat(H, span_danger("[result_text]"))
 			if(3)
 				sanity_damage = H.maxSanity*0.6
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_3)
-				to_chat(H, "<span class='userdanger'>[result_text]</span>")
+				to_chat(H, span_userdanger("[result_text]"))
 			if(4)
 				sanity_damage = H.maxSanity*0.95
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_4)
-				to_chat(H, "<span class='userdanger'><b>[result_text]</b></span>")
+				to_chat(H, span_userdanger("<b>[result_text]</b>"))
 			if(5)
 				sanity_damage = H.maxSanity
 				H.apply_status_effect(/datum/status_effect/panicked_lvl_4)
@@ -146,7 +140,7 @@
 	patrol_reset()
 	density = FALSE
 	AIStatus = AI_OFF
-	damage_coeff = list(BRUTE = 0, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0) // Prevent death jank
+	ChangeResistances(list(BRUTE = 0, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)) // Prevent death jank
 	forceMove(egoist) //Hide the distortion inside of the spawned human in case of shinanigains
 	if(unmanifest_effect)
 		new unmanifest_effect(get_turf(src))

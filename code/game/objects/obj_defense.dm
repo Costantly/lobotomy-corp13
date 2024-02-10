@@ -27,14 +27,10 @@
 /obj/proc/run_obj_armor(damage_amount, damage_type, attack_dir, armour_penetration = 0)
 	if(damage_amount < damage_deflection)
 		return 0
-	switch(damage_type)
-		if(BRUTE, RED_DAMAGE, WHITE_DAMAGE, BLACK_DAMAGE, PALE_DAMAGE)
-		if(BURN)
-		else
-			return 0
+	if(!(damage_type in armor.getList()))
+		return 0
 	var/armor_protection = 0
-	if(damage_type)
-		armor_protection = armor.getRating(damage_type)
+	armor_protection = armor.getRating(damage_type)
 	if(armor_protection)		//Only apply weak-against-armor/hollowpoint effects if there actually IS armor.
 		armor_protection = clamp(armor_protection - armour_penetration, min(armor_protection, 0), 100)
 	return round(damage_amount * (100 - armor_protection)*0.01, DAMAGE_PRECISION)
@@ -52,7 +48,11 @@
 
 /obj/hitby(atom/movable/AM, skipcatch, hitpush, blocked, datum/thrownthing/throwingdatum)
 	..()
-	take_damage(AM.throwforce, BRUTE, MELEE, 1, get_dir(src, AM))
+	var/DT = RED_DAMAGE
+	if(isitem(AM))
+		var/obj/item/I = AM
+		DT = I.damtype
+	take_damage(AM.throwforce, DT, 1, get_dir(src, AM))
 
 /obj/ex_act(severity, target)
 	if(resistance_flags & INDESTRUCTIBLE)
@@ -61,15 +61,15 @@
 	if(QDELETED(src))
 		return
 	if(target == src)
-		take_damage(INFINITY, BRUTE, BOMB, 0)
+		take_damage(INFINITY, BOMB, 0)
 		return
 	switch(severity)
 		if(1)
-			take_damage(INFINITY, BRUTE, BOMB, 0)
+			take_damage(INFINITY, BOMB, 0)
 		if(2)
-			take_damage(rand(100, 250), BRUTE, BOMB, 0)
+			take_damage(rand(100, 250), BOMB, 0)
 		if(3)
-			take_damage(rand(10, 90), BRUTE, BOMB, 0)
+			take_damage(rand(10, 90), BOMB, 0)
 
 /obj/bullet_act(obj/projectile/P)
 	. = ..()
@@ -90,7 +90,7 @@
 		playsound(src, 'sound/effects/meteorimpact.ogg', 100, TRUE)
 	else
 		playsound(src, 'sound/effects/bang.ogg', 50, TRUE)
-	take_damage(hulk_damage(), BRUTE, MELEE, 0, get_dir(src, user))
+	take_damage(hulk_damage(), MELEE, 0, get_dir(src, user))
 	return TRUE
 
 /obj/blob_act(obj/structure/blob/B)
@@ -100,7 +100,7 @@
 		var/turf/T = loc
 		if(T.intact && HAS_TRAIT(src, TRAIT_T_RAY_VISIBLE))
 			return
-	take_damage(400, BRUTE, MELEE, 0, get_dir(src, B))
+	take_damage(400, MELEE, 0, get_dir(src, B))
 
 /obj/proc/attack_generic(mob/user, damage_amount = 0, damage_type = BRUTE, sound_effect = 1, armor_penetration = 0) //used by attack_alien, attack_animal, and attack_slime
 	user.do_attack_animation(src)
@@ -176,7 +176,7 @@ GLOBAL_DATUM_INIT(acid_overlay, /mutable_appearance, mutable_appearance('icons/e
 		if(T.intact && HAS_TRAIT(src, TRAIT_T_RAY_VISIBLE))
 			return
 	if(exposed_temperature && !(resistance_flags & FIRE_PROOF))
-		take_damage(clamp(0.02 * exposed_temperature, 0, 20), BURN, FIRE, 0)
+		take_damage(clamp(0.02 * exposed_temperature, 0, 20), FIRE, 0)
 	if(!(resistance_flags & ON_FIRE) && (resistance_flags & FLAMMABLE) && !(resistance_flags & FIRE_PROOF))
 		resistance_flags |= ON_FIRE
 		SSfire_burning.processing[src] = src
@@ -202,7 +202,7 @@ GLOBAL_DATUM_INIT(acid_overlay, /mutable_appearance, mutable_appearance('icons/e
 	if(QDELETED(src))
 		return 0
 	obj_flags |= BEING_SHOCKED
-	addtimer(CALLBACK(src, .proc/reset_shocked), 1 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(reset_shocked)), 1 SECONDS)
 	return power / 2
 
 //The surgeon general warns that being buckled to certain objects receiving powerful shocks is greatly hazardous to your health

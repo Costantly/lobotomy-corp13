@@ -13,7 +13,7 @@
 	base_pixel_x = -16
 	fear_level = WAW_LEVEL
 	move_to_delay = 3
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.2, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.5)
+	damage_coeff = list(RED_DAMAGE = 0.2, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.5)
 	melee_damage_lower = 25
 	melee_damage_upper = 30
 	melee_damage_type = RED_DAMAGE
@@ -61,7 +61,7 @@
 		qdel(I)
 		say("That's all I ever wanted!")
 		can_act = FALSE
-		addtimer(CALLBACK(src,.proc/Unmanifest),3 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(Unmanifest)),3 SECONDS)
 
 
 /mob/living/simple_animal/hostile/distortion/bunnyman/ComponentInitialize()
@@ -94,10 +94,7 @@
 	playsound(src, 'sound/effects/blobattack.ogg', 150, FALSE, 4)
 	playsound(src, 'sound/weapons/chainsawhit.ogg', 250, FALSE, 4)
 	attack_sound = 'sound/abnormalities/helper/attack.ogg'
-	for(var/damtype in src.damage_coeff)
-		if(damtype == BRUTE)
-			continue
-		damage_coeff[damtype] += 0.5
+	ChangeResistances(list(RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 2))
 	melee_damage_lower = 30
 	melee_damage_upper = 45
 	rapid_melee = 3

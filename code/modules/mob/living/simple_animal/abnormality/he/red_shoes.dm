@@ -8,21 +8,22 @@
 	icon_state = "redshoes"
 	icon_living = "redshoes"
 	icon_dead = "redshoes_breach"//dels on death if it's possessing someone. Egg goes here
+	portrait = "red_shoes"
 	can_breach = TRUE
 	gender = NEUTER
 	threat_level = HE_LEVEL
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
 	start_qliphoth = 2
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(50, 50, 45, 50, 60),
-						ABNORMALITY_WORK_INSIGHT = list(50, 60, 55, 55, 55),
-						ABNORMALITY_WORK_ATTACHMENT = list(99, 99, 50, 40, 30),
-						ABNORMALITY_WORK_REPRESSION = 0
-						)
+		ABNORMALITY_WORK_INSTINCT = list(50, 50, 45, 50, 60),
+		ABNORMALITY_WORK_INSIGHT = list(50, 60, 55, 55, 55),
+		ABNORMALITY_WORK_ATTACHMENT = list(99, 99, 50, 40, 30),
+		ABNORMALITY_WORK_REPRESSION = 0,
+	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
 	del_on_death = FALSE
-	deathmessage = "crumples into a pile of bones."
+	death_message = "crumples into a pile of bones."
 	attack_sound = 'sound/abnormalities/redshoes/RedShoes_Attack.ogg'
 	melee_damage_lower = 15
 	melee_damage_upper = 30
@@ -31,23 +32,24 @@
 	rapid_melee = 2
 	ego_list = list(
 		/datum/ego_datum/weapon/sanguine,
-		/datum/ego_datum/armor/sanguine
-		)
+		/datum/ego_datum/armor/sanguine,
+	)
 	gift_type =  /datum/ego_gifts/desire
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 	var/mutable_appearance/breach_icon
 	var/mob/living/possessee
 	var/list/death_lines = list(
 		"Give them back to me!",
-		"Don’t take them away from me...",
-		"No no no! Don’t take them, no!",
-		"I’m sorry...")
+		"Don't take them away from me...",
+		"No no no! Don't take them, no!",
+		"I'm sorry...",
+	)
 	var/list/possessee_lines = list(
-				"Where is everyone?",
-				"Guys, look at me! I’ve got such nice shoes on!",
-				"You all need to see how lovely my shoes are!",
-				"They’re much prettier with blood on them."
-				)
+		"Where is everyone?",
+		"Guys, look at me! I've got such nice shoes on!",
+		"You all need to see how lovely my shoes are!",
+		"They're much prettier with blood on them.",
+	)
 	var/datum/looping_sound/redshoes_ambience/soundloop
 	var/numbermarked = 0//default amount of people that get possessed
 	var/steppy = 0
@@ -67,7 +69,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/red_shoes/death()
 	if(possessee)
-		deathmessage = FALSE
+		death_message = FALSE
 		del_on_death = TRUE
 	density = FALSE
 	for(var/obj/O in src)
@@ -109,6 +111,7 @@
 	return
 
 /mob/living/simple_animal/hostile/abnormality/red_shoes/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
@@ -116,7 +119,7 @@
 	if(get_attribute_level(user, TEMPERANCE_ATTRIBUTE) < 60)
 		Apply_Desire(user)
 		user.adjustSanityLoss(500)
-		user.visible_message("<span class='userdanger'>[user] ignores [p_their()] orders and continually glances at The Red Shoes. Now [p_theyre()] reaching out their hand to take the shoes.</span>", "<span class='userdanger'>What lovely shoes...</span>")
+		user.visible_message(span_userdanger("[user] ignores [p_their()] orders and continually glances at The Red Shoes. Now [p_theyre()] reaching out their hand to take the shoes."), span_userdanger("What lovely shoes..."))
 
 //***Breach Mechanics***//
 /mob/living/simple_animal/hostile/abnormality/red_shoes/ZeroQliphoth(mob/living/carbon/human/user)//silent girl with extra steps
@@ -156,10 +159,10 @@
 	if(ishuman(H) && (H.sanity_lost))
 		var/obj/item/clothing/suit/armor/ego_gear/EQ = H.get_item_by_slot(ITEM_SLOT_OCLOTHING)//copies all resistances from worn E.G.O
 		if(EQ)
-			for(var/damtype in damage_coeff)
-				if(damtype == BRUTE)
-					continue
-				damage_coeff[damtype] -= (EQ.armor[damtype] / 100)
+			var/list/temp = EQ.armor.getList()
+			for(var/damtype in temp)
+				temp[damtype] = 1 - (temp[damtype] / 100)
+			ChangeResistances(temp)
 		user.forceMove(src)
 		playsound(src, 'sound/abnormalities/redshoes/RedShoes_Activate.ogg', 50, 1)
 		name = user.name
@@ -180,19 +183,19 @@
 		user.SanityLossEffect(FORTITUDE_ATTRIBUTE)
 
 //BreachEffect and combat
-/mob/living/simple_animal/hostile/abnormality/red_shoes/BreachEffect(mob/living/carbon/human/user)
+/mob/living/simple_animal/hostile/abnormality/red_shoes/BreachEffect(mob/living/carbon/human/user, breach_type)
 	if(!(status_flags & GODMODE))
 		return
 	soundloop.stop()
 	for(var/mob/living/carbon/human/H in GLOB.mob_living_list)//stops possessing people, prevents runtimes. Panicked players are ghosted so use mob_living_list
 		UnPossess(H)
-	..()
+	. = ..()
 	if(!possessee)
 		name = "Red Shoe"
 		desc = "The Red Shoes’s bloody enameled leather glistens in the light."
 		icon_state = "redshoes_breach"
 		icon_living = "redshoes_breach"
-		damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.5)
+		ChangeResistances(list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.5))
 		sleep(10)
 		new /mob/living/simple_animal/hostile/red_shoe(get_turf(src))
 	datum_reference.qliphoth_change(-2)
@@ -254,7 +257,7 @@
 	if(!ishuman(owner))
 		return
 	var/mob/living/carbon/human/H = owner
-	H.adjust_attribute_buff(PRUDENCE_ATTRIBUTE, 50)
+	H.adjust_attribute_bonus(PRUDENCE_ATTRIBUTE, 50)//Return prudence back to normal
 	if(H.sanity_lost)
 		QDEL_NULL(owner.ai_controller)
 		H.ai_controller = /datum/ai_controller/insane/red_possess
@@ -275,11 +278,11 @@
 
 /datum/ai_behavior/say_line/insanity_red_possess
 	lines = list(
-				"Where is everyone?",
-				"Guys, look at me! I’ve got such nice shoes on!",
-				"You all need to see how lovely my shoes are!",
-				"They’re much prettier with blood on them."
-				)
+		"Where is everyone?",
+		"Guys, look at me! I've got such nice shoes on!",
+		"You all need to see how lovely my shoes are!",
+		"They're much prettier with blood on them.",
+	)
 
 /datum/ai_controller/insane/red_possess/SelectBehaviors(delta_time)//Selects red shoes as the target
 	if(blackboard[BB_INSANE_CURRENT_ATTACK_TARGET] != null)
@@ -310,14 +313,14 @@
 		finish_action(controller, FALSE)
 		return
 	if(!LAZYLEN(current_path))
-		current_path = get_path_to(living_pawn, target, /turf/proc/Distance_cardinal, 0, 80)
+		current_path = get_path_to(living_pawn, target, TYPE_PROC_REF(/turf, Distance_cardinal), 0, 80)
 		if(!current_path) // Returned FALSE or null.
 			finish_action(controller, FALSE)
 			return
 	if(!ishuman(living_pawn))
 		return
 	walkspeed -= (max(0.95,((get_attribute_level(living_pawn, JUSTICE_ATTRIBUTE)) * 0.01)))//one-hundreth of a second for every point of justice, capped at 95
-	addtimer(CALLBACK(src, .proc/Movement, controller), walkspeed SECONDS, TIMER_UNIQUE)
+	addtimer(CALLBACK(src, PROC_REF(Movement), controller), walkspeed SECONDS, TIMER_UNIQUE)
 	if(isturf(target.loc) && living_pawn.Adjacent(target))
 		finish_action(controller, TRUE)
 		return
@@ -361,9 +364,9 @@
 	icon_living = "redshoes_breach2"
 	icon_dead = "redshoes_breach2"//dels on death
 	gender = NEUTER
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 1.5)
+	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 1.5)
 	del_on_death = TRUE
-	deathmessage = "crumples into a pile of bones."
+	death_message = "crumples into a pile of bones."
 	attack_sound = 'sound/abnormalities/redshoes/RedShoes_Attack.ogg'
 	melee_damage_lower = 15
 	melee_damage_upper = 30

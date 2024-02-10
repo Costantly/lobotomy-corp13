@@ -27,11 +27,12 @@
 		/obj/item/toy/plush/bigbird = 10,
 		/obj/item/toy/plush/rabbit = 5,
 		/obj/item/toy/plush/yuri = 5,
-		/obj/item/toy/plush/nihil = 4)
+		/obj/item/toy/plush/nihil = 4,
+	)
 
 /obj/item/plushgacha/attack_self(mob/user)
 	var/obj/item/toy/plush/reward = pickweight(rewards)
-	to_chat(user, "<span class='notice'>You got a prize!</span>")
+	to_chat(user, span_notice("You got a prize!"))
 	new reward(get_turf(src))
 	qdel(src)
 
@@ -55,10 +56,10 @@
 /obj/item/package_quantumpad/attack_self(mob/living/user)
 	..()
 	if(amount >= 2)
-		to_chat(user, "<span class='notice'>You see another pad is still in the box.</span>")
+		to_chat(user, span_notice("You see another pad is still in the box."))
 	if(amount <= 1)
-		to_chat(user, "<span class='notice'>The [src] falls apart.</span>")
+		to_chat(user, span_notice("The [src] falls apart."))
 		qdel(src)
 	new /obj/machinery/quantumpad/warp(get_turf(user))
-	to_chat(user, "<span class='notice'>You open the box and a strange pad falls out onto the floor.</span>")
+	to_chat(user, span_notice("You open the box and a strange pad falls out onto the floor."))
 	amount--

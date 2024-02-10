@@ -4,6 +4,7 @@
 	desc = "A wee witch."
 	icon = 'ModularTegustation/Teguicons/tegumobs.dmi'
 	icon_state = "laetitia"
+	portrait = "laetitia"
 	maxHealth = 600
 	health = 600
 	threat_level = HE_LEVEL
@@ -11,21 +12,22 @@
 		ABNORMALITY_WORK_INSTINCT = list(40, 45, 50, 50, 50),
 		ABNORMALITY_WORK_INSIGHT = 40,
 		ABNORMALITY_WORK_ATTACHMENT = list(60, 60, 60, 65, 65),
-		ABNORMALITY_WORK_REPRESSION = 0
-			)
+		ABNORMALITY_WORK_REPRESSION = 0,
+	)
 	work_damage_amount = 8
 	work_damage_type = BLACK_DAMAGE
 	max_boxes = 16 // Accurate to base game
 
 	ego_list = list(
 		/datum/ego_datum/weapon/prank,
-		/datum/ego_datum/armor/prank
-		)
+		/datum/ego_datum/armor/prank,
+	)
 	gift_type = /datum/ego_gifts/prank
 	gift_message = "I hope you're pleased with this!"
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 
 /mob/living/simple_animal/hostile/abnormality/laetitia/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	var/datum/status_effect/pranked/P = user.has_status_effect(STATUS_EFFECT_PRANKED)
 	if(P)
 		if(prob(15)) //15% chance to remove prank
@@ -39,12 +41,14 @@
 	return
 
 /mob/living/simple_animal/hostile/abnormality/laetitia/SuccessEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	var/datum/status_effect/pranked/P = user.has_status_effect(STATUS_EFFECT_PRANKED)
 	if(P && prob(30)) //30% to remove prank
 		user.remove_status_effect(STATUS_EFFECT_PRANKED)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/laetitia/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	var/datum/status_effect/pranked/P = user.has_status_effect(STATUS_EFFECT_PRANKED)
 	if(P && prob(70)) //70% to trigger explosion
 		P.TriggerPrank()
@@ -61,7 +65,7 @@
 	maxHealth = 800
 	health = 800
 	pixel_x = -16
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 1)
 	melee_damage_type = RED_DAMAGE
 	stat_attack = HARD_CRIT
 	melee_damage_lower = 20
@@ -69,7 +73,7 @@
 	attack_verb_continuous = "stabs"
 	attack_verb_simple = "stab"
 	attack_sound = 'sound/abnormalities/laetitia/spider_attack.ogg'
-	deathsound = 'sound/abnormalities/laetitia/spider_dead.ogg'
+	death_sound = 'sound/abnormalities/laetitia/spider_dead.ogg'
 
 /mob/living/simple_animal/hostile/gift/Initialize()
 	. = ..()
@@ -96,8 +100,8 @@
 
 /datum/status_effect/pranked/on_apply()
 	if(get_attribute_level(owner, PRUDENCE_ATTRIBUTE) >= 80)
-		to_chat(owner, "<span class='warning'>You feel something slipped into your pocket.</span>")
-	RegisterSignal(owner, COMSIG_WORK_STARTED, .proc/WorkCheck)
+		to_chat(owner, span_warning("You feel something slipped into your pocket."))
+	RegisterSignal(owner, COMSIG_WORK_STARTED, PROC_REF(WorkCheck))
 	return ..()
 
 /datum/status_effect/pranked/tick()
@@ -114,7 +118,7 @@
 				prank_overlay.mouse_opacity = 0
 				prank_overlay.vis_flags = VIS_INHERIT_ID
 				prank_overlay.alpha = 0
-				to_chat(L, "<span class='danger'>Your heart-shaped present begins to crack...</span>")
+				to_chat(L, span_danger("Your heart-shaped present begins to crack..."))
 				animate(prank_overlay, alpha = 255, time = (duration - world.time))
 				L.vis_contents += prank_overlay
 
@@ -125,7 +129,7 @@
 	if(duration < world.time) //if prank removed due to it expiring
 		if(ishuman(owner))
 			var/mob/living/carbon/human/L = owner
-			to_chat(L, "<span class='userdanger'>You feel something deep in your body explode!</span>")
+			to_chat(L, span_userdanger("You feel something deep in your body explode!"))
 			L.vis_contents -= prank_overlay
 			var/location = get_turf(L)
 			new /mob/living/simple_animal/hostile/gift(location)

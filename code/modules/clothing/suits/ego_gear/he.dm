@@ -410,16 +410,6 @@ Any attempt to code risk class armor will result in a 10 day Github ban.*/
 							TEMPERANCE_ATTRIBUTE = 40
 							)
 
-/obj/item/clothing/suit/armor/ego_gear/he/faelantern
-	name = "midwinter nightmare"
-	desc = "Some things are too good to be true."
-	icon_state = "faelantern"
-	armor = list(RED_DAMAGE = 60, WHITE_DAMAGE = 20, BLACK_DAMAGE = -20, PALE_DAMAGE = -20) // 40
-	attribute_requirements = list(
-							FORTITUDE_ATTRIBUTE = 40
-							)
-
-
 /obj/item/clothing/suit/armor/ego_gear/he/coiling
 	name = "coiling"
 	desc = "It's beautiful snake leather."
@@ -446,3 +436,22 @@ Any attempt to code risk class armor will result in a 10 day Github ban.*/
 	attribute_requirements = list(
 							FORTITUDE_ATTRIBUTE = 40
 							)
+
+/obj/item/clothing/suit/armor/ego_gear/he/nixie
+	name = "nixie divergence"
+	desc = "A purposeless machine is bound to lose the meaning of its existence, even if it is functional."
+	icon_state = "nixie"
+	armor = list(RED_DAMAGE = 40, WHITE_DAMAGE = 20, BLACK_DAMAGE = -20, PALE_DAMAGE = 30) // 70
+	attribute_requirements = list(
+							JUSTICE_ATTRIBUTE = 40
+							)
+
+/obj/item/clothing/suit/armor/ego_gear/he/sunshower
+	name = "sunshower"
+	desc = "Luck follows the truly kind, may it protect those who are worthy."
+	icon_state = "sunshower"
+	armor = list(RED_DAMAGE = 30, WHITE_DAMAGE = 20, BLACK_DAMAGE = 40, PALE_DAMAGE = -20) // 70
+	attribute_requirements = list(
+							TEMPERANCE_ATTRIBUTE = 40
+							)
+

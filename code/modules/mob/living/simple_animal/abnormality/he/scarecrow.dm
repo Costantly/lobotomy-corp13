@@ -5,12 +5,13 @@
 	icon_state = "scarecrow"
 	icon_living = "scarecrow"
 	icon_dead = "scarecrow_dead"
+	portrait = "scarecrow"
 	del_on_death = FALSE
 	maxHealth = 1000
 	health = 1000
 	rapid_melee = 2
 	move_to_delay = 3
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 2)
 	melee_damage_lower = 20
 	melee_damage_upper = 24
 	melee_damage_type = BLACK_DAMAGE
@@ -22,22 +23,31 @@
 	threat_level = HE_LEVEL
 	start_qliphoth = 1
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 45,
-						ABNORMALITY_WORK_INSIGHT = list(50, 60, 70, 80, 90),
-						ABNORMALITY_WORK_ATTACHMENT = 45,
-						ABNORMALITY_WORK_REPRESSION = 45
-						)
+		ABNORMALITY_WORK_INSTINCT = 45,
+		ABNORMALITY_WORK_INSIGHT = list(50, 60, 70, 80, 90),
+		ABNORMALITY_WORK_ATTACHMENT = 45,
+		ABNORMALITY_WORK_REPRESSION = 45,
+	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
-	deathmessage = "stops moving, with its torso rotating forwards."
-	deathsound = 'sound/abnormalities/scarecrow/death.ogg'
+	death_message = "stops moving, with its torso rotating forwards."
+	death_sound = 'sound/abnormalities/scarecrow/death.ogg'
 
 	ego_list = list(
 		/datum/ego_datum/weapon/harvest,
-		/datum/ego_datum/armor/harvest
-		)
+		/datum/ego_datum/armor/harvest,
+	)
 	gift_type =  /datum/ego_gifts/harvest
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	grouped_abnos = list(
+		/mob/living/simple_animal/hostile/abnormality/road_home = 2,
+		/mob/living/simple_animal/hostile/abnormality/woodsman = 2,
+		/mob/living/simple_animal/hostile/abnormality/scaredy_cat = 2,
+		// Ozma = 2,
+		/mob/living/simple_animal/hostile/abnormality/pinocchio = 1.5,
+	)
+
 	/// Can't move/attack when it's TRUE
 	var/finishing = FALSE
 
@@ -87,6 +97,7 @@
 			finishing = FALSE
 
 /mob/living/simple_animal/hostile/abnormality/scarecrow/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
@@ -95,8 +106,8 @@
 		datum_reference.qliphoth_change(-1)
 	return
 
-/mob/living/simple_animal/hostile/abnormality/scarecrow/BreachEffect(mob/living/carbon/human/user)
-	..()
+/mob/living/simple_animal/hostile/abnormality/scarecrow/BreachEffect(mob/living/carbon/human/user, breach_type)
+	. = ..()
 	icon_living = "scarecrow_breach"
 	icon_state = icon_living
 	GiveTarget(user)

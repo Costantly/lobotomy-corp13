@@ -29,7 +29,7 @@
 
 /obj/projectile/ego_bullet/ego_galaxy/homing/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, .proc/fireback), 3)
+	addtimer(CALLBACK(src, PROC_REF(fireback)), 3)
 
 /obj/projectile/ego_bullet/ego_galaxy/homing/proc/fireback()
 	icon_state = "magich"
@@ -61,19 +61,16 @@
 	speed = 1.3
 	projectile_piercing = PASSMOB
 	ricochets_max = 3
-	ricochet_chance = 99999999 // JUST FUCKING DO IT
+	ricochet_chance = 100 // JUST FUCKING DO IT
 	ricochet_decay_chance = 1
-	ricochet_decay_damage = 1.5
+	ricochet_decay_damage = 1.5 // Does MORE per bounce
 	ricochet_auto_aim_range = 3
-	ricochet_incidence_leeway = 360
+	ricochet_incidence_leeway = 0
 
 /obj/projectile/ego_bullet/ego_harmony/check_ricochet_flag(atom/A)
 	if(istype(A, /turf/closed))
 		return TRUE
 	return FALSE
-
-/obj/projectile/ego_bullet/ego_harmony/check_ricochet(atom/A)
-	return TRUE
 
 /obj/projectile/ego_bullet/ego_song
 	name = "song"
@@ -117,6 +114,7 @@
 
 /obj/projectile/ego_bullet/ego_swindle
 	name = "swindle"
+	icon_state = "d6"
 	damage = 1
 	damage_type = RED_DAMAGE
 

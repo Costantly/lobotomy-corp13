@@ -18,10 +18,11 @@
 	attack_verb_continuous = "bites"
 	attack_verb_simple = "bite"
 	attack_sound = 'sound/weapons/bite.ogg'
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 2, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 2, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	blood_volume = BLOOD_VOLUME_NORMAL
 	butcher_results = list(/obj/item/food/meat/slab/worm = 1)
 	guaranteed_butcher_results = list(/obj/item/food/meat/slab/worm = 1)
+	silk_results = list(/obj/item/stack/sheet/silk/amber_simple = 1)
 
 /mob/living/simple_animal/hostile/ordeal/amber_bug/Initialize()
 	. = ..()
@@ -35,7 +36,7 @@
 	if(.)
 		var/dir_to_target = get_dir(get_turf(src), get_turf(target))
 		animate(src, pixel_y = (base_pixel_y + 18), time = 2)
-		addtimer(CALLBACK(src, .proc/AnimateBack), 2)
+		addtimer(CALLBACK(src, PROC_REF(AnimateBack)), 2)
 		for(var/i = 1 to 2)
 			var/turf/T = get_step(get_turf(src), dir_to_target)
 			if(T.density)
@@ -86,8 +87,8 @@
 	attack_verb_continuous = "eviscerates"
 	attack_verb_simple = "eviscerate"
 	attack_sound = 'sound/effects/ordeals/amber/dusk_attack.ogg'
-	deathsound = 'sound/effects/ordeals/amber/dusk_dead.ogg'
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 2)
+	death_sound = 'sound/effects/ordeals/amber/dusk_dead.ogg'
+	damage_coeff = list(RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 2)
 	blood_volume = BLOOD_VOLUME_NORMAL
 
 	alpha = 0 // It burrows in on spawn
@@ -116,7 +117,7 @@
 
 /mob/living/simple_animal/hostile/ordeal/amber_dusk/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, .proc/BurrowOut, get_turf(src)))
+	addtimer(CALLBACK(src, PROC_REF(BurrowOut), get_turf(src)))
 	soundloop = new(list(src), TRUE)
 
 /mob/living/simple_animal/hostile/ordeal/amber_dusk/Destroy()
@@ -146,7 +147,7 @@
 	var/max_spawn = clamp(GLOB.clients.len * 5, 5, 25)
 	if(length(spawned_mobs) >= max_spawn)
 		return
-	visible_message("<span class='danger'>Five smaller bugs appear out of [src]!</span>")
+	visible_message(span_danger("Five smaller bugs appear out of [src]!"))
 	for(var/i = 1 to 5)
 		var/turf/T = get_step(get_turf(src), pick(0, NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST))
 		if(T.density) // Retry
@@ -161,7 +162,7 @@
 /mob/living/simple_animal/hostile/ordeal/amber_dusk/proc/BurrowIn()
 	burrowing = TRUE
 	density = FALSE
-	visible_message("<span class='danger'>[src] burrows into the ground!</span>")
+	visible_message(span_danger("[src] burrows into the ground!"))
 	playsound(get_turf(src), 'sound/effects/ordeals/amber/dusk_dig_in.ogg', 50, 1)
 	animate(src, alpha = 0, time = 5)
 	for(var/turf/open/OT in range(1, src))
@@ -177,7 +178,7 @@
 	animate(src, alpha = 255, time = 5)
 	SLEEP_CHECK_DEATH(5)
 	density = TRUE
-	visible_message("<span class='danger'>[src] burrows out from the ground!</span>")
+	visible_message(span_danger("[src] burrows out from the ground!"))
 	playsound(get_turf(src), 'sound/effects/ordeals/amber/dusk_dig_out.ogg', 50, 1)
 	var/obj/effect/temp_visual/decoy/D = new /obj/effect/temp_visual/decoy(T, src)
 	animate(D, alpha = 0, transform = matrix()*1.5, time = 5)
@@ -201,7 +202,7 @@
 	desc = "A giant insect-like creature with a ton of sharp rocky teeth."
 	health = 15000
 	maxHealth = 15000
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 0.8)
 	icon = 'ModularTegustation/Teguicons/224x128.dmi'
 	icon_state = "ambermidnight"
 	icon_living = "ambermidnight"
@@ -220,7 +221,7 @@
 	base_pixel_y = -16
 
 	blood_volume = BLOOD_VOLUME_NORMAL
-	deathsound = 'sound/effects/ordeals/amber/midnight_dead.ogg'
+	death_sound = 'sound/effects/ordeals/amber/midnight_dead.ogg'
 
 	var/burrowing = FALSE
 	var/burrow_cooldown
@@ -233,7 +234,7 @@
 	. = ..()
 	burrow_cooldown = world.time + 20 SECONDS
 	soundloop = new(list(src), TRUE)
-	addtimer(CALLBACK(src, .proc/BurrowOut))
+	addtimer(CALLBACK(src, PROC_REF(BurrowOut)))
 
 /mob/living/simple_animal/hostile/ordeal/amber_midnight/Destroy()
 	QDEL_NULL(soundloop)
@@ -267,7 +268,7 @@
 	if(length(spawned_mobs) >= max_spawn)
 		return FALSE
 	playsound(get_turf(src), 'sound/effects/ordeals/amber/midnight_create.ogg', 50, FALSE)
-	visible_message("<span class='danger'>Two large bugs appear out of [src]!</span>")
+	visible_message(span_danger("Two large bugs appear out of [src]!"))
 	for(var/i = 1 to 2)
 		var/turf/T = get_step(get_turf(src), pick(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST))
 		var/mob/living/simple_animal/hostile/ordeal/amber_dusk/spawned/nb = new(T)
@@ -282,7 +283,7 @@
 		SLEEP_CHECK_DEATH(2 SECONDS)
 	burrowing = TRUE
 	density = FALSE
-	visible_message("<span class='danger'>[src] burrows into the ground!</span>")
+	visible_message(span_danger("[src] burrows into the ground!"))
 	playsound(src, 'sound/effects/ordeals/amber/midnight_in.ogg', 50, FALSE, 7)
 	animate(src, alpha = 0, time = 7)
 	for(var/turf/open/OT in range(2, src))
@@ -319,7 +320,7 @@
 	playsound(get_turf(src), 'sound/effects/ordeals/amber/midnight_out_far.ogg', 25, FALSE, 24, 2, falloff_distance = 9)
 	SLEEP_CHECK_DEATH(2)
 	density = TRUE
-	visible_message("<span class='danger'>[src] burrows out from the ground!</span>")
+	visible_message(span_danger("[src] burrows out from the ground!"))
 	var/obj/effect/temp_visual/decoy/D = new /obj/effect/temp_visual/decoy(get_turf(src), src)
 	animate(D, alpha = 0, transform = matrix()*1.25, time = 3)
 	SLEEP_CHECK_DEATH(2)

@@ -19,7 +19,7 @@
 	health = 2000
 	maxHealth = 2000
 	obj_damage = 600
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.6, WHITE_DAMAGE = 1, BLACK_DAMAGE = 0.6, PALE_DAMAGE = 1.5)
+	damage_coeff = list(RED_DAMAGE = 0.6, WHITE_DAMAGE = 1, BLACK_DAMAGE = 0.6, PALE_DAMAGE = 1.5)
 	melee_damage_type = RED_DAMAGE
 	melee_damage_lower = 45
 	melee_damage_upper = 55
@@ -28,16 +28,16 @@
 	start_qliphoth = 2
 	can_breach = TRUE
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 45, 50),
-						ABNORMALITY_WORK_INSIGHT = list(0, 0, 30, 35, 40),
-						ABNORMALITY_WORK_ATTACHMENT = list(0, 0, 0, 10, 20),
-						ABNORMALITY_WORK_REPRESSION = list(0, 0, 45, 50, 55),
-						)
+		ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 45, 50),
+		ABNORMALITY_WORK_INSIGHT = list(0, 0, 30, 35, 40),
+		ABNORMALITY_WORK_ATTACHMENT = list(0, 0, 0, 10, 20),
+		ABNORMALITY_WORK_REPRESSION = list(0, 0, 45, 50, 55),
+	)
 	work_damage_amount = 14
 	work_damage_type = WHITE_DAMAGE
 	attack_sound = 'sound/abnormalities/crying_children/attack_salvador.ogg'
-	deathsound = 'sound/abnormalities/crying_children/death.ogg'
-	deathmessage = "crumbles into pieces."
+	death_sound = 'sound/abnormalities/crying_children/death.ogg'
+	death_message = "crumbles into pieces."
 	del_on_death = FALSE
 	ego_list = list(/datum/ego_datum/weapon/shield/combust, /datum/ego_datum/armor/combust)
 	gift_type =  /datum/ego_gifts/inconsolable
@@ -63,7 +63,7 @@
 
 	attack_action_types = list(
 		/datum/action/cooldown/tcc_sorrow,
-		/datum/action/cooldown/tcc_combust
+		/datum/action/cooldown/tcc_combust,
 	)
 
 // Sorrow is too strong to be spammed, so you can only do it when mobs are nearby as a player
@@ -95,7 +95,7 @@
 			continue
 		targets_to_hit += V
 	if(targets_to_hit.len <= 0)
-		to_chat(TCC, "<span class='warning'>There are no enemies nearby!</span>")
+		to_chat(TCC, span_warning("There are no enemies nearby!"))
 		return FALSE
 	StartCooldown()
 	TCC.Wounds_Of_Sorrow(pick(targets_to_hit))
@@ -118,7 +118,7 @@
 	if(!(TCC.can_act))
 		return FALSE
 	if(!(TCC.desperate))
-		to_chat(TCC, "<span class='warning'>You're still not ready to use this!</span>")
+		to_chat(TCC, span_warning("You're still not ready to use this!"))
 		return FALSE
 	StartCooldown()
 	TCC.Combusting_Courage()
@@ -126,10 +126,11 @@
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/Initialize()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, .proc/OnMobDeath) // Alright, here we go again
+	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(OnMobDeath)) // Alright, here we go again
 
 // Silly multi icons, lets fix that! This is called each time it's spawned in containment, so it has normal sprite on adminbus spawn
 /mob/living/simple_animal/hostile/abnormality/crying_children/PostSpawn()
+	. = ..()
 	desc = "A wax statue of an ...angel? It creepily floats around the containment room. You feel like you shouldn't be here for too long"
 	icon = 'ModularTegustation/Teguicons/32x32.dmi'
 	icon_state = "unspeaking_child"
@@ -166,11 +167,11 @@
 		desperation_cooldown = (world.time + desperation_cooldown_time)
 		if(charge == maxcharge - 10) // 10 Final Seconds, You can't reduce anymore, only kill!!
 			charge = 666
-			addtimer(CALLBACK(src, .proc/Scorching_Desperation), 10 SECONDS)
+			addtimer(CALLBACK(src, PROC_REF(Scorching_Desperation)), 10 SECONDS)
 			for(var/mob/living/L in GLOB.mob_living_list)
 				if(faction_check_mob(L, FALSE) || L.z != z || L.stat == DEAD)
 					continue
-				to_chat(L, "<span class='userdanger'>Everything seems hazy, even metal is starting to melt. You can barely withstand the heat!</span>")
+				to_chat(L, span_userdanger("Everything seems hazy, even metal is starting to melt. You can barely withstand the heat!"))
 				flash_color(L, flash_color = COLOR_SOFT_RED, flash_time = 150)
 				SEND_SOUND(L, sound('sound/ambience/acidrain_mid.ogg'))
 
@@ -182,14 +183,14 @@
 	for(var/mob/living/L in GLOB.mob_living_list)
 		if(faction_check_mob(L, FALSE) || L.z != z || L.stat == DEAD)
 			continue
-		to_chat(L, "<span class='userdanger'>You're boiling alive from the heat of a miniature sun!</span>")
+		to_chat(L, span_userdanger("You're boiling alive from the heat of a miniature sun!"))
 		playsound(L, 'sound/abnormalities/crying_children/attack_aoe.ogg', 50, TRUE)
 		L.apply_damage(300, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 		L.apply_lc_burn(50)
 		new /obj/effect/temp_visual/fire/fast(get_turf(L))
 
-/mob/living/simple_animal/hostile/abnormality/crying_children/BreachEffect(mob/living/carbon/human/user)
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "No one’s going to cry on my behalf even if I’m sad.", 25))
+/mob/living/simple_animal/hostile/abnormality/crying_children/BreachEffect(mob/living/carbon/human/user, breach_type)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "No one’s going to cry on my behalf even if I’m sad.", 25))
 	..()
 	desc = "A towering angel statue, setting everything on it's path ablaze"
 	icon = 'ModularTegustation/Teguicons/96x96.dmi'
@@ -305,10 +306,10 @@
 		S.pixel_x = rand(-8, 8)
 		S.pixel_y = rand(-8, 8)
 		animate(S, alpha = 0, time = 1.5)
-		var/list/new_hits = HurtInTurf(T, been_hit, 60, RED_DAMAGE, null, null, TRUE, FALSE, TRUE, TRUE) - been_hit
+		var/list/new_hits = HurtInTurf(T, been_hit, 60, RED_DAMAGE, null, TRUE, FALSE, TRUE, TRUE) - been_hit
 		been_hit += new_hits
 		for(var/mob/living/L in new_hits)
-			to_chat(L, "<span class='userdanger'>[src] stabs you!</span>")
+			to_chat(L, span_userdanger("[src] stabs you!"))
 			L.apply_lc_burn(4*burn_mod)
 			new /obj/effect/temp_visual/dir_setting/bloodsplatter(get_turf(L), dir_to_target)
 	SLEEP_CHECK_DEATH(10)
@@ -363,21 +364,23 @@
 	playsound(src, 'sound/abnormalities/crying_children/attack_aoe.ogg', 50, FALSE)
 	for(var/turf/T in view(4, src))
 		new /obj/effect/temp_visual/fire/fast(T)
-		var/list/new_hits = HurtInTurf(T, been_hit, 250, RED_DAMAGE, null, null, TRUE, FALSE, TRUE, TRUE) - been_hit
+		var/list/new_hits = HurtInTurf(T, been_hit, 250, RED_DAMAGE, null, TRUE, FALSE, TRUE, TRUE) - been_hit
 		been_hit += new_hits
 		for(var/mob/living/L in new_hits)
-			to_chat(L, "<span class='userdanger'>You were scorched by [src]'s flames!</span>")
+			to_chat(L, span_userdanger("You were scorched by [src]'s flames!"))
 			L.apply_lc_burn(20)
 	SLEEP_CHECK_DEATH(10)
 	can_act = TRUE
 
 // Work Stuff
 /mob/living/simple_animal/hostile/abnormality/crying_children/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	if(prob(20))
 		Curse(user)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	Curse(user)
 	return
@@ -408,8 +411,8 @@
 		ADD_TRAIT(user, type, GENETIC_MUTATION)
 		user.update_blindness()
 		user.update_sight()
-		to_chat(user, "<span class='warning'>You were cursed by [src]!</span>")
-		addtimer(CALLBACK(src, .proc/RemoveCurse, user, type), 3 MINUTES)
+		to_chat(user, span_warning("You were cursed by [src]!"))
+		addtimer(CALLBACK(src, PROC_REF(RemoveCurse), user, type), 3 MINUTES)
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/proc/RemoveCurse(mob/living/carbon/human/user, type)
 	REMOVE_TRAIT(user, type, GENETIC_MUTATION)
@@ -417,7 +420,7 @@
 	user.update_sight()
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/proc/SpawnChildren()
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "Seeing, hearing, and speaking evil are all deeds that I can consciously prevent myself from doing.", 25))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "Seeing, hearing, and speaking evil are all deeds that I can consciously prevent myself from doing.", 25))
 	sound_to_playing_players_on_level('sound/abnormalities/crying_children/seperate.ogg', 50, zlevel = z)
 	var/list/teleport_potential = list()
 	for(var/turf/T in GLOB.department_centers)
@@ -432,15 +435,15 @@
 
 	//I tried using subtype loop for this, but it ends a bit buggy
 	var/mob/living/simple_animal/hostile/child/unseeing/SE = new(teleport_target)
-	RegisterSignal(SE, COMSIG_LIVING_DEATH, .proc/DeadChild, SE)
+	RegisterSignal(SE, COMSIG_LIVING_DEATH, PROC_REF(DeadChild), SE)
 	teleport_potential -= teleport_target
 	teleport_target = pick(teleport_potential)
 	var/mob/living/simple_animal/hostile/child/unhearing/HE = new(teleport_target)
-	RegisterSignal(HE, COMSIG_LIVING_DEATH, .proc/DeadChild, HE)
+	RegisterSignal(HE, COMSIG_LIVING_DEATH, PROC_REF(DeadChild), HE)
 	teleport_potential -= teleport_target
 	teleport_target = pick(teleport_potential)
 	var/mob/living/simple_animal/hostile/child/unspeaking/PE = new(teleport_target)
-	RegisterSignal(PE, COMSIG_LIVING_DEATH, .proc/DeadChild, PE)
+	RegisterSignal(PE, COMSIG_LIVING_DEATH, PROC_REF(DeadChild), PE)
 	children_list = list(SE, HE, PE)
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/proc/DeadChild(mob/living/deadchild)
@@ -453,13 +456,13 @@
 		forceMove(T)
 
 /mob/living/simple_animal/hostile/abnormality/crying_children/proc/FinalPhase()
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "I don’t want to hear anything. I don’t want to see anything, or speak anything…", 25))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "I don’t want to hear anything. I don’t want to see anything, or speak anything…", 25))
 	icon_phase = "desperation"
 	icon_living = "[icon_phase]_idle"
 	icon_state = "[icon_phase]_idle"
 	desperate = TRUE
 	maxHealth = 4000
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1)
 	revive(full_heal = TRUE, admin_revive = FALSE)
 	move_to_delay = 4
 	burn_mod = 2
@@ -479,7 +482,7 @@
 	attack_sound = 'sound/abnormalities/crying_children/attack_child.ogg'
 	health = 1500
 	maxHealth = 1500
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
 	melee_damage_type = RED_DAMAGE
 	melee_damage_lower = 25
 	melee_damage_upper = 40
@@ -512,7 +515,7 @@
 	desc = "Turn a blind eye to all that tries to hurt me."
 	icon_state = "unseeing_child"
 	icon_living = "unseeing_child"
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
 	var/list/blinded = list()
 
 /mob/living/simple_animal/hostile/child/unseeing/Initialize()
@@ -530,7 +533,7 @@
 		REMOVE_TRAIT(H, TRAIT_BLIND, GENETIC_MUTATION)
 		H.update_blindness()
 		H.update_sight()
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "The World Was Beautiful, Yet The Child Can't See It.", 25))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "The World Was Beautiful, Yet The Child Can't See It.", 25))
 	..()
 
 // Unhearing
@@ -539,7 +542,7 @@
 	desc = "Turn a deaf ear to words that will lead me down the wrong path."
 	icon_state = "unhearing_child"
 	icon_living = "unhearing_child"
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.8)
 	var/list/deafened = list()
 
 /mob/living/simple_animal/hostile/child/unhearing/Initialize()
@@ -553,7 +556,7 @@
 /mob/living/simple_animal/hostile/child/unhearing/death(gibbed)
 	for(var/mob/living/carbon/human/H in deafened)
 		REMOVE_TRAIT(H, TRAIT_DEAF, GENETIC_MUTATION)
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "Words Of Love And Encouragement Was Spoken, Yet The Child Can't Hear Them.", 25))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "Words Of Love And Encouragement Was Spoken, Yet The Child Can't Hear Them.", 25))
 	..()
 
 // Unspeaking
@@ -562,7 +565,7 @@
 	desc = "Turn a mute mouth to unnecessary evil."
 	icon_state = "unspeaking_child"
 	icon_living = "unspeaking_child"
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
+	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.8)
 	var/list/muted = list()
 
 /mob/living/simple_animal/hostile/child/unspeaking/Initialize()
@@ -576,7 +579,7 @@
 /mob/living/simple_animal/hostile/child/unspeaking/death(gibbed)
 	for(var/mob/living/carbon/human/H in muted)
 		REMOVE_TRAIT(H, TRAIT_MUTE, GENETIC_MUTATION)
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 20, "His Mind, Full Of Pain And Suffering, Yet The Child Can't Tell A Soul.", 25))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(show_global_blurb), 20, "His Mind, Full Of Pain And Suffering, Yet The Child Can't Tell A Soul.", 25))
 	..()
 
 /obj/projectile/beam/sorrow_beam

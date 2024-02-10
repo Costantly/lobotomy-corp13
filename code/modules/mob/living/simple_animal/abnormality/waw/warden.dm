@@ -5,11 +5,12 @@
 	icon_state = "warden"
 	icon_living = "warden"
 	icon_dead = "warden_dead"
+	portrait = "warden"
 	maxHealth = 2100
 	health = 2100
 	pixel_x = -8
 	base_pixel_x = -8
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1.5)
+	damage_coeff = list(RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1.5)
 
 	move_to_delay = 4
 	melee_damage_lower = 70
@@ -24,18 +25,18 @@
 	threat_level = WAW_LEVEL
 	start_qliphoth = 2
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = 40,
-						ABNORMALITY_WORK_INSIGHT = 15,
-						ABNORMALITY_WORK_ATTACHMENT = 0,
-						ABNORMALITY_WORK_REPRESSION = 50
-						)
+		ABNORMALITY_WORK_INSTINCT = 40,
+		ABNORMALITY_WORK_INSIGHT = 15,
+		ABNORMALITY_WORK_ATTACHMENT = 0,
+		ABNORMALITY_WORK_REPRESSION = 50,
+	)
 	work_damage_amount = 8
 	work_damage_type = BLACK_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/correctional,
-		/datum/ego_datum/armor/correctional
-		)
+		/datum/ego_datum/armor/correctional,
+	)
 	gift_type =  /datum/ego_gifts/correctional
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
 	var/finishing = FALSE
@@ -72,6 +73,7 @@
 			icon_state = "warden"
 
 /mob/living/simple_animal/hostile/abnormality/warden/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1)
 	return
 
@@ -80,8 +82,8 @@
 		datum_reference.qliphoth_change(-1)
 	return
 
-/mob/living/simple_animal/hostile/abnormality/warden/BreachEffect(mob/living/carbon/human/user)
-	..()
+/mob/living/simple_animal/hostile/abnormality/warden/BreachEffect(mob/living/carbon/human/user, breach_type)
+	. = ..()
 	GiveTarget(user)
 
 /mob/living/simple_animal/hostile/abnormality/warden/CanAttack(atom/the_target)
@@ -101,5 +103,5 @@
 	..()
 
 /mob/living/simple_animal/hostile/abnormality/warden/bullet_act(obj/projectile/P)
-	visible_message("<span class='userdanger'>[src] is unfazed by \the [P]!</span>")
+	visible_message(span_userdanger("[src] is unfazed by \the [P]!"))
 	P.Destroy()

@@ -6,6 +6,7 @@
 	icon_living = "yin"
 	var/icon_breach = "yin_breach"
 	icon_dead = "yin_slain"
+	portrait = "yin"
 	is_flying_animal = TRUE
 	maxHealth = 1600
 	health = 1600
@@ -23,27 +24,31 @@
 	work_damage_amount = 10
 	work_damage_type = BLACK_DAMAGE
 	work_chances = list(
-						ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 40, 40),
-						ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 55),
-						ABNORMALITY_WORK_ATTACHMENT = 0,
-						ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40)
-						)
+		ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 40, 40),
+		ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 55),
+		ABNORMALITY_WORK_ATTACHMENT = 0,
+		ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40),
+	)
 	max_boxes = 20
 	success_boxes = 16
 	neutral_boxes = 9
 
 	ego_list = list(
 		/datum/ego_datum/weapon/discord,
-		/datum/ego_datum/armor/discord
-		)
+		/datum/ego_datum/armor/discord,
+	)
 	gift_type = /datum/ego_gifts/discord
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	grouped_abnos = list(
+		/mob/living/simple_animal/hostile/abnormality/yang = 5, // TAKE THE FISH. DO IT
+	)
 
 	faction = list("neutral", "hostile") // Not fought by anything, typically. But...
 	var/faction_override = list("hostile") // The effects hit non-hostiles.
 
 	//Melee
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0, PALE_DAMAGE = 1)
+	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0, PALE_DAMAGE = 1)
 	melee_damage_lower = 60 // Doesn't actually swing individually
 	melee_damage_upper = 60
 	melee_damage_type = BLACK_DAMAGE
@@ -67,7 +72,7 @@
 		/mob/living/simple_animal/hostile/megafauna/apocalypse_bird,
 		/mob/living/simple_animal/hostile/megafauna/arbiter,
 		/mob/living/simple_animal/hostile/abnormality/yang,
-		/mob/living/simple_animal/hostile/abnormality/yin
+		/mob/living/simple_animal/hostile/abnormality/yin,
 	)
 	var/dragon_spawned = FALSE
 
@@ -119,7 +124,7 @@
 		break
 	if(found)
 		COOLDOWN_START(src, pulse, pulse_cooldown)
-		INVOKE_ASYNC(src, .proc/Pulse)
+		INVOKE_ASYNC(src, PROC_REF(Pulse))
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/yin/death(gibbed)
@@ -128,20 +133,20 @@
 		return ..()
 	if(SSlobotomy_events.yin_downed)
 		return FALSE
-	INVOKE_ASYNC(src, .proc/BeDead)
+	INVOKE_ASYNC(src, PROC_REF(BeDead))
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/BeDead()
 	icon_state = icon_dead
 	playsound(src, 'sound/effects/magic.ogg', 60)
 	SSlobotomy_events.yin_downed = TRUE
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
+	ChangeResistances(list(RED_DAMAGE = 0, WHITE_DAMAGE = 0, PALE_DAMAGE = 0))
 	for(var/i = 1 to 12)
 		SLEEP_CHECK_DEATH(5 SECONDS)
 		if(SSlobotomy_events.yang_downed)
 			death()
 			return
 	adjustBruteLoss(-maxHealth)
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0, PALE_DAMAGE = 1)
+	ChangeResistances(list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, PALE_DAMAGE = 1))
 	SSlobotomy_events.yin_downed = FALSE
 	icon_state = icon_breach
 
@@ -168,6 +173,7 @@
 	SSlobotomy_events.yin_downed = FALSE
 
 /mob/living/simple_animal/hostile/abnormality/yin/FailureEffect(mob/living/carbon/human/user, work_type, pe)
+	. = ..()
 	datum_reference.qliphoth_change(-1, user)
 	return
 
@@ -327,7 +333,7 @@
 			H.adjustSanityLoss(-H.maxSanity)
 			H.adjustSanityLoss(damage)
 		hit_people += L
-		to_chat(L, "<span class='userdanger'>All that is shall become all that isn't.</span>")
+		to_chat(L, span_userdanger("All that is shall become all that isn't."))
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/YangCheck()
 	for(var/datum/abnormality/AD in SSlobotomy_corp.all_abnormality_datums)
