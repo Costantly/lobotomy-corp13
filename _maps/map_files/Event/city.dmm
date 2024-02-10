@@ -385,6 +385,15 @@
 /obj/item/kitchen/rollingpin,
 /turf/open/floor/mineral/silver,
 /area/city/shop)
+"eA" = (
+/obj/structure/table/wood,
+/obj/item/hand_labeler_refill,
+/obj/item/hand_labeler_refill,
+/obj/item/hand_labeler_refill,
+/obj/item/hand_labeler_refill,
+/obj/item/hand_labeler,
+/turf/open/floor/facility/white,
+/area/city/fixers)
 "eF" = (
 /obj/machinery/door/airlock/wood{
 	name = "employee housing"
@@ -531,10 +540,6 @@
 /obj/effect/landmark/cityspawner,
 /turf/open/floor/plating/ashplanet/rocky,
 /area/city)
-"ha" = (
-/obj/structure/lootcrate/s_corp,
-/turf/open/floor/facility/dark,
-/area/city)
 "hb" = (
 /obj/machinery/telecomms/server/presets/security,
 /turf/open/floor/circuit/telecomms/mainframe,
@@ -587,10 +592,6 @@
 	},
 /turf/open/floor/wood,
 /area/city/backstreets_checkpoint)
-"hD" = (
-/obj/structure/table/wood,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "hI" = (
 /obj/machinery/light/broken{
 	dir = 1
@@ -784,11 +785,6 @@
 /obj/machinery/microwave,
 /turf/open/floor/wood,
 /area/city/shop)
-"jA" = (
-/obj/machinery/vending/coffee,
-/obj/machinery/light,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "jG" = (
 /obj/structure/table/wood,
 /obj/item/modular_computer/laptop/preset/fixer,
@@ -831,11 +827,6 @@
 "kk" = (
 /turf/closed/indestructible/reinforced,
 /area/city/backstreets_alley)
-"km" = (
-/obj/structure/table/reinforced,
-/obj/item/food/meat/slab,
-/turf/open/floor/mineral/titanium,
-/area/city/house)
 "kn" = (
 /obj/machinery/griddle,
 /turf/open/floor/mineral/titanium,
@@ -966,12 +957,6 @@
 /obj/item/toy/plush/rabbit,
 /turf/open/floor/facility/dark,
 /area/city)
-"lv" = (
-/obj/machinery/modular_computer/console/preset/civilian{
-	dir = 8
-	},
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "lD" = (
 /obj/effect/turf_decal/box/red,
 /obj/effect/landmark/syndicatebase,
@@ -997,12 +982,6 @@
 	},
 /turf/open/floor/mineral/titanium,
 /area/city/house)
-"lY" = (
-/obj/structure/closet/crate/trashcart,
-/obj/item/bodypart/l_arm,
-/obj/item/bodypart/r_arm,
-/turf/open/floor/plasteel/dark,
-/area/city/shop)
 "mc" = (
 /obj/structure/chair/wood{
 	dir = 1
@@ -1039,15 +1018,6 @@
 	},
 /turf/open/floor/plating/beach/sand,
 /area/city)
-"mN" = (
-/obj/structure/table/glass,
-/obj/item/storage/box/medipens,
-/obj/item/storage/box/medipens,
-/obj/item/storage/box/medipens,
-/obj/item/storage/box/medipens,
-/obj/item/storage/box/medipens,
-/turf/open/indestructible/white,
-/area/city/shop)
 "mR" = (
 /obj/effect/decal/cleanable/dirt/dust,
 /turf/closed/wall/bathhouse,
@@ -1217,11 +1187,6 @@
 	},
 /turf/open/floor/wood,
 /area/city/shop)
-"oD" = (
-/obj/structure/table/reinforced,
-/obj/item/food/meat/slab,
-/turf/open/floor/oldshuttle,
-/area/city/house)
 "oE" = (
 /obj/structure/plasticflaps/opaque,
 /turf/open/floor/plasteel/dark,
@@ -1399,6 +1364,12 @@
 /obj/item/food/breadslice/moldy,
 /turf/open/floor/wood,
 /area/city/shop)
+"qP" = (
+/obj/structure/moneymachine{
+	pixel_y = -32
+	},
+/turf/open/floor/facility/white,
+/area/city/fixers)
 "qQ" = (
 /obj/structure/table/greyscale,
 /obj/item/flashlight/lamp/green,
@@ -1456,6 +1427,9 @@
 	},
 /turf/open/indestructible/hoteltile,
 /area/city/house)
+"rn" = (
+/turf/open/floor/plasteel/vaporwave,
+/area/city)
 "rq" = (
 /obj/structure/table/wood,
 /obj/item/modular_computer/laptop/preset/fixer,
@@ -1542,11 +1516,6 @@
 	},
 /turf/open/floor/plasteel/showroomfloor,
 /area/city/shop)
-"si" = (
-/obj/structure/table/reinforced,
-/obj/item/food/meat/slab,
-/turf/open/floor/plasteel/checker,
-/area/city/house)
 "sj" = (
 /obj/structure/fluff/bus/passable{
 	icon_state = "bottomdoor";
@@ -2215,6 +2184,10 @@
 /obj/structure/bed/pod,
 /turf/open/floor/wood,
 /area/city/shop)
+"xF" = (
+/obj/machinery/vending/coffee,
+/turf/open/floor/facility/white,
+/area/city/fixers)
 "xM" = (
 /obj/structure/table/wood,
 /obj/item/flashlight/lamp/green,
@@ -2305,12 +2278,6 @@
 /obj/effect/landmark/cityloot,
 /turf/open/floor/carpet,
 /area/city)
-"yu" = (
-/obj/structure/table/reinforced,
-/obj/item/food/meat/slab,
-/obj/item/food/meat/slab,
-/turf/open/floor/plasteel/checker,
-/area/city/house)
 "yv" = (
 /obj/machinery/door/airlock/grunge{
 	name = "association equipment";
@@ -2418,6 +2385,11 @@
 /obj/item/kitchen/spoon,
 /turf/open/floor/mineral/titanium,
 /area/city/house)
+"zm" = (
+/obj/machinery/light,
+/obj/structure/table/wood,
+/turf/open/floor/facility/white,
+/area/city/fixers)
 "zo" = (
 /obj/structure/table/wood/bar,
 /obj/machinery/chem_dispenser/drinks/fullupgrade{
@@ -2628,6 +2600,10 @@
 /obj/structure/mineral_door/wood,
 /turf/open/floor/mineral/titanium,
 /area/city/house)
+"AL" = (
+/obj/effect/landmark/cityloot,
+/turf/open/floor/plasteel/vaporwave,
+/area/city)
 "AM" = (
 /obj/structure/chair/office{
 	dir = 4
@@ -3061,11 +3037,6 @@
 "DH" = (
 /obj/structure/table,
 /obj/item/reagent_containers/food/condiment/enzyme,
-/turf/open/floor/plasteel,
-/area/city/shop)
-"DT" = (
-/obj/structure/table,
-/obj/item/kitchen/knife,
 /turf/open/floor/plasteel,
 /area/city/shop)
 "DX" = (
@@ -3926,6 +3897,15 @@
 /obj/item/reagent_containers/glass/bucket,
 /turf/open/indestructible/white,
 /area/city/shop)
+"KY" = (
+/obj/item/folder,
+/obj/item/folder,
+/obj/item/folder,
+/obj/item/folder,
+/obj/item/folder,
+/obj/structure/table/wood,
+/turf/open/floor/facility/white,
+/area/city/fixers)
 "KZ" = (
 /obj/machinery/telecomms/server/presets/medical,
 /turf/open/floor/circuit/telecomms/mainframe,
@@ -3995,6 +3975,10 @@
 	},
 /turf/open/floor/plasteel/checker,
 /area/city/house)
+"LJ" = (
+/obj/machinery/iv_drip/saline,
+/turf/open/indestructible/white,
+/area/city/shop)
 "LK" = (
 /obj/structure/rack,
 /obj/item/ego_weapon/city/rats/knife,
@@ -4061,11 +4045,6 @@
 /obj/item/clothing/under/misc/pj/blue,
 /obj/item/clothing/under/mercenary/camo,
 /turf/open/floor/wood,
-/area/city/house)
-"Mr" = (
-/obj/structure/table/reinforced,
-/obj/item/food/meat/slab,
-/turf/open/indestructible/hoteltile,
 /area/city/house)
 "My" = (
 /obj/structure/potential,
@@ -4185,6 +4164,10 @@
 "NJ" = (
 /obj/machinery/door/poddoor/shutters/indestructible,
 /turf/open/floor/plating/ashplanet/rocky,
+/area/city/shop)
+"NL" = (
+/obj/item/price_tagger,
+/turf/open/indestructible/white,
 /area/city/shop)
 "NY" = (
 /obj/machinery/computer/arcade/battle,
@@ -4366,19 +4349,6 @@
 /obj/item/soap,
 /turf/open/floor/plasteel/white,
 /area/city)
-"QH" = (
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/structure/table/wood,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "QL" = (
 /obj/effect/turf_decal/bot,
 /obj/machinery/ntnet_relay,
@@ -4418,10 +4388,6 @@
 /obj/effect/turf_decal/bot,
 /turf/open/floor/circuit/telecomms/mainframe,
 /area/facility_hallway/north)
-"Rf" = (
-/mob/living/simple_animal/hostile/shrimp,
-/turf/open/floor/facility/dark,
-/area/city)
 "Rh" = (
 /turf/closed/wall/bathhouse,
 /area/city)
@@ -4480,6 +4446,10 @@
 	},
 /turf/open/floor/plating/ashplanet/rocky,
 /area/city/backstreets_checkpoint)
+"Se" = (
+/mob/living/simple_animal/hostile/shrimp,
+/turf/open/floor/plasteel/vaporwave,
+/area/city)
 "Sf" = (
 /obj/machinery/door/poddoor/shutters/indestructible{
 	id = "Garage"
@@ -4595,6 +4565,12 @@
 /obj/item/canvas/twentythree_twentythree,
 /turf/open/floor/wood,
 /area/city/shop)
+"TO" = (
+/obj/structure/table,
+/obj/item/kitchen/knife,
+/obj/item/price_tagger,
+/turf/open/floor/plasteel,
+/area/city/shop)
 "TQ" = (
 /obj/machinery/light{
 	dir = 8
@@ -4702,6 +4678,13 @@
 	},
 /turf/open/floor/facility/white,
 /area/city/fixers)
+"UE" = (
+/obj/structure/closet/crate/trashcart,
+/obj/item/bodypart/l_arm,
+/obj/item/bodypart/r_arm,
+/obj/machinery/light/small,
+/turf/open/floor/plasteel/dark,
+/area/city/shop)
 "UF" = (
 /obj/machinery/griddle,
 /obj/effect/turf_decal/tile/red{
@@ -5005,6 +4988,10 @@
 	},
 /turf/open/floor/wood,
 /area/city/shop)
+"XD" = (
+/obj/structure/table/reinforced,
+/turf/open/floor/oldshuttle,
+/area/city/house)
 "XF" = (
 /turf/open/floor/wood,
 /area/city)
@@ -5081,14 +5068,6 @@
 	},
 /turf/open/floor/facility/dark,
 /area/city/backstreets_room)
-"Yq" = (
-/obj/structure/table/wood,
-/obj/item/storage/backpack/duffelbag/med/surgery,
-/obj/item/clothing/gloves/color/latex/nitrile,
-/obj/item/clothing/gloves/color/latex/nitrile,
-/obj/item/storage/box/bodybags,
-/turf/open/floor/plasteel/dark,
-/area/city/shop)
 "Yr" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/effect/landmark/cityloot,
@@ -5201,6 +5180,17 @@
 /obj/effect/turf_decal/trimline/yellow/line,
 /turf/open/floor/plasteel,
 /area/city/shop)
+"Zx" = (
+/obj/structure/table/wood,
+/obj/item/storage/backpack/duffelbag/med/surgery,
+/obj/item/clothing/gloves/color/latex/nitrile,
+/obj/item/clothing/gloves/color/latex/nitrile,
+/obj/item/storage/box/bodybags,
+/obj/machinery/light/small{
+	dir = 4
+	},
+/turf/open/floor/plasteel/dark,
+/area/city/shop)
 "Zz" = (
 /obj/structure/rack,
 /obj/machinery/light{
@@ -5215,6 +5205,10 @@
 	},
 /turf/open/floor/carpet/black,
 /area/city/fixers)
+"ZL" = (
+/obj/structure/lootcrate/s_corp,
+/turf/open/floor/plasteel/vaporwave,
+/area/city)
 "ZP" = (
 /obj/machinery/vending/fixer,
 /turf/closed/indestructible/reinforced,
@@ -29019,11 +29013,11 @@ WX
 eF
 Hm
 zr
-ha
-WX
-WX
-WX
-ha
+ZL
+rn
+rn
+rn
+ZL
 zr
 zr
 zr
@@ -29276,11 +29270,11 @@ RZ
 zr
 Hm
 zr
-WX
-gx
-WX
-Rf
-WX
+rn
+AL
+rn
+Se
+rn
 zr
 xl
 xl
@@ -29535,8 +29529,8 @@ Hm
 zr
 zr
 zr
-WX
-ha
+rn
+ZL
 zr
 zr
 xl
@@ -37001,7 +36995,7 @@ TJ
 Dq
 VK
 Ab
-Mr
+Ab
 YN
 YN
 ja
@@ -37025,7 +37019,7 @@ Hm
 Dq
 TJ
 Dq
-yu
+qD
 Ez
 Dq
 Dq
@@ -37268,7 +37262,7 @@ Hm
 OT
 Ch
 CS
-DT
+TO
 CS
 Zv
 Sa
@@ -37764,7 +37758,7 @@ Co
 um
 Sr
 Sr
-QH
+KY
 HA
 Hm
 Dq
@@ -38021,7 +38015,7 @@ JH
 Sr
 Sr
 Sr
-Sr
+eA
 HA
 Hm
 Dq
@@ -38277,8 +38271,8 @@ Pi
 Sr
 Sr
 rG
-lv
-jA
+rG
+zm
 HA
 Hm
 Dq
@@ -38532,7 +38526,7 @@ Sr
 Sr
 Pi
 LP
-Sr
+qP
 HA
 HA
 HA
@@ -38800,7 +38794,7 @@ TJ
 Dq
 wo
 qD
-si
+qD
 yC
 yC
 BQ
@@ -39302,7 +39296,7 @@ IQ
 jQ
 Sr
 HA
-hD
+xF
 Sr
 HA
 HA
@@ -40352,7 +40346,7 @@ Hm
 Zt
 Jo
 We
-We
+NL
 We
 Fk
 OT
@@ -40599,7 +40593,7 @@ uR
 Dq
 yT
 jI
-km
+jI
 wr
 wr
 BU
@@ -41612,7 +41606,7 @@ Hm
 Hm
 Hm
 Dq
-km
+jI
 AU
 AU
 Dq
@@ -42398,7 +42392,7 @@ TJ
 Dq
 VK
 Ab
-Mr
+Ab
 YN
 YN
 ja
@@ -43438,7 +43432,7 @@ Hm
 Dq
 TJ
 Dq
-Mr
+Ab
 Vb
 Dq
 Dq
@@ -43450,7 +43444,7 @@ Hm
 Dq
 TJ
 Dq
-Mr
+Ab
 Vb
 Dq
 Dq
@@ -45239,7 +45233,7 @@ TJ
 Dq
 VK
 Ab
-Mr
+Ab
 YN
 YN
 ja
@@ -45249,7 +45243,7 @@ Hm
 Dq
 TJ
 Dq
-oD
+XD
 bM
 Dq
 Dq
@@ -47770,7 +47764,7 @@ OT
 kV
 wU
 wU
-lY
+UE
 OT
 fP
 mv
@@ -48561,7 +48555,7 @@ qQ
 sC
 OD
 sC
-mN
+LJ
 Zt
 We
 We
@@ -48797,7 +48791,7 @@ Oq
 OT
 OT
 Ee
-Yq
+Zx
 OT
 OT
 zr
