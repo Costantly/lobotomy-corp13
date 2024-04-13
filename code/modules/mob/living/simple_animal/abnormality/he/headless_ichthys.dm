@@ -77,7 +77,7 @@
 
 // Attacks
 /mob/living/simple_animal/hostile/abnormality/headless_ichthys/proc/IchthysJump(mob/living/target)
-	if(!istype(target) || !can_act)
+	if(!isliving(target) && !ismecha(target) || !can_act)
 		return
 	var/dist = get_dist(target, src)
 	if(dist > 1 && jump_cooldown < world.time)
@@ -90,7 +90,8 @@
 		playsound(src, 'sound/abnormalities/ichthys/jump.ogg', 50, FALSE, 4)
 		var/turf/target_turf = get_turf(target)
 		SLEEP_CHECK_DEATH(1 SECONDS)
-		forceMove(target_turf) //look out, someone is rushing you!
+		if(target_turf)
+			forceMove(target_turf) //look out, someone is rushing you!
 		playsound(src, jump_sound, 50, FALSE, 4)
 		animate(src, alpha = 255,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
 		src.pixel_z = 0
@@ -105,6 +106,8 @@
 				L.apply_damage(jump_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 				if(L.health < 0)
 					L.gib()
+			for(var/obj/vehicle/sealed/mecha/V in T)
+				V.take_damage(jump_damage, BLACK_DAMAGE)
 		SLEEP_CHECK_DEATH(0.5 SECONDS)
 		can_act = TRUE
 
@@ -144,7 +147,8 @@
 		for(var/turf/TF in hit_line)
 			if(TF.density)
 				break
-			for(var/mob/living/L in range(1, TF))
+			var/list/turfs_to_check = range(1, TF)
+			for(var/mob/living/L in turfs_to_check)
 				if(L.status_flags & GODMODE)
 					continue
 				if(L == src) //stop hitting yourself
@@ -160,6 +164,11 @@
 				already_hit += L
 				var/truedamage = ishuman(L) ? beam_damage : beam_damage/2 //half damage dealt to nonhumans
 				L.apply_damage(truedamage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE))
+			for(var/obj/vehicle/sealed/mecha/V in turfs_to_check)
+				if(V in already_hit)
+					continue
+				V.take_damage(beam_damage, BLACK_DAMAGE, attack_dir = get_dir(V, src))
+				already_hit += V
 		SLEEP_CHECK_DEATH(1.71)
 	QDEL_NULL(current_beam)
 	SLEEP_CHECK_DEATH(4 SECONDS) //Rest after laser beam

@@ -209,6 +209,9 @@
 		if(MANAGER_HP_BULLET)
 			H.adjustBruteLoss(-GetFacilityUpgradeValue(UPGRADE_BULLET_HEAL)*H.maxHealth)
 		if(MANAGER_SP_BULLET)
+			if(H.sanity_lost)
+				to_chat(owner, span_warning("ERROR: TARGET'S MIND IS TOO UNSTABLE."))
+				return FALSE
 			H.adjustSanityLoss(-GetFacilityUpgradeValue(UPGRADE_BULLET_HEAL)*H.maxSanity)
 		if(MANAGER_RED_BULLET)
 			H.apply_status_effect(/datum/status_effect/interventionshield)
@@ -649,3 +652,54 @@
 #undef MANAGER_BLACK_BULLET
 #undef MANAGER_PALE_BULLET
 #undef MANAGER_YELLOW_BULLET
+
+/obj/machinery/computer/camera_advanced/manager/representative
+	name = "representative camera console"
+	desc = "A computer used for remotely monitoring a facility."
+	icon_screen = "cameras"
+	icon_keyboard = "security_key"
+	light_color = COLOR_SOFT_RED
+	ammo = 0
+
+/obj/machinery/computer/camera_advanced/manager/representative/Initialize(mapload)
+	. = ..()
+	UnregisterSignal(SSdcs, COMSIG_GLOB_MELTDOWN_START) //unsure if this is the most effective way of doing it.
+
+/obj/machinery/computer/camera_advanced/manager/representative/GrantActions(mob/living/carbon/user)
+	if(off_action)
+		off_action.target = user
+		off_action.Grant(user)
+		actions += off_action
+
+	if(jump_action)
+		jump_action.target = user
+		jump_action.Grant(user)
+		actions += jump_action
+	//replaces proc from camera_advance origin.
+
+	if(cyclecommand)
+		cyclecommand.target = src
+		cyclecommand.Grant(user)
+		actions += cyclecommand
+
+	if(command)
+		command.target = src
+		command.Grant(user)
+		actions += command
+
+	if(follow)
+		follow.target = src
+		follow.Grant(user)
+		actions += follow
+
+	RegisterSignal(user, COMSIG_XENO_TURF_CLICK_ALT, PROC_REF(OnAltClick))
+	RegisterSignal(user, COMSIG_MOB_SHIFTCLICKON, PROC_REF(RepExaminate))
+
+/obj/machinery/computer/camera_advanced/manager/representative/ClickedEmployee()
+	return
+
+/obj/machinery/computer/camera_advanced/manager/representative/RechargeMeltdown()
+	return
+
+/obj/machinery/computer/camera_advanced/manager/representative/proc/RepExaminate(mob/living/user, atom/clicked_atom)
+	user.examinate(clicked_atom) //maybe put more info on the agent/abno they examine if we want to be fancy later

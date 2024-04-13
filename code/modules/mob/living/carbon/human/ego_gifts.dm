@@ -619,6 +619,13 @@
 	insight_mod = 3
 	slot = EYE
 
+/datum/ego_gifts/morii
+	name = "Morii"
+	icon_state = "morii"
+	temperance_bonus = 2
+	repression_mod = 6
+	slot = EYE
+
 /datum/ego_gifts/harmony
 	name = "Harmony"
 	icon_state = "harmony"
@@ -1409,6 +1416,25 @@
 	user.physiology.white_mod /= 0.95
 	user.physiology.black_mod /= 0.95
 	user.physiology.pale_mod /= 0.95
+	return ..()
+
+/datum/ego_gifts/oberon
+	name = "Oberon"
+	icon_state = "oberon"
+	desc = "Provides the user with 10% resistance to RED and BLACK damage."
+	fortitude_bonus = 6
+	temperance_bonus = 6
+	justice_bonus = 6
+	slot = LEFTBACK
+
+/datum/ego_gifts/oberon/Initialize(mob/living/carbon/human/user) // Lowered Stats but grants resistance
+	. = ..()
+	user.physiology.red_mod *= 0.9
+	user.physiology.black_mod *= 0.9
+
+/datum/ego_gifts/oberon/Remove(mob/living/carbon/human/user)
+	user.physiology.red_mod /= 0.9
+	user.physiology.black_mod /= 0.9
 	return ..()
 
 /datum/ego_gifts/twilight

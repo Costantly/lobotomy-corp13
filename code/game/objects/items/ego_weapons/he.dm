@@ -222,27 +222,17 @@
 /obj/item/ego_weapon/christmas
 	name = "christmas"
 	desc = "With my infinite hatred, I give you this gift."
-	special = "This weapon has knockback."
 	icon_state = "christmas"
 	force = 54	//Still lower DPS
 	attack_speed = 2
 	damtype = WHITE_DAMAGE
+	knockback = KNOCKBACK_LIGHT
 	attack_verb_continuous = list("bashes", "clubs")
 	attack_verb_simple = list("bashes", "clubs")
 	hitsound = 'sound/weapons/fixer/generic/club1.ogg'
 	attribute_requirements = list(
 							FORTITUDE_ATTRIBUTE = 40
 							)
-
-/obj/item/ego_weapon/christmas/attack(mob/living/target, mob/living/user)
-	. = ..()
-	if(!.)
-		return FALSE
-	var/atom/throw_target = get_edge_target_turf(target, user.dir)
-	if(!target.anchored)
-		var/whack_speed = (prob(60) ? 1 : 4)
-		target.throw_at(throw_target, rand(1, 2), whack_speed, user)
-
 /obj/item/ego_weapon/logging
 	name = "logging"
 	desc = "A versatile equipment made to cut down trees and people alike."
@@ -559,8 +549,9 @@
 	current_holder = user
 
 /obj/item/ego_weapon/homing_instinct/Destroy(mob/user)
-	UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
-	current_holder = null
+	if(current_holder)
+		UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
+		current_holder = null
 	return ..()
 
 /obj/item/ego_weapon/homing_instinct/dropped(mob/user)
@@ -893,9 +884,15 @@
 		animate(user, alpha = 1,pixel_x = 0, pixel_z = 16, time = 0.1 SECONDS)
 		user.pixel_z = 16
 		sleep(0.5 SECONDS)
+		if(QDELETED(user))
+			return
+		else if(QDELETED(A) || !can_see(user, A, dash_range))
+			animate(user, alpha = 255,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
+			user.pixel_z = 0
+			return
 		for(var/i in 2 to get_dist(user, A))
 			step_towards(user,A)
-		if((get_dist(user, A) < 2))
+		if(get_dist(user, A) < 2)
 			JumpAttack(A,user)
 		to_chat(user, span_warning("You jump towards [A]!"))
 		animate(user, alpha = 255,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
@@ -1011,6 +1008,8 @@
 
 /obj/item/ego_weapon/replica/proc/projectile_hit(atom/fired_from, atom/movable/firer, atom/target, Angle)
 	SIGNAL_HANDLER
+	if(!isliving(target))
+		return TRUE
 	var/mob/living/T = target
 	var/range = (get_dist(firer, T) - 1)//it should never pull things into your tile.
 	var/throw_target = get_edge_target_turf(T, get_dir(T, get_step_towards(T, src)))
@@ -1679,12 +1678,13 @@
 							FORTITUDE_ATTRIBUTE = 40
 							)
 
-/obj/item/ego_weapon/voodoo
+/obj/item/ego_weapon/mini/voodoo
 	name = "voodoo"
 	desc = "What seems to be a giant half of a scissors pair."
 	icon_state = "voodoo"
-	special = "This weapon deals both red and white damage."
+	special = "This weapon can be paired with itself to unlock the ability to parry."
 	force = 20
+	attack_speed = 0.7
 	damtype = WHITE_DAMAGE
 	attack_verb_continuous = list("stabs", "slashes", "attacks")
 	attack_verb_simple = list("stab", "slash", "attack")
@@ -1693,9 +1693,22 @@
 							FORTITUDE_ATTRIBUTE = 40
 							)
 
-/obj/item/ego_weapon/voodoo/attack(mob/living/target, mob/living/user)
+/obj/item/ego_weapon/mini/voodoo/attack(mob/living/target, mob/living/user)
+	if(!CanUseEgo(user))
+		return
+	var/combo = FALSE
+	var/mob/living/carbon/human/myman = user
+	var/obj/item/ego_weapon/mini/voodoo/Y = myman.get_inactive_held_item()
+	if(istype(Y)) //dual wielding? if so...
+		combo = TRUE //hits twice, you're spending more PE then you would getting a WAW anyways
 	..()
-	target.apply_damage(force, RED_DAMAGE, null, target.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+	if(combo)
+		sleep(attack_speed/2 SECONDS)
+		if(target in view(reach,user))
+			target.attacked_by(src, user)
+			target.send_item_attack_message(src, user,target)
+			user.do_attack_animation(target)
+			playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
 
 /obj/item/ego_weapon/nixie
 	name = "nixie divergence"
@@ -1783,49 +1796,121 @@
 	..()
 	force = initial(force)
 
+/*
+* Look i cant think of anything for this fucking camera
+* to do and its most likely going to do something completely
+* unreleated to the abnormality so whatever. -IP
+*/
+/obj/item/ego_weapon/morii
+	name = "morii"
+	desc = "This camera captures those dying moments one last time."
+	icon_state = "morii"
+	force = 50
+	attack_speed = 2.5
+	damtype = WHITE_DAMAGE
+	attack_verb_continuous = list("bonks", "bashes")
+	attack_verb_simple = list("bonk", "bash")
+	attribute_requirements = list(
+							JUSTICE_ATTRIBUTE = 40
+							)
+
 /obj/item/ego_weapon/uturn
 	name = "u-turn"
 	desc = "It's a large scythe, that probably hurts a lot."
+	special = "Knocks certain enemies towards you in an area. \
+	This weapon does half damage when attacking 3 or tiles more away."
 	icon_state = "uturn"
-	force = 30
+	force = 40
+	reach = 4
+	attack_speed = 1.3
 	damtype = RED_DAMAGE
-	attack_verb_continuous = list("whips", "lashes", "tears")
-	attack_verb_simple = list("whip", "lash", "tear")
-	hitsound = 'sound/weapons/whip.ogg'
+	attack_verb_continuous = list("slashes", "slices", "rips", "cuts")
+	attack_verb_simple = list("slash", "slice", "rip", "cut")
+	hitsound = 'sound/weapons/ego/da_capo2.ogg'
 	attribute_requirements = list(
 							FORTITUDE_ATTRIBUTE = 40
 							)
-	var/can_spin = TRUE
-	var/spinning = FALSE
 
 /obj/item/ego_weapon/uturn/attack(mob/living/target, mob/living/user)
-	if(spinning)
-		return FALSE
-	..()
-	can_spin = FALSE
-	addtimer(CALLBACK(src, PROC_REF(spin_reset)), 12)
-
-/obj/item/ego_weapon/uturn/proc/spin_reset()
-	can_spin = TRUE
-
-/obj/item/ego_weapon/uturn/attack_self(mob/user)
 	if(!CanUseEgo(user))
 		return
-	if(!can_spin)
-		to_chat(user,span_warning("You attacked too recently."))
+	if(get_dist(target, user) > 2)//Spear range for full damage.
+		force = 20
+	. = ..()
+	if(force != initial(force))
+		force = initial(force)
+	var/list/been_hit = list(target)
+	var/turf/end_turf = get_ranged_target_turf_direct(user, target, 4, 0)
+	for(var/turf/T in getline(user, end_turf))
+		if(user in T)
+			continue
+		for(var/turf/T2 in view(T,1))
+			new /obj/effect/temp_visual/smash_effect(T2)
+			for(var/mob/living/L in T2)
+				var/aoe = 10
+				var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
+				var/justicemod = 1 + userjust/100
+				aoe*=justicemod
+				aoe*=force_multiplier
+				if(L == user || ishuman(L))
+					continue
+				been_hit = user.HurtInTurf(T2, been_hit, aoe, RED_DAMAGE, hurt_mechs = TRUE, hurt_structure = TRUE)
+				var/atom/throw_target = get_edge_target_turf(L, get_dir(L, get_step_towards(L, get_turf(user))))
+				if(!L.anchored)
+					L.throw_at(throw_target, 1, get_dist(user, L) - 1, user)
+				to_chat(user, MESSAGE_TYPE_WARNING, "You reel in [L]!")
+				to_chat(L, MESSAGE_TYPE_WARNING, "[user] reels you in!")
+
+/obj/item/ego_weapon/giant_tree_branch
+	name = "giant tree branch"
+	desc = "Many wondered how such a large tree could prosper all the way out in the barren Outskirts."
+	special = "This weapon converts damage into healing sap. Use in hand to drink the sap."
+	icon_state = "sap"
+	lefthand_file = 'icons/mob/inhands/64x64_lefthand.dmi'
+	righthand_file = 'icons/mob/inhands/64x64_righthand.dmi'
+	inhand_x_dimension = 64
+	inhand_y_dimension = 64
+	force = 50
+	attack_speed = 2
+	damtype = RED_DAMAGE
+	attack_verb_continuous = list("bashes", "clubs")
+	attack_verb_simple = list("bashes", "clubs")
+	hitsound = 'sound/weapons/fixer/generic/club1.ogg'
+	attribute_requirements = list(
+							FORTITUDE_ATTRIBUTE = 40
+							)
+	var/amount_filled
+	var/amount_max = 30
+
+/obj/item/ego_weapon/giant_tree_branch/examine(mob/user)
+	. = ..()
+	if(amount_filled)
+		. += "It looks [(amount_filled * 100) / amount_max]% full."
+	else
+		. += "It looks empty"
+
+/obj/item/ego_weapon/giant_tree_branch/attack(mob/living/target, mob/living/carbon/human/user)
+	if(!CanUseEgo(user))
+		return
+	if(!(target.status_flags & GODMODE) && target.stat != DEAD)
+		var/heal_amt = force*0.10
+		if(isanimal(target))
+			var/mob/living/simple_animal/S = target
+			if(S.damage_coeff.getCoeff(damtype) > 0)
+				heal_amt *= S.damage_coeff.getCoeff(damtype)
+			else
+				heal_amt = 0
+		amount_filled = clamp(amount_filled + heal_amt, 0, amount_max)
+		if(amount_filled >= amount_max)
+			to_chat(user, "<span class='warning'>[src] is full!")
+	..()
+/obj/item/ego_weapon/giant_tree_branch/attack_self(mob/living/carbon/human/user)
+	..()
+	if(!amount_filled)
+		to_chat(user, "<span class='warning'>[src] is empty!")
 		return
 	if(do_after(user, 12, src))
-		can_spin = TRUE
-		addtimer(CALLBACK(src, PROC_REF(spin_reset)), 12)
-		playsound(src, 'sound/weapons/ego/harvest.ogg', 75, FALSE, 4)
-		for(var/turf/T in orange(1, user))
-			new /obj/effect/temp_visual/smash_effect(T)
-
-		for(var/mob/living/L in range(1, user))
-			var/aoe = 30
-			var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
-			var/justicemod = 1 + userjust/100
-			aoe*=justicemod
-			if(L == user || ishuman(L))
-				continue
-			L.apply_damage(aoe, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+		to_chat(user, "<span class='warning'>You take a sip from [src]!")
+		playsound(get_turf(src), 'sound/items/drink.ogg', 50, TRUE) //slurp
+		user.adjustBruteLoss(-amount_filled*2)
+		amount_filled = 0

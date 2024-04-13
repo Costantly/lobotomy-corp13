@@ -1377,6 +1377,12 @@
 		animate(user, alpha = 1,pixel_x = 0, pixel_z = 16, time = 0.1 SECONDS)
 		user.pixel_z = 16
 		sleep(0.5 SECONDS)
+		if(QDELETED(user))
+			return
+		else if(QDELETED(A) || !can_see(user, A, dash_range))
+			animate(user, alpha = 255,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
+			user.pixel_z = 0
+			return
 		for(var/i in 2 to get_dist(user, A))
 			step_towards(user,A)
 		if((get_dist(user, A) < 2))
@@ -1410,7 +1416,7 @@
 	desc = "The frothing madness of the revving engine brings a fleeting warmth to your hands and heart alike."
 	special = "This weapon hits 4 times for every hit"
 	icon_state = "animalism"
-	force = 20
+	force = 12
 	attack_speed = 1.3
 	damtype = RED_DAMAGE
 	attack_verb_continuous = list("slices", "saws", "rips")
@@ -1423,13 +1429,18 @@
 /obj/item/ego_weapon/animalism/attack(mob/living/target, mob/living/user)
 	if(!..())
 		return
-	sleep(2)
+	var/multihit = force
+	var/userjust = (get_modified_attribute_level(user, JUSTICE_ATTRIBUTE))
+	var/justicemod = 1 + userjust/100
+	multihit*= justicemod * force_multiplier
 	for(var/i = 1 to 3)
 		sleep(2)
-		target.apply_damage(force, damtype, null, target.run_armor_check(null, damtype), spread_damage = TRUE)
-		user.do_attack_animation(target)
-		playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
-		new /obj/effect/temp_visual/dir_setting/bloodsplatter(get_turf(target), pick(GLOB.alldirs))
+		if(target in view(reach,user))
+			target.send_item_attack_message(src, user,target)
+			target.apply_damage(force, damtype, null, target.run_armor_check(null, damtype), spread_damage = TRUE)
+			user.do_attack_animation(target)
+			playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
+			new /obj/effect/temp_visual/dir_setting/bloodsplatter(get_turf(target), pick(GLOB.alldirs))
 
 /obj/item/ego_weapon/psychic
 	name = "psychic dagger"
@@ -1512,7 +1523,7 @@
 	desc = "Once upon a time, these claws would cut open the bellies of numerous creatures and tear apart their guts."
 	special = "Preform an additional attack of 50% damage when at half health."
 	icon_state = "cobalt"
-	force = 20
+	force = 24
 	attack_speed = 0.5
 	damtype = RED_DAMAGE
 	attack_verb_continuous = list("claws")
@@ -1548,11 +1559,17 @@
 	if(prob(25))
 		wolf.visible_message(span_warning("[wolf] claws [those_we_rend] in a blind frenzy!"), span_warning("You swipe your claws at [those_we_rend]!"))
 	wolf.do_attack_animation(those_we_rend)
-	those_we_rend.apply_damage(10, damtype, null, those_we_rend.run_armor_check(null, damtype), spread_damage = TRUE)
-	those_we_rend.lastattacker = wolf.real_name
-	those_we_rend.lastattackerckey = wolf.ckey
-	playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
-	wolf.log_message(" attacked [those_we_rend] due to the cobalt scar weapon ability.", LOG_ATTACK) //the following attack will log itself
+	if(ishuman(wolf))
+		var/rend_damage = 16
+		var/userjust = (get_modified_attribute_level(wolf, JUSTICE_ATTRIBUTE))
+		var/justicemod = 1 + userjust/100
+		rend_damage*=justicemod
+		rend_damage*=force_multiplier
+		those_we_rend.apply_damage(rend_damage, damtype, null, those_we_rend.run_armor_check(null, damtype), spread_damage = TRUE)
+		those_we_rend.lastattacker = wolf.real_name
+		those_we_rend.lastattackerckey = wolf.ckey
+		playsound(loc, hitsound, get_clamped_volume(), TRUE, extrarange = stealthy_audio ? SILENCED_SOUND_EXTRARANGE : -1, falloff_distance = 0)
+		wolf.log_message(" attacked [those_we_rend] due to the cobalt scar weapon ability.", LOG_ATTACK) //the following attack will log itself
 	return TRUE
 
 /obj/item/ego_weapon/scene
@@ -1778,7 +1795,7 @@
 	return ..()
 
 /obj/item/ego_weapon/rosa
-	name = "flore sicut rosa"
+	name = "garden of thorns"
 	desc = "See? Wish, wish for it. Knowing that it is a sin. Only then can you bloom such colorful roses."
 	special = "Hit yourself to heal the sanity of others"
 	icon_state = "rosa"
@@ -1856,7 +1873,9 @@
 		return ..()
 	speed_slowdown = 0
 	UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
+	PowerReset(user)
 	current_holder = null
+	user.add_or_update_variable_movespeed_modifier(/datum/movespeed_modifier/anchor, multiplicative_slowdown = 0)
 	return ..()
 
 //Dropped setup
@@ -1866,7 +1885,9 @@
 		return
 	speed_slowdown = 0
 	UnregisterSignal(current_holder, COMSIG_MOVABLE_MOVED)
+	PowerReset(user)
 	current_holder = null
+	user.add_or_update_variable_movespeed_modifier(/datum/movespeed_modifier/anchor, multiplicative_slowdown = 0)
 
 /obj/item/ego_weapon/blind_obsession/proc/UserMoved(mob/user)
 	SIGNAL_HANDLER
@@ -1887,7 +1908,7 @@
 		return
 	if(do_after(user, 12, src))
 		charged = TRUE
-		speed_slowdown = 2
+		speed_slowdown = 1
 		throwforce = 100//TIME TO DIE!
 		to_chat(user,span_warning("You put your strength behind this attack."))
 		power_timer = addtimer(CALLBACK(src, PROC_REF(PowerReset)), 3 SECONDS,user, TIMER_STOPPABLE)//prevents storing 3 powered up anchors and unloading all of them at once
@@ -1897,6 +1918,7 @@
 	charged = FALSE
 	speed_slowdown = 0
 	throwforce = 80
+	deltimer(power_timer)
 
 /obj/item/ego_weapon/blind_obsession/on_thrown(mob/living/carbon/user, atom/target)//No, clerks cannot hilariously kill others with this
 	if(!CanUseEgo(user))
@@ -1915,14 +1937,14 @@
 		var/damage = 75
 		if(ishuman(thrownby))
 			damage *= 1 + (get_modified_attribute_level(thrownby, JUSTICE_ATTRIBUTE))/100
-		damage *= force_multiplier
-		for(var/turf/open/T in range(1, src))
-			var/obj/effect/temp_visual/small_smoke/halfsecond/smonk = new(T)
-			smonk.color = COLOR_TEAL
-			if(!ismob(thrownby))
-				continue
-			thrownby.HurtInTurf(T, list(thrownby), damage, RED_DAMAGE)
-		PowerReset(thrownby)
+			damage *= force_multiplier
+			for(var/turf/open/T in range(1, src))
+				var/obj/effect/temp_visual/small_smoke/halfsecond/smonk = new(T)
+				smonk.color = COLOR_TEAL
+				if(!ismob(thrownby))
+					continue
+				thrownby.HurtInTurf(T, list(thrownby), damage, RED_DAMAGE)
+			PowerReset(thrownby)
 
 /datum/movespeed_modifier/anchor
 	multiplicative_slowdown = 0
@@ -1987,20 +2009,28 @@
 	..()
 	if(combo == 4)
 		can_attack = FALSE
-		if(do_after(user, 5, src))
-			playsound(get_turf(src), 'sound/abnormalities/piscinemermaid/waterjump.ogg', 20, 0, 3)
-			animate(user, alpha = 1,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
-			user.pixel_z = -16
-			sleep(0.5 SECONDS)
-			can_attack = TRUE
-			for(var/i in 2 to get_dist(user, A))
-				step_towards(user,A)
-			if((get_dist(user, A) < 2))
-				DiveAttack(A,user)
-			playsound(get_turf(src), 'sound/abnormalities/bloodbath/Bloodbath_EyeOn.ogg', 20, 0, 3)
-			to_chat(user, span_warning("You dive towards [A]!"))
+		sleep(0.5 SECONDS)
+		if(QDELETED(user))
+			return
+		playsound(get_turf(src), 'sound/abnormalities/piscinemermaid/waterjump.ogg', 20, 0, 3)
+		animate(user, alpha = 1,pixel_x = 0, pixel_z = -16, time = 0.1 SECONDS)
+		user.pixel_z = -16
+		sleep(0.5 SECONDS)
+		can_attack = TRUE
+		if(QDELETED(user))
+			return
+		else if(QDELETED(A) || user.z != A.z)
 			animate(user, alpha = 255,pixel_x = 0, pixel_z = 16, time = 0.1 SECONDS)
 			user.pixel_z = 0
+			return
+		for(var/i in 2 to get_dist(user, A))
+			step_towards(user,A)
+		if((get_dist(user, A) < 2))
+			DiveAttack(A,user)
+		playsound(get_turf(src), 'sound/abnormalities/bloodbath/Bloodbath_EyeOn.ogg', 20, 0, 3)
+		to_chat(user, span_warning("You dive towards [A]!"))
+		animate(user, alpha = 255,pixel_x = 0, pixel_z = 16, time = 0.1 SECONDS)
+		user.pixel_z = 0
 
 /obj/item/ego_weapon/abyssal_route/proc/DiveAttack(atom/A, mob/living/user, proximity_flag, params)
 	A.attackby(src,user)

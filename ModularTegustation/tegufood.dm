@@ -93,21 +93,35 @@
 	result = /obj/item/food/apoctrifle
 	subcategory = CAT_MISCFOOD
 
+/obj/item/food/mcrib
+	name = "mcrib"
+	desc = "Well, you see, the McRib is a barbecue-flavored pork sandwich periodically sold \
+	by the international fast food restaurant chain McDonald's. It was first introduced to \
+	the McDonald's menu in 1981, following test marketing the year before. After poor sales, \
+	it was removed from the menu in 1985. Since then, it appears annually or more at various \
+	times, though Germany and Luxembourg have them as permanent menu items."
+	icon = 'icons/obj/food/food.dmi'
+	icon_state = "mcrib"
+	food_reagents = list(/datum/reagent/consumable/nutriment = 6, /datum/reagent/consumable/nutriment/protein = 5, /datum/reagent/consumable/nutriment/vitamin = 1, /datum/reagent/carbon = 4)
+	tastes = list("authentic Kansas City barbecue sauce" = 5, "pork" = 3)
+	foodtypes = GRAIN
+	w_class = WEIGHT_CLASS_SMALL
+
 ////////////////////////////////////////////////////////////////ordeal food/////////////////////////////////////////////////////////////////////////////
 /datum/crafting_recipe/food/wormfood
 	name = "Wormfood"
 	reqs = list(
 		/obj/item/food/meat/slab/worm = 1,
-		/obj/item/food/cheesewedge = 3
+		/obj/item/food/cheesewedge = 1
 	)
 	result = /obj/item/food/wormfood
 	subcategory = CAT_MEAT
 
 /obj/item/food/wormfood
 	name = "wormfood"
-	desc = "Something inside the meat is desperately consuming whatever is left."
+	desc = "Something inside the meat is eating endlessly to live. Inevitable depletion, garbage..."
 	icon_state = "wormfood1"
-	food_reagents = list(/datum/reagent/consumable/nutriment = 3, /datum/reagent/consumable/nutriment/vitamin = 2, /datum/reagent/drug/maint/tar = 1, /datum/reagent/yuck = 2)
+	food_reagents = list(/datum/reagent/consumable/nutriment = 3, /datum/reagent/consumable/nutriment/vitamin = 4, /datum/reagent/drug/mushroomhallucinogen = 1)
 	tastes = list("crunchy popping" = 1, "consumption" = 1)
 	foodtypes = MEAT | GROSS
 
@@ -118,8 +132,8 @@
 		qdel(src)
 
 /obj/item/food/wormfood_healthier //heals around 7 damage when consumed
-	name = "wormfood"
-	desc = "Their blind hunger ended in their own consumption." //Put better statement here later.
+	name = "perfect wormfood"
+	desc = "For some bizzare reason this wormfood has become a buttery meat. Their blind hunger ended in their own consumption." //Put better statement here later.
 	icon_state = "wormfood2"
 	food_reagents = list(/datum/reagent/consumable/nutriment = 4, /datum/reagent/consumable/nutriment/protein = 1, /datum/reagent/consumable/nutriment/vitamin = 2, /datum/reagent/consumable/vitfro = 2)
 	tastes = list("crunchy popping" = 1, "buttery meat" = 1)

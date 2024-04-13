@@ -23,7 +23,7 @@
 		ABNORMALITY_WORK_ATTACHMENT = -50,
 		ABNORMALITY_WORK_REPRESSION = list(50, 55, 55, 60, 60),
 	)
-	work_damage_amount = 0
+	work_damage_amount = 5
 	work_damage_type = WHITE_DAMAGE
 	start_qliphoth = 3
 
@@ -131,7 +131,7 @@
 	status_holder.physiology.work_success_mod /= 0.70
 	UnregisterSignal(status_holder, COMSIG_WORK_COMPLETED)
 	if(!isnull(datum_reference))
-		INVOKE_ASYNC(datum_reference, /datum/abnormality/proc/qliphoth_change, 1, owner)
+		INVOKE_ASYNC(datum_reference, TYPE_PROC_REF(/datum/abnormality, qliphoth_change), 1, owner)
 
 /datum/status_effect/sg_guilty/refresh()
 	playsound(get_turf(owner), 'sound/abnormalities/silentgirl/Guilt_Apply.ogg', 50, 0, 2)

@@ -4,7 +4,7 @@
 	faction = "Station"
 	total_positions = -1
 	spawn_positions = -1
-	supervisors = "the manager"
+	supervisors = "the Manager"
 	selection_color = "#ccaaaa"
 	exp_requirements = 60
 	exp_type = EXP_TYPE_CREW
@@ -25,7 +25,9 @@
 								JUSTICE_ATTRIBUTE = 20
 								)
 
-	job_important = "You are an L-Corp agent. Your job is to work on, and suppress abnormalities. Use :h to talk on your departmental radio."
+	job_important = "You are a L-Corp Agent. Your job is to work on and suppress Abnormalities. Use :h to talk on your departmental radio."
+
+	job_abbreviation = "AGT"
 
 	var/normal_attribute_level = 20 // Scales with round time & facility upgrades
 
@@ -101,6 +103,13 @@
 	for(var/A in roundstart_attributes)
 		roundstart_attributes[A] = round(set_attribute)
 
+	//Check the lcorp global upgrades
+	for(var/upgradecheck in GLOB.lcorp_upgrades)
+		if(upgradecheck == "Agent Workchance")
+			ADD_TRAIT(H, TRAIT_WORK_KNOWLEDGE, JOB_TRAIT)
+		if(upgradecheck == "Health Hud")
+			var/datum/atom_hud/medsensor = GLOB.huds[DATA_HUD_MEDICAL_ADVANCED]
+			medsensor.add_hud_to(H)
 	return ..()
 
 
@@ -134,7 +143,9 @@
 	exp_type = EXP_TYPE_CREW
 	exp_type_department = EXP_TYPE_SECURITY
 	mapexclude = list("wonderlabs", "mini")
-	job_important = "You are an Agent Captain. You're an experienced agent, that is expected to disseminate your information and experience as well as help lead the agents."
+	job_important = "You are an Agent Captain. As an experienced Agent, you are expected to disseminate important information and use your experience lead other Agents."
+
+	job_abbreviation = "CPT"
 
 /datum/outfit/job/agent/captain
 	name = "Agent Captain"
@@ -157,8 +168,10 @@
 	display_order = JOB_DISPLAY_ORDER_INTERN
 	normal_attribute_level = 20
 	exp_requirements = 0
-	job_important = "You are an Agent Intern. Your main goal is to learn how to work on abnormalities, and assist in suppression. Other agents should be more understanding to your mistakes. \
-	If there is a Records Officer, seek them for assistance."
+	job_important = "You are an Agent Intern. Your main goal is to learn how to work on Abnormalities and assist in suppressions. Other Agents will be more aware of your inexperience. \
+	If there is a Records Officer, seek them out for assistance."
+
+	job_abbreviation = "INRN"
 
 /datum/outfit/job/agent/intern
 	name = "Agent Intern"

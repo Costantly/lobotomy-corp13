@@ -23,8 +23,9 @@ GLOBAL_LIST_EMPTY(spawned_clerks)
 
 	allow_bureaucratic_error = FALSE
 //	loadalways = TRUE
-	job_important = "You are a Clerk. You're the jack of all trades in LCorp. You are to assist with cleanup, cooking, medical and other miscellaneous tasks. You are fragile, but important."
+	job_important = "You are a Clerk. Since you are unable to work with Abnormalities, you are expected to do cleanup, cooking, medical and other miscellaneous tasks. You are fragile but have access to a variety of support tools."
 
+	job_abbreviation = "CLK"
 
 //Cannot Gain stats.
 /datum/job/assistant/after_spawn(mob/living/carbon/human/H, mob/M, latejoin = FALSE)
@@ -32,6 +33,12 @@ GLOBAL_LIST_EMPTY(spawned_clerks)
 	H.adjust_attribute_buff(TEMPERANCE_ATTRIBUTE, 10)
 	H.adjust_attribute_buff(PRUDENCE_ATTRIBUTE, 10)
 	ADD_TRAIT(H, TRAIT_WORK_FORBIDDEN, JOB_TRAIT)
+
+
+	for(var/upgradecheck in GLOB.lcorp_upgrades)
+		if(upgradecheck == "Clerk Buff")
+			H.set_attribute_limit(40)
+			H.adjust_all_attribute_levels(40)
 
 /datum/outfit/job/assistant
 	name = "Clerk"
