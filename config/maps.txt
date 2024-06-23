@@ -22,24 +22,24 @@ map alphacorp
 	maxplayers 15
 endmap
 
-#map betacorp
+map betacorp
 	votable
 	minplayers 10
 	maxplayers 25
 endmap
 
-#map gammacorp
+map gammacorp
 	votable
 	minplayers 10
 	maxplayers 25
 endmap
 
-#map deltacorp
+map deltacorp
 	votable
 	minplayers 20
 endmap
 
-#map epsiloncorp
+map epsiloncorp
 	votable
 	minplayers 25
 endmap
@@ -54,7 +54,7 @@ map etacorp
 	maxplayers 15
 endmap
 
-#map thetacorp
+map thetacorp
 	votable
 	minplayers 20
 endmap
