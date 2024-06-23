@@ -223,7 +223,7 @@
 		var/obj/effect/proc_holder/spell/targeted/night_vision/bloodspell = new
 		AddSpell(bloodspell)
 	//LC13 Check. If it's the citymap, they all gain a faction
-	if(SSmaptype.maptype == "city")
+	if(SSmaptype.maptype in SSmaptype.citymaps)
 		faction += "city"
 
 
@@ -747,9 +747,3 @@
 	if(SSmaptype.maptype in SSmaptype.combatmaps)
 		return TRUE
 	return FALSE
-
-///This proc is an obvious visual effect to indicate an ineffective approach of attack - parried ranged attacks for example
-/mob/living/simple_animal/proc/PingArmor(sound = 'sound/effects/resist.ogg', newcolor = "#FFD700", fadetime = 1 SECONDS)
-	playsound(loc, sound, 40, FALSE)
-	color = newcolor
-	animate(src, color = null, time = fadetime)

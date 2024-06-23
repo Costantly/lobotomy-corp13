@@ -57,6 +57,8 @@
 	var/jump_cooldown_time = 5 SECONDS
 	var/jump_damage = 60
 
+	var/recloak_time = 0
+	var/recloak_time_cooldown = 30 SECONDS
 
 
 /mob/living/simple_animal/hostile/abnormality/apex_predator/Move()
@@ -66,6 +68,10 @@
 		return FALSE
 	..()
 
+/mob/living/simple_animal/hostile/abnormality/apex_predator/Life()
+	. = ..()
+	if(. && !(status_flags & GODMODE) && revealed && recloak_time < world.time)
+		Cloak()
 
 /mob/living/simple_animal/hostile/abnormality/apex_predator/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
 	. = ..()
@@ -111,7 +117,7 @@
 				var/mob/living/V = target
 				visible_message(span_danger("The [src] rips out [target]'s guts!"))
 				new /obj/effect/gibspawner/generic(get_turf(V))
-				V.apply_damage(backstab_damage, RED_DAMAGE, null, V.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+				V.deal_damage(backstab_damage, RED_DAMAGE)
 			//Backstab succeeds from any one of 3 tiles behind a mecha, backstab from directly behind gets boosted by mecha directional armor weakness
 			else if(ismecha(target))
 				var/relative_angle = abs(dir2angle(target.dir) - dir2angle(get_dir(target, src)))
@@ -152,6 +158,7 @@
 	density = FALSE
 
 /mob/living/simple_animal/hostile/abnormality/apex_predator/proc/Decloak()
+	recloak_time = world.time + recloak_time_cooldown
 	alpha = 255
 	revealed = TRUE
 	density = TRUE

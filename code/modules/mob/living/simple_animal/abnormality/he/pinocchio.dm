@@ -73,12 +73,11 @@
 	pixel_z = 16
 	animate(src, alpha = 255,pixel_x = 0, pixel_z = -16, time = 4 SECONDS)
 	pixel_z = 0
+	if(!datum_reference?.console)
+		return
+	datum_reference.console.updateUsrDialog()
 
 //Work/Misc
-/mob/living/simple_animal/hostile/abnormality/proc/UpdateWorkDisplay(mob/user)
-	// Doesn't use UpdateAbnoConsole(datum_reference.console) because we HAVE a user here in every scenario this changes.
-	datum_reference.console.update_static_data(user, SStgui.get_open_ui(user, datum_reference.console))
-
 /mob/living/simple_animal/hostile/abnormality/pinocchio/AttemptWork(mob/living/carbon/human/user, work_type)
 	if(realboy)
 		to_chat(user, span_warning("The abnormality isn't in here!"))
@@ -90,6 +89,7 @@
 			lying = FALSE
 			datum_reference.qliphoth_change(1)
 			PostWorkEffect()
+			datum_reference.console.updateUsrDialog()
 			return
 		else
 			datum_reference.qliphoth_change(-1)
@@ -107,7 +107,6 @@
 		var/list/new_work_chances = modular_work_chance["normal"]
 		work_chances = new_work_chances.Copy()
 		datum_reference.available_work = work_chances
-		UpdateWorkDisplay(user)
 		new /obj/effect/temp_visual/pinocchio/caught(get_turf(src))
 		return
 	playsound(src, 'sound/abnormalities/pinocchio/activate.ogg', 40, 0, 1)
@@ -118,7 +117,6 @@
 		lying = TRUE
 		work_chances = new_work_chances.Copy()
 		datum_reference.available_work = work_chances
-		UpdateWorkDisplay(user)
 
 //Breach
 /mob/living/simple_animal/hostile/abnormality/pinocchio/BreachEffect(mob/living/carbon/human/user, breach_type)
@@ -171,6 +169,10 @@
 		realboy.dropItemToGround(realboy.get_active_held_item())
 		QDEL_IN(realboy, 15) //In theory we could do an egg transformation at this point but I have no sprite.
 	death()
+
+/mob/living/simple_animal/hostile/abnormality/pinocchio/CreateAbnoCore()//The simple mob created will leave a core behind when regular conditions are fulfilled ie. when this proc is called
+	realboy.core_enabled = TRUE
+	return
 
 //Special item
 /obj/item/ego_weapon/marionette/abnormality
@@ -234,6 +236,47 @@
 	lines_type = /datum/ai_behavior/say_line/insanity_murder/puppet
 	continue_processing_when_client = FALSE //Prevents playable pinocchio from going around murdering everyone.
 
+/datum/ai_controller/insane/murder/puppet/FindEnemies()
+	. = FALSE
+	var/mob/living/living_pawn = pawn
+	var/list/potential_enemies = livinginview(9, living_pawn)
+
+	if(!LAZYLEN(potential_enemies))
+		return
+
+	var/list/weighted_list = list()
+	for(var/mob/living/L in potential_enemies)
+		if(L == living_pawn)
+			continue
+		if(L.status_flags & GODMODE)
+			continue
+		if(L.stat == DEAD)
+			continue
+		if(living_pawn.see_invisible < L.invisibility)
+			continue
+		if(!isturf(L.loc) && !ismecha(L.loc))
+			continue
+		if(living_pawn.faction_check_mob(L))
+			continue
+		weighted_list += L
+	for(var/i in weighted_list)
+		if(istype(i, /mob/living/simple_animal/hostile))
+			weighted_list[i] = 3
+		else if(ishuman(i))
+			var/mob/living/carbon/human/H = i
+			if(H.sanity_lost)
+				weighted_list[i] = 2
+			else if(ismecha(H.loc))
+				weighted_list[i] = 3
+			else
+				weighted_list[i] = 5
+		else
+			weighted_list[i] = 1
+	if(weighted_list.len > 0)
+		blackboard[BB_INSANE_CURRENT_ATTACK_TARGET] = pickweight(weighted_list)
+		return TRUE
+	return FALSE
+
 /datum/status_effect/panicked_type/puppet
 	icon = null
 
@@ -249,9 +292,10 @@
 /mob/living/carbon/human/species/pinocchio //a real boy. Compatiable with being spawned by admins to boot! Can't panic outside of fear, though.
 	race = /datum/species/puppet
 	faction = list("hostile")
+	var/core_enabled = FALSE
 
 /mob/living/carbon/human/species/pinocchio/Initialize(mapload, cubespawned=FALSE, mob/spawner) //There is basically no documentation for bodyparts and hair, so this was the next best thing.
-	..()
+	. = ..()
 	var/strings = icon('icons/mob/mutant_bodyparts.dmi', "strings_pinnochio_ADJ")
 	src.add_overlay(strings)
 
@@ -272,6 +316,20 @@
 		to_chat(src, span_userdanger("YOUR FOOLISHNESS IS IMPRESSIVE."))
 		return
 	. = ..()
+
+/mob/living/carbon/human/species/pinocchio/Destroy()
+	if(core_enabled)
+		CreateAbnoCore()
+	..()
+
+/mob/living/carbon/human/species/pinocchio/proc/CreateAbnoCore()//this is at the carbon level
+	var/obj/structure/abno_core/C = new(get_turf(src))
+	C.name = "Pinocchio Core"
+	C.desc = "The core of Pinocchio"
+	C.icon_state = ""//core icon goes here
+	C.contained_abno = /mob/living/simple_animal/hostile/abnormality/pinocchio//release()ing or extract()ing this core will spawn the abnormality, making it a valid core.
+	C.threat_level = 3
+	C.icon = 'ModularTegustation/Teguicons/abno_cores/he.dmi'
 
 /datum/species/puppet
 	name = "Puppet"

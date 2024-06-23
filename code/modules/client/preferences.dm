@@ -156,9 +156,6 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 	///What does the player think of TerraGov.
 	var/terragov_relation = RELATION_NEUTRAL
 
-	/// LC13 Preferences
-	var/work_images_visible = TRUE
-
 /datum/preferences/New(client/C)
 	parent = C
 
@@ -727,8 +724,6 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 						dat += "<b>Be [capitalize(special_role)]:</b> <a href='?_src_=prefs;preference=be_special;be_special_type=[special_role]'>[(special_role in be_special) ? TeguTranslate("Enabled", src) : TeguTranslate("Disabled", src)]</a><br>"
 			dat += "<br>"
 			dat += "<b>Midround Antagonist:</b> <a href='?_src_=prefs;preference=allow_midround_antag'>[(toggles & MIDROUND_ANTAG) ? TeguTranslate("Enabled", src) : TeguTranslate("Disabled", src)]</a><br>"
-			dat += "<h2>LC13 UI Settings</h2>"
-			dat += "<b>Visible Images:</b> <a href='?_src_=prefs;preference=work_images_visible'>[work_images_visible ? TeguTranslate("Enabled", src) : TeguTranslate("Disabled", src)]</a><br>"
 			dat += "</td></tr></table>"
 		if(2) //OOC Preferences
 			dat += "<table><tr><td width='340px' height='300px' valign='top'>"
@@ -924,6 +919,8 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		for(var/datum/job/job in sortList(SSjob.occupations, GLOBAL_PROC_REF(cmp_job_display_asc)))
 			if(job.total_positions == 0 && job.spawn_positions == 0)	//Is the job unavailable
 				continue
+			if(job.mentor_only && !is_mentor_player(user.client))		//Don't show these.
+				continue
 			index += 1
 			if((index >= limit) || (job.title in splitJobs))
 				width += widthPerColumn
@@ -947,6 +944,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 			if(job.trusted_only && !is_trusted_player(user.client))
 				HTML += "<font color=black>[rank]</font></td><td><font color=black> \[ROLEPLAY\]</font></td></tr>"
 				continue
+
 			var/required_playtime_remaining = job.required_playtime_remaining(user.client)
 			if(required_playtime_remaining)
 				HTML += "<font color=red>[rank]</font></td><td><font color=red> \[ [get_exp_format(required_playtime_remaining)] as [job.get_exp_req_type()] \] </font></td></tr>"
@@ -1932,9 +1930,6 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 				if("allow_midround_antag")
 					toggles ^= MIDROUND_ANTAG
-
-				if("work_images_visible")
-					work_images_visible = !work_images_visible
 
 				if("parallaxup")
 					parallax = WRAP(parallax + 1, PARALLAX_INSANE, PARALLAX_DISABLE + 1)

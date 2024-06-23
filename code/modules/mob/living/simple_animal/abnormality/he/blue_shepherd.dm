@@ -248,7 +248,7 @@
 		slash_damage = 50
 		melee_damage_lower = 30
 		melee_damage_upper = 40
-		SpeedChange(-0.5)
+		ChangeMoveToDelayBy(-0.5)
 		maxHealth = maxHealth * 4 //5000 health, will get hurt by buddy's howl to make up for the high health
 		set_health(health * 4)
 		med_hud_set_health()
@@ -306,7 +306,7 @@
 				current_red.WatchIt()
 			all_turfs -= T
 			continue // Red doesn't get hit.
-		L.apply_damage(slash_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
+		L.deal_damage(slash_damage, BLACK_DAMAGE)
 		all_turfs -= T
 	if(slash_count >= range)
 		buddy_hit = FALSE

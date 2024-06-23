@@ -156,7 +156,6 @@
 
 /mob/living/simple_animal/hostile/abnormality/porccubus/bullet_act(obj/projectile/P)
 	visible_message(span_warning("Porccubus playfully swat [P] projectile away!"))
-	PingArmor()
 	return FALSE //COME CLOSER AND GET DRUGGED COWARD
 
 //Breach Code Attacks

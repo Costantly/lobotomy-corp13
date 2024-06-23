@@ -22,6 +22,20 @@
 		if((old_stat < DEAD) && (H.stat >= DEAD))
 			H.add_overlay(icon('ModularTegustation/Teguicons/tegu_effects.dmi', "despair_kill"))
 
+/obj/projectile/despair_rapier/justice
+	desc = "A magic rapier, enchanted with the power of justice."
+	nodamage = TRUE	//Damage is calculated later
+	projectile_piercing = PASSMOB
+
+/obj/projectile/despair_rapier/justice/on_hit(atom/target, blocked = FALSE)
+	if(!ishuman(target))
+		nodamage = FALSE
+	else
+		return
+	..()
+	if(!ishuman(target))
+		qdel(src)
+
 /obj/projectile/apocalypse
 	name = "light"
 	icon_state = "apocalypse"
@@ -294,3 +308,71 @@
 	if(attacked_mob.stat == DEAD && living)
 		var/mob/living/simple_animal/hostile/abnormality/red_hood/red_owner
 		red_owner.ConfirmRangedKill(0.1)
+
+/obj/item/ammo_casing/caseless/nihil_abnormality
+	name = "dark energy casing"
+	desc = "A casing."
+	projectile_type = /obj/projectile/ego_bullet/nihil
+	pellets = 4
+	variance = 16
+
+/obj/projectile/ego_bullet/nihil
+	name = "dark energy"
+	icon_state = "nihil"
+	desc = "Just looking at it seems to suck the life out of you..."
+	damage = 25 //Fires 4
+	damage_type = WHITE_DAMAGE //deals both white and red
+	projectile_piercing = PASSMOB
+	hitsound = 'sound/abnormalities/nihil/filter.ogg'
+
+/obj/projectile/ego_bullet/nihil/on_hit(atom/target, blocked = FALSE, pierce_hit)
+	. = ..()
+	if(!isliving(target))
+		return
+	var/mob/living/L = target
+	L.apply_void(1)
+
+/obj/projectile/lifestew_spit
+	name = "soup projectile"
+	desc = "Hot soup."
+	icon = 'icons/effects/effects.dmi'
+	icon_state = "extinguish"
+	hitsound = 'sound/abnormalities/ichthys/jump.ogg'
+	damage_type = BLACK_DAMAGE
+	damage = 4
+	spread = 60
+	slur = 3
+	eyeblur = 3
+	speed = 1.5 //VERY SLOW, to make it easier to dodge
+	var/random_sprite_list = list(
+	"fishbone",
+	"bone"
+	)
+
+/obj/projectile/lifestew_spit/Initialize()
+	. = ..()
+	speed += pick(0, 0.1, 0.2, 0.3) // Randomized speed
+	animate(src, transform = src.transform*pick(1.8, 2.4, 2.8, 3.2), time = rand(1,4))
+	var/chansu = rand(1,100)
+	switch(chansu)
+		if(1)
+			icon = 'icons/obj/projectiles.dmi'
+			icon_state = "wishing_rock"
+			hitsound = 'sound/weapons/smash.ogg'
+		if(2 to 20)
+			icon = 'icons/obj/food/soupsalad.dmi'
+			icon_state = "lifetime_stew_chunk"
+			hitsound = 'sound/effects/meatslap.ogg'
+		if(21 to 30)
+			icon = 'icons/obj/janitor.dmi'
+			icon_state = pick(random_sprite_list)
+			hitsound = 'sound/weapons/smash.ogg'
+		else
+			color = "#622F22"
+			return
+
+/obj/projectile/lifestew_spit/Range()
+	for(var/mob/living/L in range(1, get_turf(src)))
+		if(L.stat != DEAD && L != firer && !L.faction_check_mob(firer, FALSE))
+			return Bump(L)
+	..()

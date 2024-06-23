@@ -52,6 +52,7 @@
 	/// How much damage is dealt to user on each work failure
 	var/work_damage_amount = 2
 	/// What damage type is used for work failures
+	/// Can be a list, work_damage_amount in that case is divided by the objects in the list and visuals are chosen randomly
 	var/work_damage_type = RED_DAMAGE
 	/// Maximum amount of PE someone can obtain per work procedure, if not null or 0.
 	var/max_boxes = null
@@ -90,6 +91,30 @@
 	var/list/grouped_abnos = list()
 	//Abnormaltiy portrait, updated on spawn if they have one.
 	var/portrait = "UNKNOWN"
+	var/core_icon = ""
+	var/core_enabled = TRUE
+
+	// secret skin variables ahead
+
+	/// Toggles if the abnormality has a secret form and can spawn naturally
+	var/secret_chance = FALSE
+	/// tracks if the current abnormality is in its secret form
+	var/secret_abnormality = FALSE
+
+	/// if assigned, this gift will be given instead of a normal one on a successfull gift aquisition whilst a secret skin is in effect
+	var/secret_gift
+
+	/// An icon state assigned to the abnormality in its secret form
+	var/secret_icon_state
+	/// An icon state assigned when an abnormality is alive
+	var/secret_icon_living
+	/// An icon file assigned to the abnormality in its secret form, usually should not be needed to change
+	var/secret_icon_file
+
+	/// Offset for secret skins in the X axis
+	var/secret_horizontal_offset = 0
+	/// Offset for secret skins in the Y axis
+	var/secret_vertical_offset = 0
 
 /mob/living/simple_animal/hostile/abnormality/Initialize(mapload)
 	SHOULD_CALL_PARENT(TRUE)
@@ -125,12 +150,36 @@
 	else
 		gift_message += "\nYou are granted a gift by [src]!"
 
+	if(secret_chance && (prob(1)))
+		InitializeSecretIcon()
+
+/mob/living/simple_animal/hostile/abnormality/proc/InitializeSecretIcon()
+	SHOULD_CALL_PARENT(TRUE) // if you ever need to override this proc, consider adding onto it instead or not using all the variables given
+	secret_abnormality = TRUE
+
+	if(secret_icon_file)
+		icon = secret_icon_file
+
+	if(secret_icon_state)
+		icon_state = secret_icon_state
+
+	if(secret_icon_living)
+		icon_living = secret_icon_living
+
+	if(secret_horizontal_offset)
+		base_pixel_x = secret_horizontal_offset
+
+	if(secret_vertical_offset)
+		base_pixel_y = secret_vertical_offset
+
 /mob/living/simple_animal/hostile/abnormality/Destroy()
 	SHOULD_CALL_PARENT(TRUE)
 	if(istype(datum_reference)) // Respawn the mob on death
 		datum_reference.current = null
 		addtimer(CALLBACK (datum_reference, TYPE_PROC_REF(/datum/abnormality, RespawnAbno)), 30 SECONDS)
-	..()
+	else if(core_enabled)//Abnormality Cores are spawned if there is no console tied to the abnormality
+		CreateAbnoCore(name, core_icon)//If cores are manually disabled for any reason, they won't generate.
+	. = ..()
 	if(loc)
 		if(isarea(loc))
 			var/area/a = loc
@@ -144,7 +193,7 @@
 	. = ..()
 	GLOB.abnormality_mob_list -= src
 
-/mob/living/simple_animal/hostile/abnormality/Move()
+/mob/living/simple_animal/hostile/abnormality/Move(turf/newloc, dir, step_x, step_y)
 	if(IsContained()) // STOP STEALING MY FREAKING ABNORMALITIES
 		return FALSE
 	return ..()
@@ -185,7 +234,6 @@
 	datum_reference.console.chem_charges -= 1
 	var/obj/item/reagent_containers/my_container = O
 	HarvestChem(my_container, user)
-	return
 
 /mob/living/simple_animal/hostile/abnormality/can_track(mob/living/user)
 	if((status_flags & GODMODE))
@@ -211,7 +259,7 @@
 /mob/living/simple_animal/hostile/abnormality/proc/FearEffect()
 	if(fear_level <= 0)
 		return
-	for(var/mob/living/carbon/human/H in view(7, src))
+	for(var/mob/living/carbon/human/H in ohearers(7, src))
 		if(H in breach_affected)
 			continue
 		if(H.stat == DEAD)
@@ -360,7 +408,11 @@
 		return FALSE
 	if(pe <= 0 || !prob(chance))
 		return FALSE
-	var/datum/ego_gifts/EG = new gift_type
+	var/datum/ego_gifts/EG
+	if(secret_abnormality && secret_gift)
+		EG = new secret_gift
+	else
+		EG = new gift_type
 	EG.datum_reference = src.datum_reference
 	user.Apply_Gift(EG)
 	to_chat(user, span_nicegreen("[gift_message]"))
@@ -376,7 +428,7 @@
 
 // Additional effect on each individual work tick failure
 /mob/living/simple_animal/hostile/abnormality/proc/WorktickFailure(mob/living/carbon/human/user)
-	user.apply_damage(work_damage_amount, work_damage_type, null, user.run_armor_check(null, work_damage_type), spread_damage = TRUE)
+	user.deal_damage(work_damage_amount, work_damage_type)
 	WorkDamageEffect()
 	return
 
@@ -384,8 +436,11 @@
 /mob/living/simple_animal/hostile/abnormality/proc/WorkDamageEffect()
 	var/turf/target_turf = get_ranged_target_turf(src, SOUTHWEST, 1)
 	var/obj/effect/temp_visual/roomdamage/damage = new(target_turf)
-	damage.icon_state = "[work_damage_type]"
-	return
+	if(!islist(work_damage_type))
+		damage.icon_state = "[work_damage_type]"
+	else // its a list, we gotta pick one
+		var/list/damage_types = work_damage_type
+		damage.icon_state = pick(damage_types)
 
 // Dictates whereas this type of work can be performed at the moment or not
 /mob/living/simple_animal/hostile/abnormality/proc/AttemptWork(mob/living/carbon/human/user, work_type)
@@ -465,6 +520,10 @@
 	var/chosen_message
 	var/chosen_attack_num = 0
 
+/datum/action/innate/abnormality_attack/Destroy()
+	A = null
+	return ..()
+
 /datum/action/innate/abnormality_attack/Grant(mob/living/L)
 	if(istype(L, /mob/living/simple_animal/hostile/abnormality))
 		A = L
@@ -495,3 +554,22 @@
 	button_icon_state = button_icon_toggle_deactivated
 	UpdateButtonIcon()
 	active = FALSE
+
+/mob/living/simple_animal/hostile/abnormality/proc/CreateAbnoCore()//this is called by abnormalities on Destroy()
+	var/obj/structure/abno_core/C = new(get_turf(src))
+	C.name = initial(name) + " Core"
+	C.desc = "The core of [initial(name)]"
+	C.icon_state = core_icon
+	C.contained_abno = src.type
+	C.threat_level = threat_level
+	switch(GetRiskLevel())
+		if(1)
+			return
+		if(2)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/teth.dmi'
+		if(3)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/he.dmi'
+		if(4)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/waw.dmi'
+		if(5)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/aleph.dmi'

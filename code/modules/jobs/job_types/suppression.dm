@@ -21,7 +21,7 @@
 	job_abbreviation = "ERA"
 
 	roundstart_attributes = list(FORTITUDE_ATTRIBUTE, PRUDENCE_ATTRIBUTE, TEMPERANCE_ATTRIBUTE, JUSTICE_ATTRIBUTE)
-	var/normal_attribute_level = 20 // Scales with round time & facility upgrades
+	var/normal_attribute_level = 20 // Scales with round time, facility upgrades, and ordeals done
 
 /datum/job/suppression/after_spawn(mob/living/carbon/human/outfit_owner, mob/M, latejoin = FALSE)
 	ADD_TRAIT(outfit_owner, TRAIT_WORK_FORBIDDEN, JOB_TRAIT)
@@ -36,22 +36,23 @@
 		if(15 to 29) // Shouldn't be anything more than TETHs (4 Abnormalities)
 			set_attribute *= 1.5
 
-		if(30 to 44) // HEs (8 Abnormalities)
+		if(29 to 44) // HEs (8 Abnormalities)
 			set_attribute *= 2
 
-		if(45 to 59) // A bit before WAWs (11 Abnormalities)
+		if(44 to 59) // A bit before WAWs (11 Abnormalities)
 			set_attribute *= 2.5
 
-		if(60 to 69) // WAWs around here (15 Abnormalities)
+		if(59 to 69) // WAWs around here (15 Abnormalities)
 			set_attribute *= 3
 
-		if(70 to 79) // ALEPHs starting to spawn (17 Abnormalities)
+		if(69 to 79) // ALEPHs starting to spawn (17 Abnormalities)
 			set_attribute *= 3.5
 
-		if(80 to 100) // ALEPHs around here (20 Abnormalities)
+		if(79 to 100) // ALEPHs around here (20 Abnormalities)
 			set_attribute *= 4
 
-	set_attribute += GetFacilityUpgradeValue(UPGRADE_AGENT_STATS)*2 	//Get double stats because this is all they get.
+
+	set_attribute += GetFacilityUpgradeValue(UPGRADE_AGENT_STATS) + SSlobotomy_corp.ordeal_stats //Used to have doubled respawn stats, but that might be a bit too broken with stats from ordeals.
 
 	for(var/A in roundstart_attributes)
 		roundstart_attributes[A] = round(set_attribute)
@@ -124,16 +125,20 @@
 	name = "stat equalizer"
 	desc = "A localized source of stats, only usable by Emergency Response Agents and the Disciplinary Officer"
 	icon = 'ModularTegustation/Teguicons/teguitems.dmi'
-	icon_state = "canopic_jar"
+	icon_state = "disc_stats"
 	w_class = WEIGHT_CLASS_SMALL
 	slot_flags = ITEM_SLOT_BELT | ITEM_SLOT_POCKETS
-	var/list/suppressionroles = list("Emergency Response Agent", "Disciplinary Officer")
+	var/list/allowedroles = list("Emergency Response Agent", "Disciplinary Officer")
 
 /obj/item/suppressionupdate/attack_self(mob/living/carbon/human/user)
-	if(!istype(user) || !(user?.mind?.assigned_role in suppressionroles))
-		to_chat(user, span_notice("The Gadget's light flashes red. You aren't an ERA or Disciplinary Officer. Check the label before use."))
-		return
+	if(!LAZYLEN(allowedroles))
+		if(!istype(user) || !(user?.mind?.assigned_role in allowedroles))
+			to_chat(user, span_notice("The Gadget's light flashes red. You aren't an ERA or Disciplinary Officer. Check the label before use."))
+			return
+	update_stats(user)
 
+
+/obj/item/suppressionupdate/proc/update_stats(mob/living/carbon/human/user)
 	var/list/attribute_list = list(FORTITUDE_ATTRIBUTE, PRUDENCE_ATTRIBUTE, TEMPERANCE_ATTRIBUTE, JUSTICE_ATTRIBUTE)
 
 	//I got lazy and this needs to be shipped out today
@@ -146,22 +151,23 @@
 		if(15 to 29) // Shouldn't be anything more than TETHs (4 Abnormalities)
 			set_attribute *= 1.5
 
-		if(30 to 44) // HEs (8 Abnormalities)
+		if(29 to 44) // HEs (8 Abnormalities)
 			set_attribute *= 2
 
-		if(45 to 59) // A bit before WAWs (11 Abnormalities)
+		if(44 to 59) // A bit before WAWs (11 Abnormalities)
 			set_attribute *= 2.5
 
-		if(60 to 69) // WAWs around here (15 Abnormalities)
+		if(59 to 69) // WAWs around here (15 Abnormalities)
 			set_attribute *= 3
 
-		if(70 to 79) // ALEPHs starting to spawn (17 Abnormalities)
+		if(69 to 79) // ALEPHs starting to spawn (17 Abnormalities)
 			set_attribute *= 3.5
 
-		if(80 to 100) // ALEPHs around here (20 Abnormalities)
+		if(79 to 100) // ALEPHs around here (20 Abnormalities)
 			set_attribute *= 4
 
-	set_attribute += GetFacilityUpgradeValue(UPGRADE_AGENT_STATS)*2 	//Get double stats because this is all they get.
+	if(user?.mind?.assigned_role in allowedroles)		//only give these if you're the guy that's allowed to have this, it's here so the Rec Agent can use it on interns
+		set_attribute += GetFacilityUpgradeValue(UPGRADE_AGENT_STATS) + SSlobotomy_corp.ordeal_stats
 
 	//Set all stats to 0
 	for(var/A in attribute_list)
@@ -171,3 +177,4 @@
 	//Now we have to bring it back up
 	user.adjust_all_attribute_levels(set_attribute)
 	to_chat(user, span_notice("You feel reset, and more ready for combat."))
+

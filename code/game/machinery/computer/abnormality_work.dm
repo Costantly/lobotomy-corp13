@@ -2,7 +2,6 @@
 	name = "abnormality work console"
 	desc = "Used to perform various tasks with the abnormalities."
 	resistance_flags = INDESTRUCTIBLE
-	obj_flags = CAN_BE_HIT | USES_TGUI
 
 	/// Datum reference of the abnormality this console is related to
 	var/datum/abnormality/datum_reference = null
@@ -22,6 +21,12 @@
 	var/obj/machinery/containment_panel/linked_panel
 	/// Accumulated abnormality chemical.
 	var/chem_charges = 0
+	/// Extraction Officer Visual effect
+	var/obj/effect/vfx = null
+	/// Extraction Officer Work bonus/penalty
+	var/work_bonus = 0
+	/// Stored reference to Extraction Officer Tool
+	var/obj/item/extraction/key/EOTool = null
 
 /obj/machinery/computer/abnormality/Initialize()
 	. = ..()
@@ -63,76 +68,64 @@
 				melt_text = " of Lunacy. Failure to clear the meltdown will cause another abnormality to breach"
 		. += span_warning("The containment unit is currently affected by a Qliphoth Meltdown[melt_text]. Time left: [meltdown_time].")
 
-/obj/machinery/computer/abnormality/ui_interact(mob/user, datum/tgui/ui)
+/obj/machinery/computer/abnormality/ui_interact(mob/user)
 	. = ..()
+	if(isliving(user))
+		playsound(src, 'sound/machines/terminal_prompt_confirm.ogg', 50, FALSE)
 	if(!istype(datum_reference))
 		to_chat(user, span_boldannounce("The console has no information stored!"))
 		return
-	ui = SStgui.try_update_ui(user, src, ui)
-	if(!ui)
-		ui = new(user, src, "AbnormalityWork")
-		ui.open()
-		if(isliving(user))
-			playsound(src, 'sound/machines/terminal_prompt_confirm.ogg', 50, FALSE)
+	var/dat
+	dat += "<b><span style='color: [THREAT_TO_COLOR[datum_reference.GetRiskLevel()]]'>\[[THREAT_TO_NAME[datum_reference.GetRiskLevel()]]\]</span> [datum_reference.GetName()]</b><br>"
+	if(datum_reference.overload_chance[user.ckey])
+		dat += "<span style='color: [COLOR_VERY_SOFT_YELLOW]'>Personal Work Success Rates are modified by [datum_reference.overload_chance[user.ckey]]%.</span><br>"
+		if(datum_reference.overload_chance_limit < 0 && datum_reference.overload_chance[user.ckey] <= datum_reference.overload_chance_limit) // How the fuck did you hit the limit..?
+			dat += "<span style='color: [COLOR_MOSTLY_PURE_RED]'>Work on other abnormalities, I beg you...</span><br>"
+	if(datum_reference.understanding != 0)
+		dat += "<span style='color: [COLOR_BLUE_LIGHT]'>Current Understanding is: [round((datum_reference.understanding/datum_reference.max_understanding)*100, 0.01)]%, granting a [datum_reference.understanding]% Work Success and Speed bonus.</span><br>"
+	switch(work_bonus)
+		if(EXTRACTION_KEY)
+			dat += "<span style='color: [COLOR_VERY_SOFT_YELLOW]'>Work Speed and Success Rates are being positively impacted by low Qliphoth deterrance levels.</span><br>"
+		if(EXTRACTION_LOCK)
+			dat += "<span style='color: [COLOR_MOSTLY_PURE_RED]'>Work Speed and Success Rates are being negatively impacted by high Qliphoth deterrance levels.</span><br>"
+	dat += "<br>"
 
-/obj/machinery/computer/abnormality/ui_static_data(mob/user)
-	. = list()
-	/// Colors
-	.["overload_color"] = COLOR_VERY_SOFT_YELLOW
-	.["plead_color"] = COLOR_MOSTLY_PURE_RED
-	.["understanding_color"] = COLOR_BLUE_LIGHT
-	.["threat_color"] = THREAT_TO_COLOR[datum_reference.GetRiskLevel()]
-	/// Images
-	if(GetCoreSuppression(/datum/suppression/information) || !user.client?.prefs.work_images_visible) // If it's not visible, don't send it.
-		for(var/paths in get_portrait_path())
-			user << browse_rsc(paths)
-		.["image"] = "[datum_reference.GetPortrait()].png"
-	else
-		.["image"] = FALSE
-	/// Name Information
-	.["threat"] = THREAT_TO_NAME[datum_reference.GetRiskLevel()]
-	.["name"] = datum_reference.GetName()
-	/// Works
+	//Abnormality portraits
+	var/list/paths = get_portrait_path()
+	for(var/pahs in paths)
+		user << browse_rsc(pahs)
+	dat += {"<div style="float:right; width: 60%;">
+	<img src='[datum_reference.GetPortrait()].png' class="fit-picture" width="192" height="192">
+	</div>"}
+	dat += "<br>"
+
 	var/list/work_list = datum_reference.available_work
-	.["work_links"] = list()
-	.["work_displays"] = list()
-	.["work_knowledge"] = HAS_TRAIT(user, TRAIT_WORK_KNOWLEDGE)
-	if(!tutorial && GetCoreSuppression(/datum/suppression/information))
+	if(!tutorial && istype(SSlobotomy_corp.core_suppression, /datum/suppression/information))
 		work_list = shuffle(work_list) // A minor annoyance, at most
 	for(var/wt in work_list)
-		var/work_display = "[TeguTranslate(wt, user)] [TeguTranslate("Work", user)]"
-		.["work_links"] += wt
+		var/work_display = "[wt] Work"
 		if(scramble_list[wt] != null)
 			work_display += "?"
 		var/datum/suppression/information/I = GetCoreSuppression(/datum/suppression/information)
 		if(!tutorial && istype(I))
 			work_display = Gibberish(work_display, TRUE, I.gibberish_value)
-		.["work_displays"][wt] = work_display
+		if(HAS_TRAIT(user, TRAIT_WORK_KNOWLEDGE))
+			dat += "<A href='byond://?src=[REF(src)];do_work=[wt]'>[work_display] \[[datum_reference.get_work_chance(wt, user)]%\]</A> <br>"
+		else
+			dat += "<A href='byond://?src=[REF(src)];do_work=[wt]'>[work_display]</A> <br>"
 
-/obj/machinery/computer/abnormality/ui_data(mob/user)
-	. = list()
-	/// Overload
-	.["overload"] = datum_reference.overload_chance[user.ckey] ? datum_reference.overload_chance[user.ckey] : FALSE
-	.["pleading"] = datum_reference.overload_chance_limit < 0 && datum_reference.overload_chance[user.ckey] <= datum_reference.overload_chance_limit // How the fuck did you hit the limit..?
+	var/datum/browser/popup = new(user, "abno_work", "Abnormality Work Console", 400, 350)
+	popup.set_content(dat)
+	popup.open()
+	return
 
-	/// Understanding
-	.["understanding_percent"] = round((datum_reference.understanding/datum_reference.max_understanding)*100, 0.01)
-	.["understanding"] = datum_reference.understanding
-
-	/// Works
-	.["work_chances"] = list()
-	for(var/wt in datum_reference.available_work)
-		.["work_chances"][wt] = round(datum_reference.get_work_chance(wt, user))
-
-/obj/machinery/computer/abnormality/ui_act(action, list/params)
+/obj/machinery/computer/abnormality/Topic(href, href_list)
 	. = ..()
 	if(.)
-		return
-	if(action != "do_work")
-		return
+		return .
 	if(ishuman(usr))
 		usr.set_machine(src)
-		if(params["do_work"] in datum_reference.available_work)
+		if(href_list["do_work"] in datum_reference.available_work)
 			if(HAS_TRAIT(usr, TRAIT_WORK_FORBIDDEN) && recorded) //let clerks work training rabbit
 				to_chat(usr, span_warning("The console cannot be operated by [prob(0.1) ? "a filthy clerk" : "you"]!"))
 				return
@@ -145,14 +138,15 @@
 			if(!(datum_reference.current.status_flags & GODMODE))
 				to_chat(usr, span_warning("The Abnormality has breached containment!"))
 				return
-			var/work_attempt = datum_reference.current.AttemptWork(usr, params["do_work"])
+			var/work_attempt = datum_reference.current.AttemptWork(usr, href_list["do_work"])
 			if(!work_attempt)
 				if(work_attempt == FALSE)
 					to_chat(usr, span_warning("This operation is currently unavailable."))
 				return
-			start_work(usr, params["do_work"])
+			start_work(usr, href_list["do_work"])
 
 	add_fingerprint(usr)
+	updateUsrDialog()
 
 /obj/machinery/computer/abnormality/proc/start_work(mob/living/carbon/human/user, work_type)
 	var/sanity_result = round(datum_reference.current.fear_level - get_user_level(user))
@@ -203,6 +197,11 @@
 	if(was_melting == MELTDOWN_CYAN)
 		work_chance -= 20
 	var/work_speed = 2 SECONDS / (1 + ((get_modified_attribute_level(user, TEMPERANCE_ATTRIBUTE) + datum_reference.understanding) / 100))
+	switch(work_bonus)
+		if(EXTRACTION_KEY)
+			work_speed *= 0.9 //10% faster work
+		if(EXTRACTION_LOCK)
+			work_speed *= 1.2 //20% slower work
 	work_speed /= user.physiology.work_speed_mod
 	var/success_boxes = 0
 	var/total_boxes = 0
@@ -338,6 +337,44 @@
 //Links to containment panel
 /obj/machinery/computer/abnormality/proc/LinkPanel(obj/machinery/panel)
 	linked_panel = panel
+
+//Applies or Removes Extraction Officer Key or Lock
+/obj/machinery/computer/abnormality/proc/ApplyEOTool(modifier = 0, removal = FALSE, obj/item/extraction/key/thetool = null)
+	if(removal && modifier == work_bonus)
+		if(vfx)
+			qdel(vfx)
+		work_bonus = 0
+		if(EOTool)
+			EOTool.Deactivate() //Visually turn off the tool
+			EOTool = null
+		return TRUE
+	if(!datum_reference.current)
+		return FALSE
+	var/abno_target = datum_reference.current
+	if(modifier == EXTRACTION_LOCK)
+		if(work_bonus != 0) //We can't apply a lock while something is already active
+			return FALSE
+		if(datum_reference.understanding < datum_reference.max_understanding) //Understanding is not capped - we can't punish players for overwork
+			return FALSE
+		work_bonus = EXTRACTION_LOCK
+		var/turf/target_turf = get_ranged_target_turf(abno_target, SOUTHWEST, 1)
+		vfx = new/obj/effect/extraction_effect(target_turf)
+		vfx.icon_state = "lock"
+		EOTool = thetool
+		return TRUE
+	if(modifier == EXTRACTION_KEY)
+		if(work_bonus != 0) //We can't apply a key while something is already active
+			return FALSE
+		if(datum_reference.understanding >= (datum_reference.max_understanding / 2)) //Understanding is over 50% - we can't keep giving them free bonuses
+			return FALSE
+		work_bonus = EXTRACTION_KEY
+		var/turf/target_turf = get_ranged_target_turf(abno_target, SOUTHWEST, 1)
+		vfx = new/obj/effect/extraction_effect(target_turf)
+		vfx.icon_state = "key"
+		EOTool = thetool //We store a reference to the key so we can visually turn it off at 50% understanding
+		return TRUE
+	return FALSE
+
 
 //special console just for training rabbit
 /obj/machinery/computer/abnormality/training_rabbit

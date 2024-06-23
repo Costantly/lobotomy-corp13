@@ -88,6 +88,7 @@
 	inhand_y_dimension = 96
 	force = 33
 	reach = 2		//Has 2 Square Reach.
+	stuntime = 5	//Longer reach, gives you a short stun.
 	attack_speed = 1.8// really slow
 	damtype = RED_DAMAGE
 
@@ -140,7 +141,7 @@
 	var/ramping_damage = 0 //no maximum, will stack as long as people are attacking with it.
 
 /obj/item/ego_weapon/iron_maiden/Initialize()
-	..()
+	. = ..()
 	AddElement(/datum/element/update_icon_updates_onmob)
 
 /obj/item/ego_weapon/iron_maiden/proc/Multihit(mob/living/target, mob/living/user, attack_amount)

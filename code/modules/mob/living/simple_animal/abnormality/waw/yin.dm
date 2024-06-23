@@ -68,6 +68,7 @@
 	var/list/hit_people = list()
 	var/list/spawned_effects = list()
 	var/list/prohibitted_flips = list(
+		/mob/living/simple_animal/hostile/abnormality/nihil,
 		/mob/living/simple_animal/hostile/abnormality/white_night,
 		/mob/living/simple_animal/hostile/megafauna/apocalypse_bird,
 		/mob/living/simple_animal/hostile/megafauna/arbiter,
@@ -380,7 +381,7 @@
 		for(var/mob/living/L in T)
 			if(faction_check(L.faction, src.faction))
 				continue
-			L.apply_damage(damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
+			L.deal_damage(damage, BLACK_DAMAGE)
 		for(var/obj/vehicle/sealed/mecha/V in T)
 			V.take_damage(damage, BLACK_DAMAGE)
 		new /obj/effect/temp_visual/small_smoke/yin_smoke/long(T)

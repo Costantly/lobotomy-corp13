@@ -113,7 +113,10 @@ GLOBAL_LIST_INIT(admin_verbs_fun, list(
 	/client/proc/smite,
 	/client/proc/admin_away,
 	/client/proc/AbnoRadio,
-	/client/proc/InitCoreSuppression
+	/client/proc/InitCoreSuppression,
+	/client/proc/ConfigFood,
+	/client/proc/ExecutionBulletToggle,
+	/client/proc/distort_all,
 	))
 GLOBAL_PROTECT(admin_verbs_fun)
 GLOBAL_LIST_INIT(admin_verbs_spawn, list(/datum/admins/proc/spawn_atom, /datum/admins/proc/podspawn_atom, /datum/admins/proc/spawn_cargo, /datum/admins/proc/spawn_objasmob, /client/proc/respawn_character, /datum/admins/proc/beaker_panel))
@@ -178,6 +181,7 @@ GLOBAL_PROTECT(admin_verbs_debug)
 	/client/proc/cmd_display_init_log,
 	/client/proc/cmd_display_overlay_log,
 	/client/proc/reload_configuration,
+	/client/proc/spawn_abnormality_boss,
 	/client/proc/atmos_control,
 	/client/proc/reload_cards,
 	/client/proc/validate_cards,
@@ -793,18 +797,20 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 	set name = "Spawn Abnormality Cell"
 	if(!check_rights(R_ADMIN))
 		return
-
+	if(!LAZYLEN(GLOB.abnormality_room_spawners))
+		to_chat(src, span_interface("Failed to spawn abno. The facility is already full!"))
+		return
 	var/confirm = alert(src, "Choose Abnormality?", "Choose abnormality type?", "No", "Yes")
 	if(confirm == "Yes")
 		var/datum/abno_type = pick_closest_path(FALSE, make_types_fancy(subtypesof(/mob/living/simple_animal/hostile/abnormality)))
 		if(ispath(abno_type))
 			SSabnormality_queue.queued_abnormality = abno_type
-	SSabnormality_queue.SpawnAbno()
 
 	log_admin("[key_name(usr)] has spawned [SSabnormality_queue.queued_abnormality].")
 	message_admins("[key_name(usr)] has spawned [SSabnormality_queue.queued_abnormality].")
-
 	SSblackbox.record_feedback("nested tally", "admin_spawn_abnormality", 1, list("Initiated Spawn Abnormality", "[SSabnormality_queue.queued_abnormality]")) //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+
+	SSabnormality_queue.SpawnAbno()
 
 // Suppresses all LC13 abnormalities
 /client/proc/ClearAbno()

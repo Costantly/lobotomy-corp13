@@ -177,7 +177,6 @@ ID_CONSOLE_JOBSLOT_DELAY 30
 
 ## allow players to initiate a restart vote
 ALLOW_VOTE_RESTART
-ALLOW_VOTE_RESTART
 
 ## allow players to initiate a transfer vote
 ALLOW_VOTE_TRANSFER
@@ -186,7 +185,6 @@ ALLOW_VOTE_TRANSFER
 #ALLOW_VOTE_MODE
 
 ## allow players to initiate a map-change vote
-ALLOW_VOTE_MAP
 ALLOW_VOTE_MAP
 
 ## min delay (deciseconds) between voting sessions (default 10 minutes)
@@ -205,7 +203,7 @@ VOTE_PERIOD 900
 #NORESPAWN
 
 ## Respawn delay in deciseconds (Default is 3000 = 5 minutes)
-RESPAWN_DELAY 0
+RESPAWN_DELAY 1200
 
 ## set a hosted by name for unix platforms
 HOSTEDBY EgorDinamit
@@ -548,14 +546,14 @@ DEFAULT_VIEW_SQUARE 15x15
 #DISCORD_ROLEID 000000000000000000
 
 ##Amount of time required for senior job titles in minutes
-SENIOR_TIMELOCK 0
+SENIOR_TIMELOCK 600
 
 ##Amount of time required for ULTRA senior job titles in minutes
-ULTRA_SENIOR_TIMELOCK 0
+ULTRA_SENIOR_TIMELOCK 4800
 
 ### Autotransfer Settings
 ## Uncomment to enable shuttle autotransfer
-#VOTE_AUTOTRANSFER_ENABLED
+VOTE_AUTOTRANSFER_ENABLED
 ## Time (in deciseconds) before the first transfer vote. Default: 2 hours
 VOTE_AUTOTRANSFER_INITIAL 45000
 ## Time (in deciseconds) between subsequent transfer votes. Default: 30 minutes

@@ -12,19 +12,15 @@
 
 /datum/suppression/information/Run(run_white = FALSE, silent = FALSE)
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_GLOB_MELTDOWN_START, .proc/OnMeltdown)
-	UpdateAbnoConsole(GLOB.lobotomy_devices)
+	RegisterSignal(SSdcs, COMSIG_GLOB_MELTDOWN_START, PROC_REF(OnMeltdown))
 
 /datum/suppression/information/End(silent = FALSE)
 	UnregisterSignal(SSdcs, COMSIG_GLOB_MELTDOWN_START)
 	SSlobotomy_corp.box_work_multiplier *= 1.25
-	. = ..()
-	UpdateAbnoConsole(GLOB.lobotomy_devices)
-	return
+	return ..()
 
 // Increase gibberish value every time an ordeal occurs
 /datum/suppression/information/proc/OnMeltdown(datum/source, ordeal = FALSE)
 	SIGNAL_HANDLER
 	if(ordeal)
 		gibberish_value = min(80, gibberish_value + gibberish_value_increase)
-		UpdateAbnoConsole(GLOB.lobotomy_devices)

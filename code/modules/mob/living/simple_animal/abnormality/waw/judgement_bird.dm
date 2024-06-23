@@ -4,6 +4,7 @@
 	icon = 'ModularTegustation/Teguicons/48x64.dmi'
 	icon_state = "judgement_bird"
 	icon_living = "judgement_bird"
+	core_icon = "jbird_egg"
 	portrait = "judgement_bird"
 	faction = list("hostile", "Apocalypse")
 	speak_emote = list("chirps")
@@ -94,7 +95,7 @@
 		if(L.stat == DEAD)
 			continue
 		new /obj/effect/temp_visual/judgement(get_turf(L))
-		L.apply_damage(judgement_damage, PALE_DAMAGE, null, L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
+		L.deal_damage(judgement_damage, PALE_DAMAGE)
 
 		if(L.stat == DEAD)	//Gotta fucking check again in case it kills you. Real moment
 			if(!IsCombatMap())
@@ -191,7 +192,8 @@
 		if(get_dist(src, J) < 6) // Unnecessary for this distance
 			continue
 		target_turfs += get_turf(J)
-
+	if(!LAZYLEN(target_turfs))
+		return ..()
 	var/turf/target_turf = pick(target_turfs)
 	if(istype(target_turf))
 		patrol_path = get_path_to(src, target_turf, TYPE_PROC_REF(/turf, Distance_cardinal), 0, 200)

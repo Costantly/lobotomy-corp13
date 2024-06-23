@@ -22,24 +22,24 @@ map alphacorp
 	maxplayers 15
 endmap
 
-map betacorp
+#map betacorp
 	votable
 	minplayers 10
 	maxplayers 25
 endmap
 
-map gammacorp
+#map gammacorp
 	votable
 	minplayers 10
 	maxplayers 25
 endmap
 
-map deltacorp
+#map deltacorp
 	votable
 	minplayers 20
 endmap
 
-map epsiloncorp
+#map epsiloncorp
 	votable
 	minplayers 25
 endmap
@@ -49,20 +49,12 @@ map zetacorp
 	maxplayers 15
 endmap
 
-map deltacorp
-	votable
-endmap
-
-map epsiloncorp
+map etacorp
 	votable
 	maxplayers 15
 endmap
 
-map etacorp
-	votable
-endmap
-
-map gammacorp
+#map thetacorp
 	votable
 	minplayers 20
 endmap
@@ -72,12 +64,13 @@ map psicorp
 	maxplayers 10
 endmap
 
+map cityfixers
+endmap
+
 #Need testing
 map iotacorp
 endmap
 
-map city
-endmap
 
 map kappacorp
 endmap
@@ -85,13 +78,6 @@ endmap
 map lambdacorp
 endmap
 
-map thetacorp
-	votable
-endmap
-
-map zetacorp
-	votable
-endmap
 
 map rcorp_test
 endmap

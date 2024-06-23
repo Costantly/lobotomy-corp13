@@ -385,15 +385,6 @@
 /obj/item/kitchen/rollingpin,
 /turf/open/floor/mineral/silver,
 /area/city/shop)
-"eA" = (
-/obj/structure/table/wood,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler_refill,
-/obj/item/hand_labeler,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "eF" = (
 /obj/machinery/door/airlock/wood{
 	name = "employee housing"
@@ -1397,12 +1388,6 @@
 /obj/item/food/breadslice/moldy,
 /turf/open/floor/wood,
 /area/city/shop)
-"qP" = (
-/obj/structure/moneymachine{
-	pixel_y = -32
-	},
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "qQ" = (
 /obj/structure/table/greyscale,
 /obj/item/flashlight/lamp/green,
@@ -1460,9 +1445,6 @@
 	},
 /turf/open/indestructible/hoteltile,
 /area/city/house)
-"rn" = (
-/turf/open/floor/plasteel/vaporwave,
-/area/city)
 "rq" = (
 /obj/structure/table/wood,
 /obj/item/modular_computer/laptop/preset/fixer,
@@ -2234,10 +2216,6 @@
 /obj/structure/bed/pod,
 /turf/open/floor/wood,
 /area/city/shop)
-"xF" = (
-/obj/machinery/vending/coffee,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "xM" = (
 /obj/structure/table/wood,
 /obj/item/flashlight/lamp/green,
@@ -2435,11 +2413,6 @@
 /obj/item/kitchen/spoon,
 /turf/open/floor/mineral/titanium,
 /area/city/house)
-"zm" = (
-/obj/machinery/light,
-/obj/structure/table/wood,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "zo" = (
 /obj/structure/table/wood/bar,
 /obj/machinery/chem_dispenser/drinks/fullupgrade{
@@ -2650,10 +2623,6 @@
 /obj/structure/mineral_door/wood,
 /turf/open/floor/mineral/titanium,
 /area/city/house)
-"AL" = (
-/obj/effect/landmark/cityloot,
-/turf/open/floor/plasteel/vaporwave,
-/area/city)
 "AM" = (
 /obj/structure/chair/office{
 	dir = 4
@@ -3954,15 +3923,6 @@
 /obj/item/reagent_containers/glass/bucket,
 /turf/open/indestructible/white,
 /area/city/shop)
-"KY" = (
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/item/folder,
-/obj/structure/table/wood,
-/turf/open/floor/facility/white,
-/area/city/fixers)
 "KZ" = (
 /obj/machinery/telecomms/server/presets/medical,
 /turf/open/floor/circuit/telecomms/mainframe,
@@ -4041,10 +4001,6 @@
 	},
 /turf/open/floor/plasteel/checker,
 /area/city/house)
-"LJ" = (
-/obj/machinery/iv_drip/saline,
-/turf/open/indestructible/white,
-/area/city/shop)
 "LK" = (
 /obj/structure/rack,
 /obj/item/ego_weapon/city/rats/knife,
@@ -4230,10 +4186,6 @@
 "NJ" = (
 /obj/machinery/door/poddoor/shutters/indestructible,
 /turf/open/floor/plating/ashplanet/rocky,
-/area/city/shop)
-"NL" = (
-/obj/item/price_tagger,
-/turf/open/indestructible/white,
 /area/city/shop)
 "NY" = (
 /obj/machinery/computer/arcade/battle,
@@ -4516,10 +4468,6 @@
 	},
 /turf/open/floor/plating/ashplanet/rocky,
 /area/city/backstreets_checkpoint)
-"Se" = (
-/mob/living/simple_animal/hostile/shrimp,
-/turf/open/floor/plasteel/vaporwave,
-/area/city)
 "Sf" = (
 /obj/machinery/door/poddoor/shutters/indestructible{
 	id = "Garage"
@@ -4756,13 +4704,6 @@
 	},
 /turf/open/floor/facility/white,
 /area/city/fixers)
-"UE" = (
-/obj/structure/closet/crate/trashcart,
-/obj/item/bodypart/l_arm,
-/obj/item/bodypart/r_arm,
-/obj/machinery/light/small,
-/turf/open/floor/plasteel/dark,
-/area/city/shop)
 "UF" = (
 /obj/machinery/griddle,
 /obj/effect/turf_decal/tile/red{
@@ -5066,10 +5007,6 @@
 	},
 /turf/open/floor/wood,
 /area/city/shop)
-"XD" = (
-/obj/structure/table/reinforced,
-/turf/open/floor/oldshuttle,
-/area/city/house)
 "XF" = (
 /turf/open/floor/wood,
 /area/city)
@@ -5258,17 +5195,6 @@
 /obj/effect/turf_decal/trimline/yellow/line,
 /turf/open/floor/plasteel,
 /area/city/shop)
-"Zx" = (
-/obj/structure/table/wood,
-/obj/item/storage/backpack/duffelbag/med/surgery,
-/obj/item/clothing/gloves/color/latex/nitrile,
-/obj/item/clothing/gloves/color/latex/nitrile,
-/obj/item/storage/box/bodybags,
-/obj/machinery/light/small{
-	dir = 4
-	},
-/turf/open/floor/plasteel/dark,
-/area/city/shop)
 "Zz" = (
 /obj/structure/rack,
 /obj/machinery/light{
@@ -5283,10 +5209,6 @@
 	},
 /turf/open/floor/carpet/black,
 /area/city/fixers)
-"ZL" = (
-/obj/structure/lootcrate/s_corp,
-/turf/open/floor/plasteel/vaporwave,
-/area/city)
 "ZP" = (
 /obj/machinery/vending/fixer,
 /turf/closed/indestructible/reinforced,

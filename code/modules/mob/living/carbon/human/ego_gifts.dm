@@ -278,6 +278,12 @@
 	temperance_bonus = 2
 	slot = HAND_2
 
+/datum/ego_gifts/cord
+	name = "cord"
+	icon_state = "cord"
+	temperance_bonus = 2
+	slot = NECKWEAR
+
 /**
  * TETH EGO Gifts
  */
@@ -752,7 +758,7 @@
 	justice_bonus = -5
 	slot = BROOCH
 
-/datum/ego_gifts/replica
+/datum/ego_gifts/replica//KQE regular gift
 	name = "Pinpoint Logic Circuit"
 	icon_state = "replica"
 	fortitude_bonus = -3
@@ -760,6 +766,12 @@
 	temperance_bonus = 2
 	justice_bonus = 4
 	slot = BROOCH
+
+/datum/ego_gifts/ups//KQE event gift
+	name = "UPS System"
+	icon_state = "ups"
+	justice_bonus = 5
+	slot = FACE
 
 /datum/ego_gifts/roseate_desire
 	name = "Roseate Desire"
@@ -1445,3 +1457,34 @@
 	temperance_bonus = 7
 	justice_bonus = 7
 	slot = RIGHTBACK
+
+/datum/ego_gifts/sukuna
+	name = "Sukuna's Mask Thingy"
+	desc = "I have no idea what it is, but it heals you from pale."
+	icon_state = "sukunamask"
+	fortitude_bonus = 15
+	prudence_bonus = -10
+	temperance_bonus = -20
+	justice_bonus = 30
+	slot = FACE
+
+
+/datum/ego_gifts/sukuna/Initialize(mob/living/carbon/human/user)
+	. = ..()
+	RegisterSignal(user, COMSIG_MOB_APPLY_DAMGE, PROC_REF(AttemptHeal))
+	user.physiology.pale_mod *= 0.9
+
+/datum/ego_gifts/blessing/Remove(mob/living/carbon/human/user)
+	user.physiology.pale_mod /= 0.9
+	return ..()
+
+/datum/ego_gifts/sukuna/Remove(mob/living/carbon/human/user)
+	UnregisterSignal(user, COMSIG_MOB_APPLY_DAMGE, PROC_REF(AttemptHeal))
+	return ..()
+
+/datum/ego_gifts/sukuna/proc/AttemptHeal(datum/source, damage, damagetype, def_zone)
+	if(!owner && damagetype != PALE_DAMAGE)
+		return
+	if(!damage)
+		return
+	owner.adjustBruteLoss(-damage*0.75)
