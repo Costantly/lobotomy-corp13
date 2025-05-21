@@ -24,7 +24,7 @@
 	possible_a_intents = list(INTENT_HELP, INTENT_HARM)
 	//similar to a human
 	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
-	butcher_results = list(/obj/item/food/meat/slab/human = 2, /obj/item/food/meat/slab/human/mutant/moth = 1)
+	butcher_results = list(/obj/item/food/meat/slab/buggy = 2)
 	silk_results = list(/obj/item/stack/sheet/silk/steel_simple = 1)
 
 /mob/living/simple_animal/hostile/ordeal/steel_dawn/Initialize()
@@ -66,11 +66,12 @@
 	attack_verb_continuous = "slashes"
 	attack_verb_simple = "slash"
 	death_sound = 'sound/voice/mook_death.ogg'
-	butcher_results = list(/obj/item/food/meat/slab/human = 1, /obj/item/food/meat/slab/human/mutant/moth = 2)
+	butcher_results = list(/obj/item/food/meat/slab/buggy = 2)
+	silk_results = list(/obj/item/stack/sheet/silk/steel_simple = 2, /obj/item/stack/sheet/silk/steel_advanced = 1)
 
-/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/MeleeAction()
-	health+=10
-	if(health <= maxHealth*0.25 && stat != DEAD && prob(75))
+/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/AttackingTarget(atom/attacked_target)
+	adjustBruteLoss(-10)
+	if(health <= maxHealth * 0.25 && stat != DEAD && prob(75))
 		walk_to(src, 0)
 		say("FOR G CORP!!!")
 		animate(src, transform = matrix()*1.8, color = "#FF0000", time = 15)
@@ -83,12 +84,14 @@
 	visible_message(span_danger("[src] suddenly explodes!"))
 	new /obj/effect/temp_visual/explosion(get_turf(src))
 	playsound(loc, 'sound/effects/ordeals/steel/gcorp_boom.ogg', 60, TRUE)
-	for(var/mob/living/L in view(3, src))
+	for(var/mob/living/L in ohearers(3, src))
 		L.apply_damage(60, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE))
 
 	//Buff allies, all of these buffs only activate once.
 	//Buff the grunts around you when you die
-	for(var/mob/living/simple_animal/hostile/ordeal/steel_dawn/Y in view(7, src))
+	for(var/mob/living/simple_animal/hostile/ordeal/steel_dawn/Y in ohearers(7, src))
+		if(Y.stat >= UNCONSCIOUS)
+			continue
 		Y.say("FOR G CORP!!!")
 
 		//increase damage
@@ -98,7 +101,9 @@
 		Y.adjustBruteLoss(-maxHealth*0.5)
 
 	//And any manager
-	for(var/mob/living/simple_animal/hostile/ordeal/steel_dusk/Z in view(7, src))
+	for(var/mob/living/simple_animal/hostile/ordeal/steel_dusk/Z in ohearers(7, src))
+		if(Z.stat >= UNCONSCIOUS)
+			continue
 		Z.say("There will be full-on roll call tonight.")
 		Z.screech_windup = 3 SECONDS
 
@@ -126,8 +131,10 @@
 		return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/flying/MeleeAction()
+/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/flying/AttackingTarget(atom/attacked_target)
 	if(ranged_cooldown <= world.time && prob(30))
+		if(!target)
+			GiveTarget(attacked_target)
 		OpenFire()
 		return
 	return ..()
@@ -171,16 +178,6 @@
 		forceMove(wallcheck)
 		SLEEP_CHECK_DEATH(0.5)
 	charging = FALSE
-
-/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/flying/proc/ClearSky(turf/T)
-	if(!T || isclosedturf(T) || T == loc)
-		return FALSE
-	if(locate(/obj/structure/window) in T.contents)
-		return FALSE
-	for(var/obj/machinery/door/D in T.contents)
-		if(D.density)
-			return FALSE
-	return TRUE
 
 /mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/flying/proc/SweepAttack(mob/living/sweeptarget)
 	sweeptarget.visible_message(span_danger("[src] slams into [sweeptarget]!"), span_userdanger("[src] slams into you!"))
@@ -229,7 +226,8 @@
 	footstep_type = FOOTSTEP_MOB_SHOE
 	possible_a_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_HARM)
 	death_sound = 'sound/voice/hiss5.ogg'
-	butcher_results = list(/obj/item/food/meat/slab/human = 2, /obj/item/food/meat/slab/human/mutant/moth = 1)
+	butcher_results = list(/obj/item/food/meat/slab/buggy = 3)
+	silk_results = list(/obj/item/stack/sheet/silk/steel_simple = 4, /obj/item/stack/sheet/silk/steel_advanced = 2, /obj/item/stack/sheet/silk/steel_elegant = 1)
 	//Last command issued
 	var/last_command = 0
 	//Delay on charge command
@@ -251,6 +249,9 @@
 		/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon/flying = 2
 		)
 	AddComponent(/datum/component/ai_leadership, units_to_add, 8, TRUE, TRUE)
+
+	if(SSmaptype.maptype in SSmaptype.citymaps)
+		guaranteed_butcher_results += list(/obj/item/head_trophy/steel_head = 1)
 
 /mob/living/simple_animal/hostile/ordeal/steel_dusk/Life()
 	. = ..()

@@ -7,6 +7,9 @@
 	base_pixel_x = -32
 	pixel_y = -16
 	base_pixel_y = -16
+	offsets_pixel_x = list("south" = -32, "north" = -32, "west" = -32, "east" = -32)
+	offsets_pixel_y = list("south" = -16, "north" = -16, "west" = -16, "east" = -16)
+	occupied_tiles_up = 1
 	icon = 'ModularTegustation/Teguicons/96x96.dmi'
 	icon_state = "blue_star"
 	icon_living = "blue_star"
@@ -26,6 +29,7 @@
 	)
 	work_damage_amount = 16
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gloom
 	can_patrol = FALSE
 
 	wander = FALSE
@@ -41,6 +45,17 @@
 	)
 	gift_type =  /datum/ego_gifts/star
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "A group of employees worship this abnormality, despite the fact nothing can be sacred in this place. <br>\
+		You recall how you pulled away one employee away from it in the past, even as she screamed and wailed that you were keeping her chained to this world. <br>You thought you were saving her. <br>\
+		You can hear a distant howl emanating from the centre of the blue-coloured heart. <br>It's the sound of stars. <br>They're welcoming you, asking you to join them as a star."
+	observation_choices = list(
+		"Be pulled in" = list(TRUE, "You don't hesitate as you approach the centre of the void. <br>Sensation in your hands and legs are the first things to go, creeping up your body until you couldn't feel anything physical at all. <br>\
+			Despite how scary it should have been, you feel at peace, <br>this isn't an end it's a new beginning - You're a martyr. <br>\
+			Let's meet everyone again, as stars."),
+		"Hold yourself tight" = list(FALSE, "You wrapped your arms around yourself and shut your eyes, turning your senses inward until the temptation passes and the sounds become distant howls again. <br>\
+			You opened your eyes and looked again at the heart. <br>It remains in the air, floating towards a new beginning."),
+	)
 
 	var/pulse_cooldown
 	var/pulse_cooldown_time = 12 SECONDS
@@ -124,6 +139,7 @@
 	. = ..()
 	var/turf/T = pick(GLOB.department_centers)
 	soundloop.start()
-	forceMove(T)
+	if(breach_type != BREACH_MINING)
+		forceMove(T)
 	BluePulse()
 	return

@@ -25,6 +25,7 @@
 
 	work_damage_amount = 5
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 	start_qliphoth = 1
 	max_boxes = 14
 	ego_list = list(
@@ -36,6 +37,13 @@
 	gift_message = "Not a single employee has seen Meat Lantern's full form."
 
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "It's always the same, dull colours in the facility. Grey walls, grey floors, grey ceilings, even the people were grey. <br>\
+		Every day was grey until, one day, you saw the a small, beautifully green flower growing and glowing from the ground."
+	observation_choices = list(
+		"Approach the flower" = list(TRUE, "It's the most beautiful thing you've ever seen, you brush your hand against it and the petals tickle your hand. You feel a tremor beneath and..."),
+		"Call for security" = list(FALSE, "Something so beautiful had no right to exist in the City. You called for security and left in a hurry back to your grey workplace."),
+	)
 
 	var/can_act = TRUE
 	var/detect_range = 1
@@ -129,9 +137,8 @@
 	..()
 
 /mob/living/simple_animal/hostile/abnormality/meat_lantern/PostWorkEffect(mob/living/carbon/human/user, work_type, pe, work_time, canceled)
-	if(work_time < 18 SECONDS)
-		if(prob(80))
-			datum_reference.qliphoth_change(-1)
+	if (get_attribute_level(user, TEMPERANCE_ATTRIBUTE) >= 60)
+		datum_reference.qliphoth_change(-1)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/meat_lantern/FailureEffect(mob/living/carbon/human/user, work_type, pe)
@@ -140,12 +147,15 @@
 	return
 
 /mob/living/simple_animal/hostile/abnormality/meat_lantern/BreachEffect(mob/living/carbon/human/user, breach_type)
+	if(breach_type == BREACH_MINING)//as funny as it sounds, this abnormality would be unreachable
+		sleep(10 SECONDS)
 	. = ..()
 	update_icon()
 	density = FALSE
 	med_hud_set_health() //hides medhud
 	med_hud_set_status()
-	forceMove(pick(GLOB.xeno_spawn))
+	if(breach_type != BREACH_MINING)
+		forceMove(pick(GLOB.xeno_spawn))
 	chop_cooldown = world.time + chop_cooldown_time
 	proximity_monitor = new(src, detect_range)
 	return

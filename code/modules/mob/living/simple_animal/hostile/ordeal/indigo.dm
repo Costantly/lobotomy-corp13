@@ -38,10 +38,10 @@
 	. = ..()
 	a_intent_change(INTENT_HELP)
 
-/mob/living/simple_animal/hostile/ordeal/indigo_noon/AttackingTarget()
+/mob/living/simple_animal/hostile/ordeal/indigo_noon/AttackingTarget(atom/attacked_target)
 	. = ..()
-	if(. && isliving(target))
-		var/mob/living/L = target
+	if(. && isliving(attacked_target))
+		var/mob/living/L = attacked_target
 		if(L.stat != DEAD)
 			if(L.health <= HEALTH_THRESHOLD_DEAD && HAS_TRAIT(L, TRAIT_NODEATH))
 				devour(L)
@@ -65,9 +65,8 @@
 
 /mob/living/simple_animal/hostile/ordeal/indigo_noon/PickTarget(list/Targets)
 	if(health <= maxHealth * 0.6) // If we're damaged enough
-		for(var/mob/living/simple_animal/hostile/ordeal/indigo_noon/sweeper in view(7, src)) // And there is no sweepers even more damaged than us
+		for(var/mob/living/simple_animal/hostile/ordeal/indigo_noon/sweeper in ohearers(7, src)) // And there is no sweepers even more damaged than us
 			if(sweeper.stat != DEAD && (health > sweeper.health))
-				sweeper.PickTarget(Targets) // Let this sweeper see the same targets as we do
 				return ..()
 		var/list/highest_priority = list()
 		for(var/mob/living/L in Targets)
@@ -120,6 +119,12 @@
 	melee_damage_lower = 42
 	melee_damage_upper = 55
 	damage_coeff = list(RED_DAMAGE = 0.7, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.7)
+	guaranteed_butcher_results = list(/obj/item/food/meat/slab/sweeper = 1)
+
+/mob/living/simple_animal/hostile/ordeal/indigo_dusk/white/Initialize(mapload)
+	. = ..()
+	if(SSmaptype.maptype in SSmaptype.citymaps)
+		guaranteed_butcher_results += list(/obj/item/head_trophy/indigo_head/white = 1)
 
 /mob/living/simple_animal/hostile/ordeal/indigo_dusk/white/CanAttack(atom/the_target)
 	if(ishuman(the_target))
@@ -137,6 +142,12 @@
 	melee_damage_lower = 42
 	melee_damage_upper = 55
 	damage_coeff = list(RED_DAMAGE = 0.7, WHITE_DAMAGE = 0.7, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 1.5)
+	guaranteed_butcher_results = list(/obj/item/food/meat/slab/sweeper = 1)
+
+/mob/living/simple_animal/hostile/ordeal/indigo_dusk/black/Initialize(mapload)
+	. = ..()
+	if(SSmaptype.maptype in SSmaptype.citymaps)
+		guaranteed_butcher_results += list(/obj/item/head_trophy/indigo_head/black = 1)
 
 /mob/living/simple_animal/hostile/ordeal/indigo_dusk/red
 	name = "\proper Commander Jacques"
@@ -146,6 +157,13 @@
 	rapid_melee = 4
 	melee_damage_type = RED_DAMAGE
 	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.7, PALE_DAMAGE = 0.7)
+	guaranteed_butcher_results = list(/obj/item/food/meat/slab/sweeper = 1)
+
+/mob/living/simple_animal/hostile/ordeal/indigo_dusk/red/Initialize(mapload)
+	. = ..()
+	if(SSmaptype.maptype in SSmaptype.citymaps)
+		guaranteed_butcher_results += list(/obj/item/head_trophy/indigo_head = 1)
+
 
 /mob/living/simple_animal/hostile/ordeal/indigo_dusk/pale
 	name = "\proper Commander Silvina"
@@ -155,6 +173,12 @@
 	rapid_melee = 2
 	melee_damage_type = PALE_DAMAGE
 	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.7, BLACK_DAMAGE = 0.7, PALE_DAMAGE = 0.5)
+	guaranteed_butcher_results = list(/obj/item/food/meat/slab/sweeper = 1)
+
+/mob/living/simple_animal/hostile/ordeal/indigo_dusk/pale/Initialize(mapload)
+	. = ..()
+	if(SSmaptype.maptype in SSmaptype.citymaps)
+		guaranteed_butcher_results += list(/obj/item/head_trophy/indigo_head/pale = 1)
 
 /mob/living/simple_animal/hostile/ordeal/indigo_dusk/Initialize(mapload)
 	. = ..()
@@ -171,10 +195,10 @@
 	. = ..()
 	a_intent_change(INTENT_HELP) //so that they dont get body blocked by their kin outside of combat
 
-/mob/living/simple_animal/hostile/ordeal/indigo_dusk/AttackingTarget()
+/mob/living/simple_animal/hostile/ordeal/indigo_dusk/AttackingTarget(atom/attacked_target)
 	. = ..()
-	if(. && isliving(target))
-		var/mob/living/L = target
+	if(. && isliving(attacked_target))
+		var/mob/living/L = attacked_target
 		if(L.stat != DEAD)
 			if(L.health <= HEALTH_THRESHOLD_DEAD && HAS_TRAIT(L, TRAIT_NODEATH))
 				devour(L)
@@ -225,6 +249,8 @@
 	move_resist = MOVE_FORCE_OVERPOWERING
 	simple_mob_flags = SILENCE_RANGED_MESSAGE
 	can_patrol = TRUE
+	occupied_tiles_up = 1
+	offsets_pixel_x = list("south" = -16, "north" = -16, "west" = -16, "east" = -16)
 
 	//How many people has she eaten
 	var/belly = 0
@@ -334,10 +360,10 @@
 	patrol_reset()
 	return FALSE
 
-/mob/living/simple_animal/hostile/ordeal/indigo_midnight/AttackingTarget()
+/mob/living/simple_animal/hostile/ordeal/indigo_midnight/AttackingTarget(atom/attacked_target)
 	. = ..()
-	if(. && isliving(target))
-		var/mob/living/L = target
+	if(. && isliving(attacked_target))
+		var/mob/living/L = attacked_target
 		if(L.stat != DEAD)
 			if(L.health <= HEALTH_THRESHOLD_DEAD && HAS_TRAIT(L, TRAIT_NODEATH))
 				devour(L)

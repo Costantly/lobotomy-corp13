@@ -40,6 +40,7 @@
 	)
 	work_damage_amount = 14
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
 	ego_list = list(
 		/datum/ego_datum/weapon/seasons,
@@ -48,6 +49,19 @@
 
 	gift_type =  /datum/ego_gifts/seasons
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+//Should be unique for each season, for now let's use Spring
+	observation_prompt = "I'm standing outside a forest I both have never seen before, yet know well. <br>There is no City, no civilization on the horizon, I am utterly alone. <br>\
+		Dauntlessly, I press into the forest, seeing no other path forward, and encounter a cute-looking, pink forest spirit. <br>\
+		The spirits of the forest are playful, but it's best not to offend them by forgetting to make an offering"
+	observation_choices = list(
+		"Make an offering" = list(TRUE, "I ask the spirit to lead me to an altar to make my offering and it leads me off a beaten path... <br>\
+			It felt as though I had walked for miles and days, my clothes torn and skin pricked by brambles and thorns but finally we arrived. <br>\
+			Before me is a skull-headed pagan God hanging ominously over its altar, fear grips my heart as the pink spirit leads me to lay down on the altar..."),
+		"Continue on" = list(FALSE, "I pass by the spirit and hear it giggle ominously... <br>\
+			... <br>\
+			In the end, I am never able to find a way out of the forest."),
+	)
 
 	//Var Lists
 	var/list/season_stats = list(
@@ -159,15 +173,19 @@
 /mob/living/simple_animal/hostile/abnormality/seasons/Initialize()
 	. = ..()
 	RegisterSignal(SSdcs, COMSIG_GLOB_SEASON_CHANGE, PROC_REF(Transform))
+	addtimer(CALLBACK(src, PROC_REF(TryTransform)), 1)
+
+/mob/living/simple_animal/hostile/abnormality/seasons/proc/TryTransform()
+	dir = SOUTH
+	Transform()
 
 /mob/living/simple_animal/hostile/abnormality/seasons/PostSpawn()
 	. = ..()
-	dir = SOUTH
-	Transform()
 	work_timer = addtimer(CALLBACK(src, PROC_REF(WorkCheck)), 9 MINUTES, TIMER_OVERRIDE & TIMER_UNIQUE & TIMER_STOPPABLE)
 	if((locate(/obj/effect/season_turf) in range(1, src)))
 		return
-	Downgrade()
+	if(datum_reference != null) // Can't downgrade if GotS is not even contained.
+		Downgrade()
 
 //Work Stuff
 /mob/living/simple_animal/hostile/abnormality/seasons/PostWorkEffect(mob/living/carbon/human/user, work_type, pe)
@@ -213,9 +231,6 @@
 //Transformations
 /mob/living/simple_animal/hostile/abnormality/seasons/proc/Transform()
 	current_season = SSlobotomy_events.current_season
-	var/list/new_work_chances = modular_work_chance[current_season]
-	work_chances = new_work_chances.Copy()
-	datum_reference.available_work = work_chances
 	ChangeResistances(modular_damage_coeff[current_season])
 	work_damage_type = season_stats[current_season][2]
 	melee_damage_type = season_stats[current_season][2]
@@ -227,6 +242,10 @@
 	projectilesound = breaching_stats[current_season][1]
 	playsound(get_turf(src), "[breaching_stats[current_season][2]]", 30, 0, 8)
 	projectiletype = breaching_stats[current_season][3]
+	if(datum_reference != null) // Do not change containment conditions if it does not have a containment cell assigned.
+		var/list/new_work_chances = modular_work_chance[current_season]
+		work_chances = new_work_chances.Copy()
+		datum_reference.available_work = work_chances
 	if(downgraded)
 		icon_state = "[current_season]_mini"
 		portrait = "[current_season]"
@@ -309,8 +328,9 @@
 		ZeroQliphoth()
 		return
 	. = ..()
-	var/turf/T = pick(GLOB.department_centers)
-	forceMove(T)
+	if(breach_type != BREACH_MINING)
+		var/turf/T = pick(GLOB.department_centers)
+		forceMove(T)
 
 //Weather controlling
 /mob/living/simple_animal/hostile/abnormality/seasons/proc/CheckWeather()
@@ -332,11 +352,11 @@
 		return FALSE
 	if(!client)
 		if((cone_attack_cooldown <= world.time) && prob(35))
-			return ConeAttack(target)
+			return ConeAttack(attacked_target)
 		if((slam_cooldown <= world.time) && prob(35))
 			return Slam()
-	if(ishuman(target))
-		if(Finisher(target))
+	if(ishuman(attacked_target))
+		if(Finisher(attacked_target))
 			return
 	return ..()
 
@@ -562,10 +582,7 @@
 		if(prob(10))
 			if(prob(66))
 				sleep(rand(1,5))
-			new /obj/effect/hotspot(T)
-			for(var/mob/living/M in T.contents)
-				M.adjust_fire_stacks(3)
-				M.IgniteMob()
+			new /obj/structure/turf_fire(T)
 
 /datum/weather/fog //Fall weather, causes nearsightedness.
 	name = "fog"

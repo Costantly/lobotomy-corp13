@@ -142,6 +142,45 @@
 	variable = TRUE
 	multiplicative_slowdown = 1.5
 
+/obj/projectile/clown_throw_rcorp
+	name = "blade"
+	desc = "A blade thrown maliciously"
+	icon_state = "clown"
+	damage_type = RED_DAMAGE
+	nodamage = TRUE
+	damage = 0
+	projectile_piercing = PASSMOB
+	ricochets_max = 2
+	ricochet_chance = 100
+	ricochet_decay_chance = 1
+	ricochet_decay_damage = 2
+	ricochet_auto_aim_range = 3
+	ricochet_incidence_leeway = 0
+
+/obj/projectile/clown_throw_rcorp/Initialize()
+	. = ..()
+	SpinAnimation()
+
+/obj/projectile/clown_throw_rcorp/check_ricochet_flag(atom/A)
+	if(istype(A, /turf/closed))
+		return TRUE
+	return FALSE
+
+/obj/projectile/clown_throw_rcorp/on_hit(atom/target, blocked = FALSE)
+	if(ishuman(target))
+		damage = 5
+		nodamage = FALSE
+		var/mob/living/carbon/human/H = target
+		H.apply_lc_bleed(6)
+		H.add_movespeed_modifier(/datum/movespeed_modifier/clowned)
+		addtimer(CALLBACK(H, TYPE_PROC_REF(/mob, remove_movespeed_modifier), /datum/movespeed_modifier/clowned), 1 SECONDS, TIMER_UNIQUE | TIMER_OVERRIDE)
+		qdel(src)
+
+	if(istype(target, /mob/living))
+		to_chat(target, "The [src] flies right passed you!")
+		return
+	..()
+
 /obj/projectile/bride_bolts
 	name = "mind bolts"
 	desc = "A magic white bolt, enchanted to protect or to avenge the sculptor."
@@ -202,27 +241,13 @@
 	desc = "A sharp-looking icicle"
 	icon_state = "ice_2"
 	damage_type = PALE_DAMAGE
-
 	damage = 35
-
-//slow, dodgable, and make it hard to see and talk
-/obj/projectile/fleshblob
-	name = "blood blob"
-	icon_state = "mini_leaper"
-	damage_type = RED_DAMAGE
-
-	damage = 30
-	spread = 15
-	eyeblur = 10
-	slur = 5
-	speed = 2.4
 
 /obj/projectile/actor
 	name = "bullet"
 	icon_state = "bullet"
 	desc = "causes a lot of pain"
 	damage_type = WHITE_DAMAGE
-
 	damage = 10
 
 /obj/projectile/actor/on_hit(target)
@@ -244,26 +269,35 @@
 	icon = 'icons/obj/ego_weapons.dmi'
 	icon_state = "warring2_firey"
 	damage_type = BLACK_DAMAGE
-
-	damage = 45
+	damage = 20
 
 /obj/projectile/thunder_tomahawk/Initialize()
 	. = ..()
 	SpinAnimation()
 
-/obj/projectile/beam/water_jet //it's just a reskin for gold ordeals
+/obj/projectile/beam/water_jet
 	name = "water jet"
 	icon_state = "snapshot"
 	hitsound = null
-	damage = 10
+	damage = 0
 	damage_type = WHITE_DAMAGE
-
 	hitscan = TRUE
+	projectile_piercing = PASSMOB
 	muzzle_type = /obj/effect/projectile/muzzle/laser/snapshot
 	tracer_type = /obj/effect/projectile/tracer/laser/snapshot
 	impact_type = /obj/effect/projectile/impact/laser/snapshot
 	wound_bonus = -100
 	bare_wound_bonus = -100
+
+/obj/projectile/beam/water_jet/on_hit(atom/target, blocked = FALSE)
+	if(isliving(target) && isliving(firer))
+		var/mob/living/T = target
+		var/mob/living/F = firer
+		if(faction_check(F.faction, T.faction, FALSE))
+			return
+	damage = 10 // Using nodamage var does not work for this purpose
+	. = ..()
+	qdel(src)
 
 /obj/projectile/hunter_blade
 	name = "hunter's scythe"
@@ -276,18 +310,6 @@
 	pixel_y = 16
 	hitsound = 'sound/abnormalities/redhood/attack_2.ogg'
 
-/obj/projectile/hunter_blade/on_hit(atom/target, blocked = FALSE, pierce_hit)
-	var/living = FALSE
-	if(!isliving(target))
-		return ..()
-	var/mob/living/attacked_mob = target
-	if(attacked_mob.stat != DEAD)
-		living = TRUE
-	..()
-	if(attacked_mob.stat == DEAD && living)
-		var/mob/living/simple_animal/hostile/abnormality/red_hood/red_owner
-		red_owner.ConfirmRangedKill(0.1)
-
 /obj/projectile/red_hollowpoint
 	name = "hollowpoint shell"
 	desc = "A bullet fired from a red-cloaked mercenary's ruthless weapon."
@@ -297,26 +319,14 @@
 	spread = 10
 	pixel_y = 30
 
-/obj/projectile/red_hollowpoint/on_hit(atom/target, blocked = FALSE, pierce_hit)
-	var/living = FALSE
-	if(!isliving(target))
-		return ..()
-	var/mob/living/attacked_mob = target
-	if(attacked_mob.stat != DEAD)
-		living = TRUE
-	..()
-	if(attacked_mob.stat == DEAD && living)
-		var/mob/living/simple_animal/hostile/abnormality/red_hood/red_owner
-		red_owner.ConfirmRangedKill(0.1)
-
 /obj/item/ammo_casing/caseless/nihil_abnormality
 	name = "dark energy casing"
 	desc = "A casing."
-	projectile_type = /obj/projectile/ego_bullet/nihil
+	projectile_type = /obj/projectile/ego_bullet/abno_nihil
 	pellets = 4
 	variance = 16
 
-/obj/projectile/ego_bullet/nihil
+/obj/projectile/ego_bullet/abno_nihil
 	name = "dark energy"
 	icon_state = "nihil"
 	desc = "Just looking at it seems to suck the life out of you..."
@@ -325,7 +335,7 @@
 	projectile_piercing = PASSMOB
 	hitsound = 'sound/abnormalities/nihil/filter.ogg'
 
-/obj/projectile/ego_bullet/nihil/on_hit(atom/target, blocked = FALSE, pierce_hit)
+/obj/projectile/ego_bullet/abno_nihil/on_hit(atom/target, blocked = FALSE, pierce_hit)
 	. = ..()
 	if(!isliving(target))
 		return
@@ -376,3 +386,51 @@
 		if(L.stat != DEAD && L != firer && !L.faction_check_mob(firer, FALSE))
 			return Bump(L)
 	..()
+
+//Last shot projectiles
+/obj/projectile/bonebullet
+	name = "bone round"
+	icon_state = "bonebullet"
+	damage_type = RED_DAMAGE
+	damage = 10 //rapid fire/shotgun fire
+	spread = 30
+	projectile_piercing = PASSMOB
+	nodamage = TRUE	//Damage is calculated later
+	var/list/safe_mobs = list(
+	/mob/living/simple_animal/hostile/abnormality/last_shot,
+	/mob/living/simple_animal/hostile/meatblob,
+	/mob/living/simple_animal/hostile/meatblob/gunner,
+	/mob/living/simple_animal/hostile/meatblob/gunner/shotgun,
+	/mob/living/simple_animal/hostile/meatblob/gunner/sniper,
+	)
+
+/obj/projectile/bonebullet/on_hit(atom/target, blocked = FALSE)
+	if(!is_type_in_list(target, safe_mobs))
+		nodamage = FALSE
+	else
+		return
+	. = ..()
+	if(nodamage)
+		return
+	qdel(src)
+
+/obj/projectile/bonebullet/bonebullet_piercing
+	name = "bone sniper round"
+	icon_state = "bonebullet_long"
+	damage = 100
+	speed = 0.4
+
+/obj/projectile/frost_splinter
+	name = "frost splinter"
+	desc = "A large shard of ice."
+	icon_state = "ice_2"
+	damage_type = RED_DAMAGE
+	damage = 40
+	speed = 3
+	alpha = 0
+	spread = 20
+
+/obj/projectile/frost_splinter/Initialize()
+	. = ..()
+	hitsound = "sound/weapons/ego/rapier[pick(1,2)].ogg"
+	animate(src, alpha = 255, time = 3)

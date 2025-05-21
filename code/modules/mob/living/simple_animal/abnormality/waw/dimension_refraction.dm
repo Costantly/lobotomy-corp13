@@ -13,6 +13,7 @@
 
 	maxHealth = 1200
 	health = 1200
+	blood_volume = 0
 	density = FALSE
 	damage_coeff = list(RED_DAMAGE = 0, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
 	stat_attack = HARD_CRIT
@@ -30,6 +31,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 
 	ego_list = list(
 		/datum/ego_datum/weapon/diffraction,
@@ -37,6 +39,15 @@
 	)
 	gift_type =  /datum/ego_gifts/diffraction
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "It's invisible to almost all means of measurement, the only way I know it's there is due to the effect it has on the cup of water before me. <br>\
+		I calmly observe the chamber's surroundings and make adjustments when I notice the surface of the cup's liquid begin to bubble."
+	observation_choices = list(
+		"Stay and observe" = list(TRUE, "I continue to record my observations as the water rises up into the air, followed by the cup. <br>\
+			The water folds into a sphere around the cup in a most immaculate manner before being violently dispersed, the cup shattering into infinitesmal fragments. <br>\
+			I leave the chamber, satisfied with my observations."),
+		"Exit the containment unit" = list(FALSE, "The manual says to leave the chamber immediately if the cup's condition becomes violent. <br>As I leave, the water falls still."),
+	)
 
 	var/cooldown_time = 3
 	var/aoe_damage = 12

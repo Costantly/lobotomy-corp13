@@ -32,6 +32,7 @@
 	base_pixel_x = -34
 	work_damage_amount = 8
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 
 	ego_list = list(
 		/datum/ego_datum/weapon/sloshing,
@@ -45,6 +46,13 @@
 		/mob/living/simple_animal/hostile/abnormality/fairy_festival = 1.5,
 		/mob/living/simple_animal/hostile/abnormality/fairy_longlegs = 1.5,
 		/mob/living/simple_animal/hostile/abnormality/faelantern = 1.5,
+	)
+
+	observation_prompt = "\"Care for a drink?\""
+	observation_choices = list(
+		"Yes" = list(TRUE, "\"Yer a good drinkin buddy as any!\""),
+		"No" = list(FALSE, "\"Pssh! you're no fun!\" <br>\
+			The fairy walks away, stumbling along the way."),
 	)
 
 	var/can_act = TRUE
@@ -78,7 +86,10 @@
 	)
 
 //Action Buttons
-	attack_action_types = list(/datum/action/innate/abnormality_attack/toggle/FairyJump)
+	attack_action_types = list(
+	/datum/action/innate/abnormality_attack/toggle/FairyJump,
+	/datum/action/cooldown/gentleman_drink,
+	)
 
 /datum/action/innate/abnormality_attack/toggle/FairyJump
 	name = "Toggle Jump"
@@ -89,6 +100,23 @@
 	toggle_attack_num = 1
 	toggle_message = span_colossus("You will now jump with your next attack when possible.")
 	button_icon_toggle_deactivated = "generic_toggle0"
+
+/datum/action/cooldown/gentleman_drink
+	name = "Offer a drink"
+	icon_icon = 'icons/obj/drinks.dmi'
+	button_icon_state = "fairy_wine"
+	check_flags = AB_CHECK_CONSCIOUS
+	transparent_when_unavailable = TRUE
+	cooldown_time = 5 SECONDS
+
+/datum/action/cooldown/gentleman_drink/Trigger()
+	if(!..())
+		return FALSE
+	if(!istype(owner, /mob/living/simple_animal/hostile/abnormality/fairy_gentleman))
+		return FALSE
+	if(SSmaptype.maptype == "limbus_labs")
+		new /obj/item/reagent_containers/food/drinks/fairywine(owner.loc)
+		owner.visible_message(span_notice("[owner] produces a round of drinks"))
 
 //Work mechanics
 /mob/living/simple_animal/hostile/abnormality/fairy_gentleman/SuccessEffect(mob/living/carbon/human/user, work_type, pe)
@@ -124,16 +152,16 @@
 	is_flying_animal = TRUE
 	ADD_TRAIT(src, TRAIT_MOVE_FLYING, INNATE_TRAIT)
 
-/mob/living/simple_animal/hostile/abnormality/fairy_gentleman/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/fairy_gentleman/AttackingTarget(atom/attacked_target)
 	if(!can_act)
 		return
 	melee_damage_type = WHITE_DAMAGE
 	if(jump_cooldown <= world.time && prob(10) && !client)
-		FairyJump(target)
+		FairyJump(attacked_target)
 		return
-	if(!ishuman(target))
+	if(!ishuman(attacked_target))
 		return ..()
-	var/mob/living/carbon/human/H = target
+	var/mob/living/carbon/human/H = attacked_target
 	H.drunkenness += 5
 	to_chat(H, span_warning("Yuck, some of it got in your mouth!"))
 	if(H.sanity_lost)
@@ -166,7 +194,7 @@
 
 // Attacks
 /mob/living/simple_animal/hostile/abnormality/fairy_gentleman/proc/FairyJump(mob/living/target)
-	if(!istype(target) || !can_act)
+	if(!isliving(target) && !ismecha(target) || !can_act)
 		return
 	var/dist = get_dist(target, src)
 	if(dist > 1 && jump_cooldown < world.time)
@@ -201,6 +229,8 @@
 				L.deal_damage(jump_damage, BLACK_DAMAGE)
 				if(L.health < 0)
 					L.gib()
+			for(var/obj/vehicle/sealed/mecha/V in T)
+				V.take_damage(jump_damage, BLACK_DAMAGE)
 		var/wait_time = 0.5 SECONDS
 		if(target_drunk)
 			wait_time += 3.5 SECONDS

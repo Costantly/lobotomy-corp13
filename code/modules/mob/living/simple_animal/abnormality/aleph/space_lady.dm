@@ -13,7 +13,6 @@
 	can_breach = TRUE
 	threat_level = ALEPH_LEVEL
 	start_qliphoth = 2
-	ranged = 1
 	retreat_distance = 3
 	minimum_distance = 3
 	work_chances = list(
@@ -24,6 +23,7 @@
 	)
 	work_damage_amount = 16	//Half white, half black damage
 	work_damage_type = list(WHITE_DAMAGE, BLACK_DAMAGE)
+	chem_type = /datum/reagent/abnormality/sin/gluttony	//Literally a black hole (and a white hole I guess)
 
 	ego_list = list(
 		/datum/ego_datum/weapon/space,
@@ -35,6 +35,18 @@
 	minimum_distance = 3
 	retreat_distance = 3
 	ranged_cooldown_time = 3 SECONDS
+
+	observation_prompt = "What touched this place cannot be quantified or understood by human science. <br>It was just a color out of space. <br>\
+		It exists on the border of our waking minds, where darkness and light are one, and time and space do not intersect. <br>She has a message, from another place, another time."
+	observation_choices = list(
+		"Hear the past" = list(TRUE, "What I learned and saw during those two hideous days and nights, it is better not to tell."),
+		"Hear the present" = list(TRUE, "A thousand years compressed into a day, a countably infinite number of people work, die and live in its corridors; <br>\
+			the line between them and the monsters they keep gets blurrier and blurrier. <br>\
+			A seed is about to sprout..."),
+		"Hear the future" = list(TRUE, "The Library is what the Bookhunters call it, a mystical place of life and death. <br>\
+			Should you conquer its trials, they say, you can find the book that will grant the answers to whatever it is you seek. <br>\
+			Black feathers and regret..."),
+	)
 
 	var/explosion_timer = 2 SECONDS
 	var/explosion_state = 3
@@ -49,6 +61,8 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/space_lady/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	OpenFire()
 	return
 
@@ -239,7 +253,8 @@
 
 /mob/living/simple_animal/hostile/abnormality/space_lady/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
-	Teleport()
+	if(breach_type != BREACH_MINING)
+		Teleport()
 
 
 //Bullets

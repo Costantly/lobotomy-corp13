@@ -19,6 +19,7 @@
 	base_pixel_x = -16
 	work_damage_amount = 8
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/envy
 
 	ego_list = list(
 		/datum/ego_datum/weapon/lutemia,
@@ -27,6 +28,16 @@
 	gift_type = /datum/ego_gifts/lutemis
 	gift_message = "Let's all become fruits. Let's hang together. Your despair, sadness... Let's all dangle down."
 	abnormality_origin = ABNORMALITY_ORIGIN_WONDERLAB
+
+	observation_prompt = "You pass by the containment cell and, in the corner of your eye, spy your comrades dangling from ribbons, furiously scratching at their necks in choked agony."
+	observation_choices = list(
+		"Save them" = list(TRUE, "Regardless of your resolution, you find yourself before the tree anyway as one of its ribbons wrap around your neck. <br>\
+			\"Let's dangle together, let your sorrows, your pain dangle, let's all dangle down...\" <br>It whispers into your mind. <br>\
+			Your comrades were never here, the life passes from your body painlessly. <br> None of this is real."),
+		"Do not save them" = list(TRUE, "Regardless of your resolution, you find yourself before the tree anyway as one of its ribbons wrap around your neck. <br>\
+			\"Let's dangle together, let your sorrows, your pain dangle, let's all dangle down...\" <br>It whispers into your mind. <br>\
+			Your comrades were never here, the life passes from your body painlessly. <br> None of this is real."),
+	)
 
 //Introduction to our hallucinations. This is a global hallucination, but it's all it really does.
 /mob/living/simple_animal/hostile/abnormality/dingledangle/ZeroQliphoth(mob/living/carbon/human/user)

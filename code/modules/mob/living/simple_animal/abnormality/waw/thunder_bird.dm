@@ -43,8 +43,8 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
-	//change the E.G.O to "warring"
 	ego_list = list(
 		/datum/ego_datum/weapon/warring,
 		/datum/ego_datum/weapon/warring2,
@@ -53,6 +53,16 @@
 	gift_type =  /datum/ego_gifts/warring
 	gift_message = "The totem somehow dons a seemingly ridiculous hat on your head."
 	abnormality_origin = ABNORMALITY_ORIGIN_ORIGINAL
+
+	observation_prompt = "The totem sits atop a pile of gore and viscera. <br>\
+		Human scalps dangle motionlessly, strung to its wings. <br>\
+		Though the totem lies still, you feel compelled to answer it."
+	observation_choices = list(
+		"Remain silent" = list(TRUE, "The disgusting totem answered with silence. <br>\
+			The Thunderbird had been defeated long ago, its existence being its only privilege."),
+		"Speak" = list(FALSE, "Before you can utter a word, thunder booms within the cell. <br>\
+			The Thunderbird can be spoken to, but never reasoned with."),
+	)
 
 /*---Combat---*/
 	//Melee stats
@@ -92,11 +102,11 @@
 	new /obj/structure/tbird_perch(get_turf(src))
 
 //attempts to charge its target regardless of distance with a short cooldown. Can be spammed if distant enough.
-/mob/living/simple_animal/hostile/abnormality/thunder_bird/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/thunder_bird/AttackingTarget(atom/attacked_target)
 	if(charging)
 		return
 	if(dash_cooldown <= world.time && prob(10) && !client)
-		thunder_bird_dash(target)
+		thunder_bird_dash(attacked_target)
 		return
 	return ..()
 
@@ -130,6 +140,7 @@
 /mob/living/simple_animal/hostile/abnormality/thunder_bird/death()
 	if(health > 0)
 		return
+	icon = 'ModularTegustation/Teguicons/abno_cores/waw.dmi'
 	density = FALSE
 	playsound(src, 'sound/abnormalities/thunderbird/tbird_charge.ogg', 100, 1)
 	animate(src, alpha = 0, time = 10 SECONDS)
@@ -261,7 +272,7 @@
 //thunderbolts
 /mob/living/simple_animal/hostile/abnormality/thunder_bird/proc/fireshell()
 	fire_cooldown = world.time + fire_cooldown_time
-	for(var/mob/living/carbon/human/L in livinginrange(fireball_range, src))
+	for(var/mob/living/carbon/human/L in range(fireball_range, src))
 		if(faction_check_mob(L, FALSE))
 			continue
 		if (targetAmount <= 2)
@@ -283,10 +294,12 @@
 	var/boom_damage = 50
 	layer = POINT_LAYER	//Sprite should always be visible
 	var/mob/living/simple_animal/hostile/abnormality/thunder_bird/master
+	var/duration = 3 SECONDS
+	var/range = 1
 
 /obj/effect/thunderbolt/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, PROC_REF(explode)), 3 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(Explode)), duration)
 
 //Zombie conversion through lightning bombs
 /obj/effect/thunderbolt/proc/Convert(mob/living/carbon/human/H)
@@ -304,13 +317,14 @@
 		C.name = "[H.real_name]"//applies the target's name and adds the name to its description
 		C.desc = "What appears to be [H.real_name], only charred and screaming incoherently..."
 		C.gender = H.gender
+		C.faction = master.faction
 		H.gib()
 	can_act = TRUE
 
 //Smaller Scorched Girl bomb
-/obj/effect/thunderbolt/proc/explode()
+/obj/effect/thunderbolt/proc/Explode()
 	playsound(get_turf(src), 'sound/abnormalities/thunderbird/tbird_bolt.ogg', 50, 0, 8)
-	var/list/turfs_to_check = view(1, src)
+	var/list/turfs_to_check = view(range, src)
 	for(var/mob/living/carbon/human/H in turfs_to_check)
 		H.deal_damage(boom_damage, BLACK_DAMAGE)
 		H.electrocute_act(1, src, flags = SHOCK_NOSTUN)
@@ -324,11 +338,12 @@
 	S.start()
 	qdel(src)
 
+
 /*--Zombies!--*/
 //zombie mob
 /mob/living/simple_animal/hostile/thunder_zombie
 	name = "Thunderbird Worshipper"
-	desc = "What appears to be human, only charred and screaming incoherently..."
+	desc = "An pitiable remnant of what was once human. Scalped, charred, and screaming incoherently..."
 	icon = 'ModularTegustation/Teguicons/32x32.dmi'
 	icon_state = "thunder_zombie"
 	icon_living = "thunder_zombie"
@@ -359,13 +374,13 @@
 	var/mob/living/simple_animal/hostile/abnormality/thunder_bird/master
 
 //Zombie conversion from zombie kills
-/mob/living/simple_animal/hostile/thunder_zombie/AttackingTarget()
+/mob/living/simple_animal/hostile/thunder_zombie/AttackingTarget(atom/attacked_target)
 	. = ..()
 	if(!can_act)
 		return
-	if(!ishuman(target))
+	if(!ishuman(attacked_target))
 		return
-	var/mob/living/carbon/human/H = target
+	var/mob/living/carbon/human/H = attacked_target
 	if(H.stat >= SOFT_CRIT || H.health < 0)
 		Convert(H)
 

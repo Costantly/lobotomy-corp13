@@ -11,6 +11,7 @@
 	base_pixel_y = -32
 	maxHealth = 400
 	health = 400
+	blood_volume = 0
 	start_qliphoth = 4
 	threat_level = TETH_LEVEL
 	work_chances = list(
@@ -21,7 +22,7 @@
 	)
 	work_damage_amount = 5
 	work_damage_type = WHITE_DAMAGE
-	chem_type = /datum/reagent/abnormality/abno_oil
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
 	ego_list = list(
 		/datum/ego_datum/weapon/noise,
@@ -34,6 +35,16 @@
 		/mob/living/simple_animal/hostile/abnormality/quiet_day = 1.5,
 		/mob/living/simple_animal/hostile/abnormality/khz = 1.5,
 		/mob/living/simple_animal/hostile/abnormality/army = 1.5,
+	)
+
+	observation_prompt = "You remember that day and this room still does. <br>\
+		As you wait, your radio hisses with static and ghostly voices, buried in electromagnetic snow. <br>\
+		\"h...e...l...p\" <br>\
+		A ghost from the past calls out, the voice is familiar but you can't place who it belongs to."
+	observation_choices = list(
+		"Tune your radio to 1.76 MHz" = list(TRUE, "You tune your radio and hear her plea plain as day, her voice is like sunshine. <br>\
+			Unbridled anger and sorrow at the unfairness of it all fills you as you leave the cell."),
+		"Forget" = list(FALSE, "But you can't forget. Not until you've atoned."),
 	)
 
 	var/reset_time = 4 MINUTES //Qliphoth resets after this time. To prevent bugs

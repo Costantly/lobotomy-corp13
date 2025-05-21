@@ -747,7 +747,7 @@
 /mob/living/simple_animal/hostile/spicebush_plant/proc/HealPulse()
 	pulse_cooldown = world.time + pulse_cooldown_time
 	//playsound(src, 'sound/abnormalities/rudolta/throw.ogg', 50, FALSE, 4)//TODO: proper SFX goes here
-	for(var/mob/living/carbon/human/L in livinginrange(8, src))//livinginview(8, src))
+	for(var/mob/living/carbon/human/L in range(8, src))//livinginview(8, src))
 		if(L.stat == DEAD || L.is_working)
 			continue
 		L.adjustBruteLoss(-2)
@@ -1002,13 +1002,14 @@
 /* Wishing Well - Broken Crown */
 /obj/effect/proc_holder/ability/brokencrown
 	name = "Broken Crown"
-	desc = "Extract a random empowered E.G.O. weapon once, return it to the armor to try for a different weapon."
+	desc = "Extract a random empowered E.G.O. weapon once, return it to the armor to try for a different weapon. The item will automatically be returned if the armor is taken off."
 	action_icon_state = "brokencrown0"
 	base_icon_state = "brokencrown"
 	cooldown_time = 5 MINUTES
 	var/obj/structure/toolabnormality/wishwell/linked_structure
 	var/list/ego_list = list()
 	var/obj/item/ego_weapon/chosenEGO
+	var/obj/item/linkeditem = null
 	var/ready = TRUE
 
 /obj/effect/proc_holder/ability/brokencrown/proc/Absorb(obj/item/I, mob/living/user)
@@ -1017,16 +1018,8 @@
 		return FALSE
 	if(!is_type_in_list(I, ego_list))
 		return FALSE
-	if(istype(I, /obj/item/ego_weapon))
-		var/obj/item/ego_weapon/egoweapon = I
-		if(egoweapon.force_multiplier < 1.2)
-			to_chat(user, span_notice("You must use a weapon with a damage multiplier of 20% or higher!"))
-			return FALSE
-		Reload(I, user)
-		return TRUE
-	if(istype(I, /obj/item/gun/ego_gun))
-		var/obj/item/gun/ego_gun/egogun = I
-		if(egogun.projectile_damage_multiplier < 1.2)
+	if(is_ego_melee_weapon(I))
+		if(I.force_multiplier < 1.2)
 			to_chat(user, span_notice("You must use a weapon with a damage multiplier of 20% or higher!"))
 			return FALSE
 		Reload(I, user)
@@ -1053,7 +1046,7 @@
 				linked_structure = TRUE
 		if(!LAZYLEN(ego_list))
 			for(var/egoitem in linked_structure.alephitem)
-				if(ispath(egoitem, /obj/item/ego_weapon) || ispath(egoitem, /obj/item/gun/ego_gun))
+				if(ispath(egoitem, /obj/item/ego_weapon) || ispath(egoitem, /obj/item/ego_weapon/ranged))
 					ego_list += egoitem
 					continue
 		chosenEGO = pick(ego_list)
@@ -1064,15 +1057,25 @@
 			egoweapon.name = "shimmering [egoweapon.name]"
 			egoweapon.set_light(3, 6, "#D4FAF37")
 			egoweapon.color = "#FFD700"
+			linkeditem = egoweapon
 
-		else if(ispath(ego, /obj/item/gun/ego_gun))
-			var/obj/item/gun/ego_gun/egogun = new ego(get_turf(user))
+		else if(ispath(ego, /obj/item/ego_weapon/ranged))
+			var/obj/item/ego_weapon/ranged/egogun = new ego(get_turf(user))
+			egogun.force_multiplier = 1.20
 			egogun.projectile_damage_multiplier = 1.20
 			egogun.name = "shimmering [egogun.name]"
 			egogun.set_light(3, 6, "#D4FAF37")
 			egogun.color = "#FFD700"
+			linkeditem = egogun
 		ready = FALSE
 		return ..()
+
+/obj/effect/proc_holder/ability/brokencrown/proc/Reabsorb()
+	if(linkeditem && !ready)
+		linkeditem.visible_message(span_userdanger("<font color='#CECA2B'>[linkeditem] glows brightly for a moment then... fades away without a trace.</font>"))
+		qdel(linkeditem)
+		ready = TRUE
+	return
 
 /* Opened Can of Wellcheers - Wellcheers */
 /obj/effect/proc_holder/ability/wellcheers
@@ -1103,10 +1106,10 @@
 	AddComponent(/datum/component/knockback, 1, FALSE, TRUE)
 	QDEL_IN(src, (90 SECONDS))
 
-/mob/living/simple_animal/hostile/shrimp/friendly/AttackingTarget()
+/mob/living/simple_animal/hostile/shrimp/friendly/AttackingTarget(atom/attacked_target)
 	. = ..()
 	if(.)
-		var/mob/living/L = target
+		var/mob/living/L = attacked_target
 		if(L.health < 0 || L.stat == DEAD)
 			L.gib() //Punch them so hard they explode
 /* Flesh Idol - Repentance */
@@ -1280,8 +1283,8 @@
 	AddComponent(/datum/component/swarming)
 	QDEL_IN(src, (20 SECONDS))
 
-/mob/living/simple_animal/hostile/naked_nest_serpent_friend/AttackingTarget()
-	var/mob/living/L = target
+/mob/living/simple_animal/hostile/naked_nest_serpent_friend/AttackingTarget(atom/attacked_target)
+	var/mob/living/L = attacked_target
 	var/datum/status_effect/stacking/infestation/INF = L.has_status_effect(/datum/status_effect/stacking/infestation)
 	if(!INF)
 		INF = L.apply_status_effect(/datum/status_effect/stacking/infestation)

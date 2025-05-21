@@ -23,6 +23,7 @@
 	stat_attack = DEAD
 	move_to_delay = 3
 	threat_level = WAW_LEVEL
+	fear_level = ALEPH_LEVEL
 	attack_sound = 'sound/weapons/bladeslice.ogg'
 	attack_verb_continuous = "stabs"
 	attack_verb_simple = "stab"
@@ -39,6 +40,8 @@
 	)
 	work_damage_amount = 12
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gluttony
+	good_hater = TRUE
 	death_message = "blows up like a balloon!"
 	speak_chance = 2
 	emote_see = list("honks.")
@@ -57,9 +60,38 @@
 	gift_message = "Life isn't scary when you don't fear death."
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
 
+//TODO : resprite
+	observation_prompt = "One of the containment cells at Lobotomy Corporation houses a clown. <br>\
+		Some people are afraid of clowns, but I don't mind them at all. <br>\
+		Even then, nobody could be fooled into believing this \"clown\" was just a person in makeup. <br>\
+		When I first met this thing, I started to understand how those people feel. <br>\
+		Right now, during my attachment work, it started its usual clown performance. <br>\
+		Things are looking good so far. <br>Out of its pocket, the clown pulls out..."
+	observation_choices = list(
+		"Run" = list(TRUE, "I bolted out of containment unit as fast as I could. <br>\
+		I could hear giggling as I left. <br>But that was more than just a cruel prank."),
+		"It's just a tool" = list(FALSE, "I thought it was a tool. <br>Just for that moment."),
+	)
+
 	del_on_death = FALSE //for explosions
 	var/finishing = FALSE
 	var/step = FALSE
+	var/finishing_small_damage = 5
+	var/finishing_big_damage = 30
+
+/mob/living/simple_animal/hostile/abnormality/clown/Login()
+	. = ..()
+	to_chat(src, "<h1>You are Clown Smiling at Me, A Combat Role Abnormality.</h1><br>\
+		<b>|Dark Carnival|: When you click on a tile which is outside your melee range, you will throw a knife towards that tile. Your knife will deal no damage to abnormalities, and will pass through them. \
+		If you hit a human with this knife, you will deal RED damage to them, slow them down massively and inflict 8 'Bleed'. \
+		Also, You blades are able to bounch against walls! Each time they bounch against a wall, their damage will be doubled!<br>\
+		<br>\
+		|Jovial Cutting|: When you attack a dead human, you will start rapidly gutting them, which will deal WHITE damage to all humans watching. \
+		A few seconds after gutting that human, you will gib them.<br>\
+		<br>\
+		|Bleed|: When a target with bleed moves, they will take True damage equal to the stack, then it reduces by half.<br>\
+		<br>\
+		|A Show’s End|: Once you reach 0 HP, you will explode which deal great RED damage to nearby humans, inflict 30 'Bleed' and leave behind a few trails of lube, which can slip humans who cross them.</b>")
 
 //A clown isn't a clown without his shoes
 /mob/living/simple_animal/hostile/abnormality/clown/BreachEffect(mob/living/carbon/human/user, breach_type)
@@ -94,12 +126,12 @@
 			return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/clown/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/clown/AttackingTarget(atom/attacked_target)
 	. = ..()
 	if(.)
-		if(!ishuman(target))
+		if(!ishuman(attacked_target))
 			return
-		var/mob/living/carbon/human/TH = target
+		var/mob/living/carbon/human/TH = attacked_target
 		if(TH.health < 0)
 			finishing = TRUE
 			TH.Stun(4 SECONDS)
@@ -109,16 +141,16 @@
 					finishing = FALSE
 					return
 				TH.attack_animal(src)
-				for(var/mob/living/carbon/human/H in view(7, get_turf(src)))
-					H.deal_damage(5, WHITE_DAMAGE)
+				for(var/mob/living/carbon/human/H in ohearers(7, get_turf(src)))
+					H.deal_damage(finishing_small_damage, WHITE_DAMAGE)
 				SLEEP_CHECK_DEATH(2)
 			if(!targets_from.Adjacent(TH) || QDELETED(TH))
 				finishing = FALSE
 				return
 			playsound(get_turf(src), 'sound/abnormalities/clownsmiling/final_stab.ogg', 50, 1)
 			TH.gib()
-			for(var/mob/living/carbon/human/H in view(7, get_turf(src)))
-				H.deal_damage(30, WHITE_DAMAGE)
+			for(var/mob/living/carbon/human/H in ohearers(7, get_turf(src)))
+				H.deal_damage(finishing_big_damage, WHITE_DAMAGE)
 
 /mob/living/simple_animal/hostile/abnormality/clown/MoveToTarget(list/possible_targets)
 	if(ranged_cooldown <= world.time)
@@ -172,7 +204,10 @@
 	playsound(get_turf(src), 'sound/abnormalities/clownsmiling/announcedead.ogg', 75, 1)
 	for(var/mob/living/L in view(5, src))
 		if(!faction_check_mob(L))
-			L.deal_damage(50, RED_DAMAGE)
+			L.deal_damage(25, RED_DAMAGE)
+			if(IsCombatMap())
+				L.apply_lc_bleed(30)
+	new /obj/effect/particle_effect/foam(get_turf(src))
 	gib()
 
 //Clown picture-related code

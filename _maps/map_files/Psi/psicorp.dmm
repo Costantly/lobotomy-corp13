@@ -2986,7 +2986,8 @@
 /area/facility_hallway/discipline)
 "pZ" = (
 /obj/machinery/door/airlock/highsecurity{
-	name = "Lower Level Department"
+	name = "Lower Level Department";
+	hackProof = 1
 	},
 /turf/open/floor/facility/halls,
 /area/department_main/extraction)
@@ -3978,6 +3979,24 @@
 	},
 /turf/open/floor/plasteel/sepia,
 /area/facility_hallway/command)
+"vT" = (
+/obj/effect/turf_decal/tile/yellow{
+	dir = 4
+	},
+/obj/effect/turf_decal/tile/yellow{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/yellow{
+	dir = 8
+	},
+/obj/effect/turf_decal/tile/yellow,
+/obj/machinery/light/cold/no_nightlight{
+	dir = 1
+	},
+/obj/machinery/camera/autoname,
+/obj/structure/extraction_belt,
+/turf/open/floor/plasteel/dark,
+/area/department_main/extraction)
 "vX" = (
 /obj/effect/turf_decal/siding/yellow,
 /turf/open/floor/carpet/stellar,
@@ -8970,7 +8989,8 @@
 /area/facility_hallway/discipline)
 "VH" = (
 /obj/machinery/door/airlock/highsecurity{
-	name = "Records Office"
+	name = "Records Office";
+	hackProof = 1
 	},
 /turf/open/floor/facility/dark,
 /area/department_main/extraction)
@@ -9930,7 +9950,8 @@
 	dir = 4
 	},
 /obj/machinery/door/airlock/vault{
-	name = "Dont Touch Me containment zone"
+	name = "Dont Touch Me containment zone";
+	hackProof = 1
 	},
 /turf/open/floor/plasteel/dark,
 /area/department_main/extraction)
@@ -28221,7 +28242,7 @@ jc
 jc
 jc
 jc
-TO
+vT
 ve
 ve
 dN

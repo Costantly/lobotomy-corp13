@@ -15,6 +15,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 	max_boxes = 15
 
 	ego_list = list(
@@ -37,7 +38,6 @@
 		say("You again? Fine. We'll play again.")
 	else
 		say("I'll go fer scissors. How 'bout you?")
-	last_worked = user
 	return TRUE
 
 
@@ -49,7 +49,6 @@
 	if(pe == 0) //work fail
 		Win(user, work_type)
 		return
-
 	switch(work_type)
 		if("Scissors")
 			player = 0
@@ -61,17 +60,29 @@
 	player*=3
 	player += janken
 
+	var/cheat_chance = FALSE
+	//If you paid PE to the rep, you can cheat in this game.
+	for(var/upgradecheck in GLOB.jcorp_upgrades)
+		if(upgradecheck == "Abno Luck")
+			cheat_chance = TRUE
+
 	//Goes through every use case.
 	//Ties, When both digits are the same.
 	//Lose, when the player loses
 	//Win, when the player wins
 	switch(player)
 		if(0, 4, 8)
-			Tie(user, work_type)
+			if(prob(10) && cheat_chance)
+				Lose(user, work_type)
+			else
+				Tie(user, work_type)
 		if(2, 5, 6)
 			Lose(user, work_type)
 		if(1, 3, 7)
-			Win(user, work_type)
+			if(prob(10) && cheat_chance)
+				Lose(user, work_type)
+			else
+				Win(user, work_type)
 	..()
 
 /mob/living/simple_animal/hostile/abnormality/willyouplay/proc/Tie(mob/living/carbon/human/user, work_type)
@@ -82,11 +93,13 @@
 		say("I don't play with folks who don't trust me.")
 	else
 		say("Hmph, a draw. You got lucky this time.")
+	IncreaseStats(user, 1, FALSE)
 
 //Player wins RPS, loses an arm tho
 /mob/living/simple_animal/hostile/abnormality/willyouplay/proc/Win(mob/living/carbon/human/user, work_type)
 	say("You lose.")
 	user.deal_damage(80, RED_DAMAGE)
+	IncreaseStats(user, 1, FALSE)
 
 	//Less than 80 fort and you lose an arm
 	if(get_attribute_level(user, FORTITUDE_ATTRIBUTE) <= 60)
@@ -99,7 +112,6 @@
 			return
 
 /mob/living/simple_animal/hostile/abnormality/willyouplay/proc/Lose(mob/living/carbon/human/user, work_type)
-	var/list/attribute_list = list(FORTITUDE_ATTRIBUTE, PRUDENCE_ATTRIBUTE, TEMPERANCE_ATTRIBUTE, JUSTICE_ATTRIBUTE)
 	var/statgain
 	if(user == last_worked)
 		statgain = -2
@@ -108,20 +120,21 @@
 		statgain += 4
 		SLEEP_CHECK_DEATH(20)
 		say("You win. Scissors are only useful when cloth's around")
-		for(var/A in attribute_list)
-			var/processing = get_attribute_level(user, A)
-			if(processing > 80)
-				return
-			user.adjust_attribute_level(A, statgain)
+		IncreaseStats(user, statgain, TRUE)
 
 
 	else	//Big Air bonus for picking the funny rare one
 		statgain += 7
 		say("You win, now get outta here.")
-		for(var/A in attribute_list)
-			var/processing = get_attribute_level(user, A)
-			if(processing > 80)
-				return
-			user.adjust_attribute_level(A, statgain)
+		IncreaseStats(user, statgain, TRUE)
 
-
+/mob/living/simple_animal/hostile/abnormality/willyouplay/proc/IncreaseStats(mob/living/carbon/human/user, statgain, check_melt = FALSE)
+	var/list/attribute_list = list(FORTITUDE_ATTRIBUTE, PRUDENCE_ATTRIBUTE, TEMPERANCE_ATTRIBUTE, JUSTICE_ATTRIBUTE)
+	for(var/A in attribute_list)
+		var/processing = get_raw_level(user, A)
+		if(processing > 80)
+			if(check_melt == TRUE && datum_reference.console.meltdown)
+				user.adjust_attribute_level(A, 1)
+			continue
+		user.adjust_attribute_level(A, statgain)
+	last_worked = user

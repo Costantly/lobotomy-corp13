@@ -35,6 +35,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/lust
 
 	ego_list = list(
 		/datum/ego_datum/weapon/my_own_bride,
@@ -42,6 +43,14 @@
 	)
 	gift_type =  /datum/ego_gifts/bride
 	abnormality_origin = ABNORMALITY_ORIGIN_WONDERLAB
+
+	observation_prompt = "The King Pygmalion prayed earnestly to the Goddess Aphrodite, wishing for the marble statue he had made and fallen in love to come to life. <br>\
+		She answered his prayer, bringing Galatea to life and united them in matrinomy. <br>\
+		What is the real name of the abnormality before you?"
+	observation_choices = list(
+		"Galatea" = list(TRUE, "Perhaps they sculpted each other."),
+		"Pygmalion" = list(TRUE, "Perhaps they sculpted each other."),
+	)
 
 	var/missing_prudence = 0
 	var/mob/living/carbon/human/sculptor = null
@@ -64,6 +73,8 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/pygmalion/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	return OpenFire()
 
 /mob/living/simple_animal/hostile/abnormality/pygmalion/OpenFire()
@@ -158,7 +169,7 @@
 		if(client)
 			to_chat(src, span_userdanger("The sculptor is in danger. It is now your duty to protect them!"))
 
-		threat_level = TETH_LEVEL
+		fear_level = TETH_LEVEL
 		var/datum/attribute/user_attribute = sculptor.attributes[PRUDENCE_ATTRIBUTE]
 		var/user_attribute_level = max(1, user_attribute.level)
 		if (user_attribute_level > PRUDENCE_CAP)

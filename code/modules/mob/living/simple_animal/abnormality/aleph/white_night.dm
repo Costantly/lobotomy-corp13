@@ -35,6 +35,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	)
 	work_damage_amount = 14
 	work_damage_type = PALE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 	can_patrol = FALSE
 
 	light_system = MOVABLE_LIGHT
@@ -50,6 +51,14 @@ GLOBAL_LIST_EMPTY(apostles)
 
 	grouped_abnos = list(
 		/mob/living/simple_animal/hostile/abnormality/onesin = 5,
+	)
+
+	observation_prompt = "Thou knocked the door, now it hath opened. <br>\
+		Thou who carries burden, came to seek the answer."
+	observation_choices = list( // TODO IN A FEW YEARS: multiple messages, the answer should be irrelevant, code should check for wing gift.
+		"Where did you come from?" = list(TRUE, "I am from the end." ),
+		"Who are you?" = list(FALSE, "Thy question is empty, I cannot answer"),
+		"Why have you come?" = list(FALSE, "Thy question is empty, I cannot answer"),
 	)
 
 	var/holy_revival_cooldown
@@ -96,6 +105,7 @@ GLOBAL_LIST_EMPTY(apostles)
 			revive_humans()
 
 /mob/living/simple_animal/hostile/abnormality/white_night/death(gibbed)
+	GrantMedal()
 	for(var/mob/living/carbon/human/heretic in heretics)
 		if(heretic.stat == DEAD || !heretic.ckey)
 			continue
@@ -130,14 +140,14 @@ GLOBAL_LIST_EMPTY(apostles)
 					(target_c.y + i <= world.maxy ? getline(locate(min(target_c.x + i, world.maxx), target_c.y + i, target_c.z), locate(max(target_c.x - i + 1, 1), target_c.y + i, target_c.z)) : list()) +\
 					(target_c.x - i > 0 			? getline(locate(target_c.x - i, min(target_c.y + i, world.maxy), target_c.z), locate(target_c.x - i, max(target_c.y - i + 1, 1), target_c.z)) : list())
 		for(var/turf/open/T in turf_list)
+			CHECK_TICK
 			if(faction_check != "apostle")
 				RVP.NewSparkles(T, 10, "#AAFFAA") // Indicating that it's a good thing
 			else
 				RVP.NewCultSparks(T, 10)
 			for(var/mob/living/L in T)
 				RVP.NewCultIn(T, L.dir)
-				addtimer(CALLBACK(src, PROC_REF(revive_target), L, i, faction_check))
-			CHECK_TICK
+				INVOKE_ASYNC(src, PROC_REF(revive_target), L, i, faction_check)
 		SLEEP_CHECK_DEATH(1.5)
 
 /mob/living/simple_animal/hostile/abnormality/white_night/proc/revive_target(mob/living/L, attack_range = 1, faction_check = "apostle")
@@ -213,6 +223,9 @@ GLOBAL_LIST_EMPTY(apostles)
 	return
 
 /mob/living/simple_animal/hostile/abnormality/white_night/BreachEffect(mob/living/carbon/human/user, breach_type)
+	if(breach_type == BREACH_MINING)
+		qdel(src)
+		return
 	holy_revival_cooldown = world.time + holy_revival_cooldown_base
 	. = ..()
 	for(var/mob/M in GLOB.player_list)
@@ -228,6 +241,15 @@ GLOBAL_LIST_EMPTY(apostles)
 	particles = new /particles/white_night()
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(sound_to_playing_players), 'sound/abnormalities/whitenight/rapture2.ogg', 50), 10 SECONDS)
 	return
+
+/// Grants medals and achievements to surrounding players
+//May move this to _abnormality some day.
+/mob/living/simple_animal/hostile/abnormality/white_night/proc/GrantMedal()
+	if(!client && !(flags_1 & ADMIN_SPAWNED_1) && SSachievements.achievements_enabled)
+		for(var/mob/living/L in view(7,src))
+			if(L.stat || !L.client)
+				continue
+			L.client.give_award(/datum/award/achievement/lc13/white_night, L)
 
 /* Apostles */
 
@@ -293,17 +315,19 @@ GLOBAL_LIST_EMPTY(apostles)
 		return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/apostle/AttackingTarget()
+/mob/living/simple_animal/hostile/apostle/AttackingTarget(atom/attacked_target)
 	if(!can_act)
 		return
 
-	if(isliving(target))
-		var/mob/living/L = target
+	if(isliving(attacked_target))
+		var/mob/living/L = attacked_target
 		if(faction_check_mob(L))
 			return
 	. = ..()
-	if(. && isliving(target))
+	if(. && isliving(attacked_target))
 		if(!client && ranged && ranged_cooldown <= world.time)
+			if(!target)
+				GiveTarget(attacked_target)
 			OpenFire()
 
 /mob/living/simple_animal/hostile/apostle/scythe

@@ -8,6 +8,8 @@
 	portrait = "fan"
 	maxHealth = 400
 	health = 400
+	speak_emote = list("states")
+	speech_span = SPAN_ROBOT
 	threat_level = HE_LEVEL
 	start_qliphoth = 1
 	work_chances = list(
@@ -18,6 +20,7 @@
 	)
 	work_damage_amount = 5
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 	max_boxes = 12
 
 	ego_list = list(
@@ -26,6 +29,16 @@
 	)
 	gift_type = /datum/ego_gifts/metal
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+	observation_prompt = "It's an ordinary office fan, made of metal. <br>It's turned off for now and you're feeling warm. <br>\
+		Turn it on?"
+	observation_choices = list(
+		"Set it to 3" = list(TRUE, "You set it to its highest setting. <br>The breeze feels pleasant, a nap would be nice..."),
+		"Leave it off" = list(FALSE, "It's just an old urban legend, but, they say fans like this one can kill people if you slept with them on..."),
+		"Set it to 1" = list(FALSE, "It's not enough, you're still too hot!"),
+		"Set it to 2" = list(FALSE, "You can barely feel a breeze, you just need a little more..."),
+	)
+
 	var/list/safe = list()
 	var/list/warning = list()
 	var/list/danger = list()
@@ -33,7 +46,6 @@
 	var/safework = FALSE //Safe if the abnormality was melting
 	var/successcount
 	var/turned_off = FALSE
-
 
 /mob/living/simple_animal/hostile/abnormality/fan/examine(mob/user)
 	. = ..()
@@ -162,7 +174,7 @@
 	if(stacks <= 10)
 		return
 	owner.deal_damage((stacks / 5), RED_DAMAGE)
-	owner.playsound_local(owner, 'sound/effects/book_burn.ogg', 25, TRUE)
+	owner.playsound_local(owner, 'sound/effects/burn.ogg', 25, TRUE)
 
 /datum/status_effect/stacking/fanhot/on_remove()
 	. = ..()

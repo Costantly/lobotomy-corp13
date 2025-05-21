@@ -13,7 +13,7 @@ SUBSYSTEM_DEF(cityevents)
 	var/list/distortions_available = list()
 	var/helpful_events = list("chickens", "money", "tresmetal", "hppens", "sppens")
 	var/harmful_events = list("drones", "beaks", "shrimps", "lovetowneasy", "lovetownhard")
-	var/ordeal_events = list("sweepers", "scouts", "bots", "gbugs", "gcorporals")
+	var/ordeal_events = list("sweepers", "scouts", "bots", "gbugs")
 	var/neutral_events = list("swag")
 	var/boss_events = list("sweeper", "lovetown", "factory", "gcorp")
 	var/list/generated = list()	//Which ckeys have generated stats
@@ -53,7 +53,7 @@ SUBSYSTEM_DEF(cityevents)
 	total_events += pick(helpful_events)
 	total_events += pick(harmful_events)
 	total_events += pick(ordeal_events)
-//	total_events += pick(ordeal_events)
+	total_events += pick(ordeal_events)
 //	total_events += pick(ordeal_events)
 	total_events += pick(neutral_events)
 	total_events += pick(neutral_events)
@@ -84,14 +84,12 @@ SUBSYSTEM_DEF(cityevents)
 			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/green_bot, 10)
 		if("gbugs")
 			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/steel_dawn, 30)
-		if("gcorporals")
-			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/steel_dawn/steel_noon, 10)
 
 		//Harmful events
 		if("shrimps")
 			spawnatlandmark(/mob/living/simple_animal/hostile/shrimp, 20)
 		if("beaks")
-			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/bigBirdEye, 10)
+			spawnatlandmark(/mob/living/simple_animal/hostile/ordeal/bigbird_eye, 10)
 		if("drones")
 			spawnatlandmark(/mob/living/simple_animal/hostile/kcorp/drone, -10)//extremely low chance
 		if("lovetowneasy")
@@ -117,6 +115,8 @@ SUBSYSTEM_DEF(cityevents)
 		if("swag")
 			spawnitem(/obj/item/clothing/shoes/swagshoes, 2)	// Swag out, man
 	wavetime+=1
+	if(prob(50))
+		JobAddition()
 
 //Spawning Mobs, always spawns 3.
 /datum/controller/subsystem/cityevents/proc/spawnatlandmark(mob/living/L, chance)
@@ -136,6 +136,30 @@ SUBSYSTEM_DEF(cityevents)
 	for(var/J in itemdrops)
 		if(prob(chance))
 			new I (get_turf(J))
+
+//Add in random antags as time goes on.
+/datum/controller/subsystem/cityevents/proc/JobAddition()
+	var/jobpicked = rand(1,5)
+	for(var/datum/job/processing in SSjob.occupations)
+		if(jobpicked <= 2)
+			if(istype(processing, /datum/job/scavenger))
+				deadchat_broadcast("A Rat job slot has just opened, respawn to play as one.", message_type=DEADCHAT_ANNOUNCEMENT)
+				processing.total_positions +=1
+
+		if(jobpicked == 3)
+			if(istype(processing, /datum/job/associateroaming))
+				deadchat_broadcast("A Roaming association job slot has just opened, respawn to play as one.", message_type=DEADCHAT_ANNOUNCEMENT)
+				processing.total_positions +=1
+
+		if(jobpicked == 4)
+			if(istype(processing, /datum/job/roamingsalsu))
+				deadchat_broadcast("A Blade Lineage Salsu job slot has just opened, respawn to play as one.", message_type=DEADCHAT_ANNOUNCEMENT)
+				processing.total_positions += 1
+
+		if(jobpicked == 5)
+			if(istype(processing, /datum/job/butcher))
+				deadchat_broadcast("A Backstreets Butcher job slot has just opened, respawn to play as one.", message_type=DEADCHAT_ANNOUNCEMENT)
+				processing.total_positions += 1
 
 /datum/controller/subsystem/cityevents/proc/Boss()
 	minor_announce("Warning, large hostile detected. Suppression required.", "Local Activity Alert:", TRUE)

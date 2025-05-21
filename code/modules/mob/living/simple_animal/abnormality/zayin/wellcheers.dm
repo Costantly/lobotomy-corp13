@@ -56,6 +56,23 @@
 	harvest_phrase = span_notice("The machine dispenses some clear-ish soda into %VESSEL.")
 	harvest_phrase_third = "%PERSON holds up %VESSEL and lets %ABNO dispense some clear-ish soda into it."
 
+	observation_prompt = "A vending machine stands before you. <br>\
+		Two delicious looking shrimp are standing at both sides of the machine. <br>Will you buy soda?"
+	observation_choices = list(
+		"Yes" = list(TRUE, "Before you can make a choice, one of the shrimp buys you soda. <br>\
+			You drink the soda, and fall asleep... <br>... <br>Somewhere in the distance, you hear seagulls."),
+		"No" = list(TRUE, "Before you can make a choice, one of the shrimp buys you soda. <br>\
+			You drink the soda, and fall asleep... <br>... <br>Somewhere in the distance, you hear seagulls.")
+	)
+
+//Not only is it funny, I want it to have the shit it does on Legacy
+/mob/living/simple_animal/hostile/abnormality/wellcheers/Initialize()
+	if(SSmaptype.chosen_trait == FACILITY_TRAIT_LEGACY_PALE)
+		work_damage_amount = 2
+		work_damage_type = PALE_DAMAGE
+	. = ..()
+
+
 /mob/living/simple_animal/hostile/abnormality/wellcheers/HandleStructures()
 	. = ..()
 	if(!.)

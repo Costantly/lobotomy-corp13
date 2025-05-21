@@ -206,7 +206,21 @@
 	if(dextrous && !ismob(A))
 		..()
 	else
-		AttackingTarget(A)
+		if(isturf(A) || iseffect(A))
+			var/turf/T = get_turf(A)
+			for(var/mob/living/L in T)
+				if(istype(L, /mob/living/simple_animal/projectile_blocker_dummy))
+					var/mob/living/simple_animal/projectile_blocker_dummy/pbd = L
+					if(pbd.parent == src)
+						continue
+					L = pbd.parent
+				if(L.invisibility > see_invisible)
+					continue
+				if(L.stat != DEAD)
+					target = L
+					break
+				target = L
+		AttackingTarget(target)
 
 
 

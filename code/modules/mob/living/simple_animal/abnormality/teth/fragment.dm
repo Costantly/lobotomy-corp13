@@ -31,12 +31,22 @@
 	)
 	work_damage_amount = 5
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/envy
+
 	ego_list = list(
 		/datum/ego_datum/weapon/fragment,
 		/datum/ego_datum/armor/fragment,
 	)
 	gift_type =  /datum/ego_gifts/fragments
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "It started singing. You..."
+	observation_choices = list(
+		"Listen to it" = list(TRUE, "You silently listen to it. \
+			The universe lingers in your ears. You see the song. Glamorously, it approaches you."),
+		"Plug your ears" = list(FALSE, "You are not prepared yet. The song stopped when you plugged the ears."),
+	)
+
 	var/song_cooldown
 	var/song_cooldown_time = 10 SECONDS
 	var/song_damage = 5 // Dealt 8 times
@@ -49,6 +59,13 @@
 
 	//PLAYABLES ACTIONS
 	attack_action_types = list(/datum/action/cooldown/fragment_song)
+
+/mob/living/simple_animal/hostile/abnormality/fragment/Login()
+	. = ..()
+	to_chat(src, "<h1>You are Fragment of the Universe, A Combat Role Abnormality.</h1><br>\
+		<b>|Echoes of the Stars|: You are able to trigger your “Song” ability using the button on your screen or a hotkey (Spacebar by Default).<br>\
+		While you are using your “Song” all humans that you see will start taking WHITE damage over time.<br>\
+		This attack goes through the Rhinos mechs, which can cause the user to panic within the mech and become completely helpless.</b>")
 
 /datum/action/cooldown/fragment_song
 	name = "Sing"
@@ -179,3 +196,9 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 
 #undef FRAGMENT_SONG_COOLDOWN
+
+
+/mob/living/simple_animal/hostile/abnormality/fragment/proc/TriggerSong()
+	for(var/datum/action/cooldown/fragment_song/A in actions)
+		A.Trigger()
+

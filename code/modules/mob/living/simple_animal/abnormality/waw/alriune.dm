@@ -26,10 +26,21 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/pride
+	good_hater = TRUE
 
 	light_color = COLOR_PINK
 	light_range = 9
 	light_power = 1
+
+	observation_prompt = "You told me, shedding petals instead of tears. <br>\
+		\"We were all nothing but soil once, so do not speak of an end here.\" <br>\
+		You told me, blossoming flowers from body as if they are your last words. <br>\"Soon...\""
+	observation_choices = list(
+		"Spring will come" = list(TRUE, "Spring is coming. <br>Slowly, rapturously, my end began."),
+		"Winter will come" = list(TRUE, "Winter is coming. <br>\
+			Gradually, my exipation was drawing to an end hectically."),
+	)
 
 	/// Currently displayed petals. When value is at 3 - reset to 0 and perform attack
 	var/petals_current = 0
@@ -142,7 +153,8 @@
 /mob/living/simple_animal/hostile/abnormality/alriune/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
 	petals_next = world.time + petals_next_time + 30
-	TeleportAway()
+	if(breach_type != BREACH_MINING)//in ER you get a few seconds to smack it down
+		TeleportAway()
 	icon_state = "alriune_active"
 	return
 

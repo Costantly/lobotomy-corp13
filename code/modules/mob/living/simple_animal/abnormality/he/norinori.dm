@@ -33,6 +33,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gluttony
 
 	ego_list = list(
 		/datum/ego_datum/weapon/split,
@@ -40,6 +41,28 @@
 	)
 	gift_type =  /datum/ego_gifts/split
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+	observation_prompt = "The split fox stands before you. <br>\
+		Despite it's unassuming appearance, this thing can kill you in seconds. <br>\
+		You have been tasked to work on this creature. <br>\
+		What type of work will you attempt? <br>\
+		Choose carefully."
+	observation_choices = list(
+		"Inject Cogito" = list(TRUE, "You prepare to start instinct work .<br>\
+			... <br>\
+			Checking Vitals <br>\
+			... <br>\
+			Adjusting Fluid Intake <br>\
+			... <br>\
+			Allocating 37% Cogito <br>\
+			... <br>\
+			The work is complete, <br>you report the good result to the work log."),
+		"Try to make friends with it" = list(FALSE, "Surely such a cute thing must be friendly, right? <br>\
+			It seems you have not learned your lesson <br>\
+			The split fox senses your intent. <br>\
+			It opens up, revealing a core connected to several sharp cutting tools <br>\
+			You are too close to get away."),
+	)
 
 //breach related
 	var/can_act = TRUE
@@ -93,6 +116,8 @@
 	if(!ishuman(died))
 		return FALSE
 	if(!died.ckey)
+		return FALSE
+	if(died.z != z)
 		return FALSE
 	datum_reference.qliphoth_change(-1) // One death reduces it
 	return TRUE

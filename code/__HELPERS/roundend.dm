@@ -179,6 +179,39 @@
 		file_data["wanted"] = list("author" = "[GLOB.news_network.wanted_issue.scannedUser]", "criminal" = "[GLOB.news_network.wanted_issue.criminal]", "description" = "[GLOB.news_network.wanted_issue.body]", "photo file" = "[GLOB.news_network.wanted_issue.photo_file]")
 	WRITE_FILE(json_file, json_encode(file_data))
 
+//LC13 Survival Achivments
+/datum/controller/subsystem/ticker/proc/SurvivalAwards(client/player_client)
+	if(!ishuman(player_client.mob))
+		return FALSE
+	var/mob/living/carbon/human/human_mob = player_client.mob
+	if(human_mob.stat == DEAD)
+		return FALSE
+
+	if(human_mob.mind)
+		var/datum/mind/M = human_mob.mind
+		if(M.get_skill_level(/datum/skill/fishing) >= 6)
+			player_client.give_award(/datum/award/achievement/lc13/scorpworld, human_mob)
+		//If you join not from roundstart you do not apply for these achivements.
+		if(M.late_joiner)
+			return FALSE
+
+		if(SSmaptype.maptype == "standard")
+			//Standard LC13 Gamemode Achivements.
+			var/list/valid_roles = list(
+				"Manager",
+				"Clerk",
+				"Agent Captain",
+				"Agent",
+				"Agent Intern",
+				"Extraction Officer",
+				"Records Officer",
+				"Training Officer",
+				)
+			if(M.assigned_role in valid_roles)
+				player_client.give_award(/datum/award/achievement/lc13/lcorpworld, human_mob)
+			if(istype(human_mob.ego_gift_list["Right Back Slot"], /datum/ego_gifts/twilight))
+				player_client.give_award(/datum/award/achievement/lc13/twilight, human_mob)
+
 ///Handles random hardcore point rewarding if it applies.
 /datum/controller/subsystem/ticker/proc/HandleRandomHardcoreScore(client/player_client)
 	if(!ishuman(player_client.mob))
@@ -230,6 +263,9 @@
 	var/speed_round = FALSE
 	if(world.time - SSticker.round_start_time <= 300 SECONDS)
 		speed_round = TRUE
+	var/check_survival = FALSE
+	if(world.time - SSticker.round_start_time >= 1 HOURS)
+		check_survival = TRUE
 
 	for(var/client/C in GLOB.clients)
 		if(!C.credits)
@@ -237,6 +273,9 @@
 		C.playcreditsmusic(40)//playtitlemusic(40) // Tegustation Music edit
 		if(speed_round)
 			C.give_award(/datum/award/achievement/misc/speed_round, C.mob)
+		//You survived for more than a hour!
+		if(check_survival)
+			SurvivalAwards(C)
 		HandleRandomHardcoreScore(C)
 
 	var/popcount = gather_roundend_feedback()
@@ -337,6 +376,9 @@
 	//PE Quota
 	if(SSmaptype.maptype == "standard")
 		parts += pe_report()
+	//Enkephalin Rush
+	if(SSmaptype.maptype == "enkephalin_rush")
+		parts += mining_report()
 
 	listclearnulls(parts)
 
@@ -348,7 +390,7 @@
 
 	if(GLOB.round_id)
 		var/statspage = CONFIG_GET(string/roundstatsurl)
-		var/info = statspage ? "<a href='?action=openLink&link=[url_encode(statspage)][GLOB.round_id]'>[GLOB.round_id]</a>" : GLOB.round_id
+		var/info = statspage ? "<a href='byond://?action=openLink&link=[url_encode(statspage)][GLOB.round_id]'>[GLOB.round_id]</a>" : GLOB.round_id
 		parts += "[FOURSPACES]Round ID: <b>[info]</b>"
 	parts += "[FOURSPACES]Shift Duration: <B>[DisplayTimeText(world.time - SSticker.round_start_time)]</B>"
 	parts += "[FOURSPACES]Facility Integrity: <B>[mode.station_was_nuked ? "<span class='redtext'>Destroyed</span>" : "[popcount["station_integrity"]]%"]</B>"
@@ -737,7 +779,7 @@
 	var/datum/action/report/R = new
 	C.player_details.player_actions += R
 	R.Grant(C.mob)
-	to_chat(C,"<a href='?src=[REF(R)];report=1'>Show roundend report again</a>")
+	to_chat(C,"<a href='byond://?src=[REF(R)];report=1'>Show roundend report again</a>")
 
 /datum/action/report
 	name = "Show roundend report"
@@ -867,3 +909,21 @@
 				return
 			qdel(query_update_everything_ranks)
 		qdel(query_check_everything_ranks)
+
+//enkephalin rush roundend stuff
+/datum/controller/subsystem/ticker/proc/mining_report()
+	. = list()
+	var/repaired_machines = (GLOB.lobotomy_repairs)
+	var/total_machines = (GLOB.lobotomy_damages)
+	var/facility_full_percentage = 100 * (repaired_machines / total_machines)
+	. += "<span class='header'>Site Recovery Report</span>"
+	. += "<div class='panel stationborder'>"
+	. += "[facility_full_percentage]% of the facility has been recovered!<br>"
+	if(facility_full_percentage >= 100)
+		. += "The facility is fully functional!<br>"
+	if(GLOB.bough_collected)
+		. += "The golden bough has been successfully retrieved!<br>"
+	else
+		. += "You have failed to collect the golden bough.<br>"
+	. += "</div>"
+	return

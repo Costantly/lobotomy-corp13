@@ -17,7 +17,7 @@
 	start_qliphoth = 3
 	work_damage_amount = 5		//Calculated later
 	work_damage_type = WHITE_DAMAGE
-	chem_type = /datum/reagent/abnormality/woe
+	chem_type = /datum/reagent/abnormality/sin/gloom
 	pixel_x = -32
 	base_pixel_x = -32
 
@@ -27,6 +27,15 @@
 	)
 	gift_type =  /datum/ego_gifts/sorority
 	abnormality_origin = ABNORMALITY_ORIGIN_WONDERLAB
+
+	observation_prompt = "You sit cross-legged before the pair, flowers conceal their faces and expression. <br>\
+		\"Ahh, woe is us. We have become sinners. Please hear us, hear of our sins that we do not know we've committed, and absolve us of our grief...\""
+	observation_choices = list(
+		"Listen to their story" = list(TRUE, "You exit the cell, their story leaving your mind and voices on the wind but their sorrow remains. <br>\
+			You'll be back again and still won't understand their grief."),
+		"Don't listen" = list(TRUE, "You exit the cell, their story leaving your mind and voices on the wind but their sorrow remains. <br>\
+			You'll be back again and still won't understand their grief."),
+	)
 
 	var/breaching = FALSE
 

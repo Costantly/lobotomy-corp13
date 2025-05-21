@@ -18,7 +18,7 @@
 
 	work_damage_amount = 7
 	work_damage_type = WHITE_DAMAGE
-	chem_type = /datum/reagent/abnormality/woe
+	chem_type = /datum/reagent/abnormality/sin/sloth
 	start_qliphoth = 2
 	var/scream_range = 10
 	var/scream_damage = 45
@@ -28,6 +28,16 @@
 	)
 	gift_type =  /datum/ego_gifts/wedge
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "A woman is crying. \
+		You cannot see her face as you are turned back to her. But you know who she is. \
+		Her muttering is unintelligible, and it gives you goosebumps. You don't like being in the same space with her. \
+		You want to get out. The woman seems to be sobbing. You feel as though her crying is insisting you to turn towards her. \
+		And you also feel, that you should not."
+	observation_choices = list(
+		"Turn back" = list(TRUE, "You face the fear, and turn to face the woman."),
+		"Do not turn back" = list(FALSE, "Something terrible could happen if you turn back. You exit the room, without looking back."),
+	)
 
 /mob/living/simple_animal/hostile/abnormality/wall_gazer/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
 	. = ..()

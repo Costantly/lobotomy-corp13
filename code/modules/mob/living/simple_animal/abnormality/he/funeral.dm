@@ -9,6 +9,7 @@
 	del_on_death = FALSE
 	maxHealth = 1350 //I am a menace to society.
 	health = 1350
+	blood_volume = 0
 
 	ranged = TRUE
 	minimum_distance = 2
@@ -31,6 +32,7 @@
 	)
 	work_damage_amount = 12
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gloom
 	max_boxes = 16
 	death_message = "gently descends into its own coffin."
 	base_pixel_x = -16
@@ -44,6 +46,21 @@
 	gift_type =  /datum/ego_gifts/solemnlament
 	gift_message = "The butterflies are waiting for the end of the world."
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "A tall butterfly-faced man stands before, clad in an undertakers's garment. <br>\
+		Between the two of you is a coffin and he gestures you towards it with all 3 of his hands."
+	observation_choices = list(
+		"Enter the coffin" = list(TRUE, "You lie down in the coffin as the butterfly-faced man stands by, his head angled and all 3 hands crossed together over his waist in a solemn gesture. <br>\
+			It's a perfect fit for you. <br>\
+			You feel the weight of innumerable lifetimes and the weariness that came with them. <br>\
+			The butterflies lift you and the coffin as pallbearers, they lament for you in place of the people who cannot."),
+		"Don't enter the coffin" = list(TRUE, "You don't enter because it's not your coffin. <br>\
+			The undertaker reaches out his middle hand to his waiting, insectile audience and one of the butterflies lands upon his fingers. <br>\
+			He offers you the butterfly and you place it into the coffin, gently. <br>\
+			The butterflies are the souls of the dead, waiting to be put to rest, but are still mourning for the living. <br>\
+			You and the butterfly-faced man stand in silent vigil. You both now share a vow; to grieve for the living and dead. <br>\
+			A kaledioscope of butterflies follows you as you leave the containment unit."),
+	)
 
 	var/gun_cooldown
 	var/gun_cooldown_time = 4 SECONDS
@@ -69,8 +86,9 @@
 	toggle_message = span_colossus("You will now fire butterflies from your hands.")
 	button_icon_toggle_deactivated = "funeral_toggle0"
 
-
 /mob/living/simple_animal/hostile/abnormality/funeral/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	return OpenFire()
 
 /mob/living/simple_animal/hostile/abnormality/funeral/OpenFire()
@@ -222,12 +240,20 @@
 
 /mob/living/simple_animal/hostile/abnormality/funeral/proc/SwarmTurfLinger(turf/T)
 	for(var/i = 1 to 40) //40 times
-		for(var/mob/living/carbon/human/H in HurtInTurf(T, list(), swarm_damage, WHITE_DAMAGE, check_faction = TRUE, hurt_mechs = TRUE))
-			if(H.stat == DEAD)
-				continue
-			if(H.sanity_lost)
-				H.death()
-				KillAnimation(H)
+		if(SSmaptype.maptype == "limbus_labs")
+			for(var/mob/living/carbon/human/H in HurtInTurf(T, list(), swarm_damage, WHITE_DAMAGE, check_faction = TRUE, hurt_mechs = TRUE, hurt_structure = TRUE))
+				if(H.stat == DEAD)
+					continue
+				if(H.sanity_lost)
+					H.death()
+					KillAnimation(H)
+		else
+			for(var/mob/living/carbon/human/H in HurtInTurf(T, list(), swarm_damage, WHITE_DAMAGE, check_faction = TRUE, hurt_mechs = TRUE))
+				if(H.stat == DEAD)
+					continue
+				if(H.sanity_lost)
+					H.death()
+					KillAnimation(H)
 		SLEEP_CHECK_DEATH(0.25 SECONDS) //10 seconds
 
 /mob/living/simple_animal/hostile/abnormality/funeral/proc/KillAnimation(mob/living/carbon/human/killed)

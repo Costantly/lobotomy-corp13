@@ -9,6 +9,7 @@
 	portrait = "siren"
 	maxHealth = 1000
 	health = 1000
+	speak_emote = list("plays")
 	threat_level = HE_LEVEL
 	start_qliphoth = 5
 	minimum_distance = 3 //runs away during pink midnight
@@ -20,6 +21,7 @@
 	)
 	work_damage_amount = 11
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 
 	ego_list = list(
 		/datum/ego_datum/weapon/song,
@@ -28,6 +30,17 @@
 	)
 	gift_type = /datum/ego_gifts/song
 
+	observation_prompt = "My grandfather loved this song once, he used to tell me it was the first song he and his wife, my grandmother, danced and shared their first kiss to. <br>\
+		When she passed he would play this song all the time until the vinyl began to warp. <br>One day, I visited him after a long time and the song wasn't playing. <br>\
+		\"It's not the same song,\" he'd whisper chin resting over his clenched hands, gripped together until they were as white as his knuckles. <br>\
+		\"Why isn't the same song?\""
+	observation_choices = list(
+		"Put the song on again" = list(TRUE, "The record began to play, the slow warped song filled the air. <br>\
+			\"It's just not the same without her here...\""),
+		"Throw it away" = list(FALSE, "You throw the old record into the trash, the well-used viny shattering. <br>\
+			\"NO! HOW CAN I REMEMBER HER NOW?\" Your grandfather wails, coming at you with fury in his eyes before stopping. <br>\
+			\"...Who were you again?\""),
+	)
 
 //meltdown effects
 	var/meltdown_cooldown_time = 144 SECONDS

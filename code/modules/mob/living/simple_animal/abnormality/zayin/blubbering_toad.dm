@@ -14,6 +14,7 @@
 	base_pixel_x = -16
 
 	threat_level = ZAYIN_LEVEL
+	chem_type = /datum/reagent/abnormality/sin/gloom
 	maxHealth = 1400 //megahuge stats, almost as strong as a WAW.
 	health = 1400
 	can_breach = TRUE
@@ -44,6 +45,35 @@
 	response_help_simple = "pet"
 	response_help_continuous = "pets"
 
+	ego_list = list(
+		/datum/ego_datum/weapon/cavernous_wailing,
+		/datum/ego_datum/armor/cavernous_wailing,
+	)
+	gift_type =  /datum/ego_gifts/melty_eyeball
+	gift_message = "The toad gave you an eyeball, maybe it was for lending an ear?"
+	abnormality_origin = ABNORMALITY_ORIGIN_LIMBUS
+
+	observation_prompt = "\"Croohoo, croohoo, croohoo.\" <br>\
+		A giant toad cries inside a cave. <br>\
+		Patches of dark blue resin cover the cave. <br>\
+		This resin is like gloom. <br>\
+		A sap of gloom, not quite like tears or sadness. <br>\
+		The toad holds this resin."
+	observation_choices = list(
+		"Sit and wait" = list(TRUE, "An indeterminate amount of time passes. <br>\
+			As you waited for the toad to finish its cries, <br>\
+			it gazed into you, closing and opening its eyelids slowly. <br>\
+			With a quick, slick sound, a long blue tongue popped out towards you. <br>\
+			An eyeball belonging to the toad was on its tongue. <br>\
+			When you picked it up, it blinked its other eye at us before going on its way. <br>\
+			Was that its thanks for lending an ear?"),
+		"Mimic the cry" = list(FALSE, "\"Croohic, croohoo.\" <br>\
+			The toad’s cry is dull and heavy. <br>\
+			It doesn’t seem to have understood what it heard. <br>\
+			After crying like that a few more times, it hopped away from its spot. <br>\
+			All that’s left is the sticky blue resin."),
+	)
+
 	//work
 	var/pulse_healing = 15
 	var/healing_pulse_amount = 0
@@ -59,14 +89,6 @@
 	var/transformed = FALSE
 	var/broken = FALSE
 	var/persistant = FALSE
-
-	ego_list = list(
-		/datum/ego_datum/weapon/cavernous_wailing,
-		/datum/ego_datum/armor/cavernous_wailing,
-	)
-	gift_type =  /datum/ego_gifts/melty_eyeball
-	gift_message = "The toad gave you an eyeball, maybe it was for lending an ear?"
-	abnormality_origin = ABNORMALITY_ORIGIN_LIMBUS
 
 //Work/Misc
 /mob/living/simple_animal/hostile/abnormality/blubbering_toad/PostSpawn()
@@ -95,8 +117,15 @@
 
 //Attack or approach it directly and it attacks you!
 /mob/living/simple_animal/hostile/abnormality/blubbering_toad/BreachEffect(mob/living/user, breach_type = BREACH_NORMAL)
-	if(breach_type == BREACH_PINK)
+	if(breach_type == BREACH_PINK || breach_type == BREACH_MINING)
 		persistant = TRUE
+	if(breach_type == BREACH_MINING)//nerfed to a ZAYIN statline since this is something you'll typically fight roundstart
+		name = "Weakened [name]"
+		maxHealth = 400
+		melee_damage_lower = 9
+		melee_damage_upper = 15
+		tongue_damage = 10
+		broken = TRUE
 	SetIdiot(user)
 	return ..()
 
@@ -140,7 +169,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/blubbering_toad/death() //EGG! just kidding no egg....
 	density = FALSE
-	playsound(src, 'sound/abnormalities/doomsdaycalendar/Limbus_Dead_Generic.ogg', 40, 0, FALSE)
+	playsound(src, 'sound/effects/limbus_death.ogg', 40, 0, FALSE)
 	animate(src, alpha = 0, time = 5 SECONDS)
 	QDEL_IN(src, 5 SECONDS)
 	..()
@@ -208,14 +237,14 @@
 	update_icon_state() //prevents icons from getting stuck
 	..()
 
-/mob/living/simple_animal/hostile/abnormality/blubbering_toad/AttackingTarget()
-	if(!ishuman(target))
+/mob/living/simple_animal/hostile/abnormality/blubbering_toad/AttackingTarget(atom/attacked_target)
+	if(!ishuman(attacked_target))
 		return
-	if(target != idiot)
-		LoseTarget(target)
+	if(attacked_target != idiot)
+		LoseTarget(attacked_target)
 		return
 	..()
-	var/mob/living/carbon/human/H = target
+	var/mob/living/carbon/human/H = attacked_target
 	if(H.sanity_lost) //prevents hitting the same guy in an infinite loop
 		melee_damage_type = BLACK_DAMAGE
 	if(H.health < 0)
@@ -247,7 +276,7 @@
 
 //Transformation
 /mob/living/simple_animal/hostile/abnormality/blubbering_toad/adjustHealth(amount, updating_health = TRUE, forced = FALSE)
-	..()
+	. = ..()
 	if(broken)
 		return
 	if(transformed)
@@ -259,7 +288,7 @@
 			icon_state = icon_living
 			melee_damage_type = WHITE_DAMAGE
 			broken = TRUE
-			playsound(src, 'sound/abnormalities/doomsdaycalendar/Limbus_Dead_Generic.ogg', 40, 0, 1)
+			playsound(src, 'sound/effects/limbus_death.ogg', 40, 0, 1)
 		return
 	if(health < (maxHealth / 2)) //50% health or lower
 		var/state = pick("red", "white")
@@ -272,7 +301,7 @@
 		icon_living = "blubbering_[state]"
 		icon_tongue = "blubbering_tongue_[state]"
 		icon_state = icon_living
-		playsound(src, 'sound/abnormalities/doomsdaycalendar/Limbus_Dead_Generic.ogg', 40, 0, 1)
+		playsound(src, 'sound/effects/limbus_death.ogg', 40, 0, 1)
 
 /datum/status_effect/blue_resin
 	id = "blue resin"

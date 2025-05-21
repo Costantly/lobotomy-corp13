@@ -67,9 +67,10 @@
 	/*
 	* This is related to abnochem where a chemical can be harvested from abnormalities.
 	* This is more for general flavor and will be randomly filled if left empty.
-	* I placed this here because i felt like violence makes the most sense.
+	* Kirie/Kitsunemitsu Note - This has been updated to the new Sin chem system.
+	* There's 7 sin chems based off the limbus sins, pick one to put here.
 	*/
-	chem_type = /datum/reagent/abnormality/violence
+	chem_type = /datum/reagent/abnormality/sin/pride
 
 	//shows in chat when the creature is defeated. Default is "stops moving".
 	death_message = "falls over."
@@ -95,6 +96,19 @@
 	 */
 	gift_type =  /datum/ego_gifts/regret
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	/**
+	 * Final observation code.
+	 * observation_prompt controls the text that the user sees when they start the observation
+	 * observation_choices is made in the format of:
+	 * "Choice" = list(TRUE or FALSE [depending on if the answer is correct], "Response"),
+	 */
+	observation_prompt = "Around his neck is a rope. It is up to you to cut his rope."
+	observation_choices = list(
+		"Don't cut the rope" = list(TRUE, "His neck snaps, granting him silence and eternal rest."),
+		"Cut the rope" = list(FALSE, "\"You think I'm pathetic, huh? But is you people who are really pathetic. Because you get killed. By people like me.\""),
+	)
+
 	//Unique variable im defining for this abnormality. This is the timer for their during work emotes.
 	var/work_emote_cooldown = 0
 

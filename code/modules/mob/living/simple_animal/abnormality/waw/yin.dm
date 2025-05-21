@@ -23,6 +23,7 @@
 	threat_level = WAW_LEVEL
 	work_damage_amount = 10
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/envy
 	work_chances = list(
 		ABNORMALITY_WORK_INSTINCT = list(0, 0, 40, 40, 40),
 		ABNORMALITY_WORK_INSIGHT = list(0, 0, 55, 55, 55),
@@ -42,6 +43,17 @@
 
 	grouped_abnos = list(
 		/mob/living/simple_animal/hostile/abnormality/yang = 5, // TAKE THE FISH. DO IT
+	)
+
+	observation_prompt = "The Devil's Pendant was one half of a greater whole, but now they've been cleaved in half, forever wanting to reunite. <br>\
+		The pendant laid upon the podium before you, even being in the same room as it seemed to suck the life out of you and erodes your very essence."
+	observation_choices = list(
+		"Put it on" = list(TRUE, "The moment you put it on, your body is stricken with deepest agony, feeling like thorns racing through your body, puncturing flesh and mind alike but you endure. <br>\
+			It didn't mean to harm you, it's just the way it is. <br>\
+			If there is light and goodness in this world, shouldn't there be darkness and evil too? <br>\
+			The world is far more than brightness and warmth."),
+		"Don't put it on" = list(FALSE, "It is darkness made manifest, made to encapsulate all the negativity in the world. <br>\
+			If you can't accept the darkness of the world, you're not ready to accept the darkness in you."),
 	)
 
 	faction = list("neutral", "hostile") // Not fought by anything, typically. But...
@@ -77,6 +89,15 @@
 	)
 	var/dragon_spawned = FALSE
 
+/mob/living/simple_animal/hostile/abnormality/yin/Login()
+	. = ..()
+	to_chat(src, "<h1>You are Yin, A Tank Role Abnormality.</h1><br>\
+		<b>|Ruination|: When you click on a tile which is not right next to you, you will fire a laser towards that tile. \
+		The laser deal BLACK damage, and has a 10 second cooldown.<br>\
+		<br>\
+		|Decay|: Each time you take damage, if your pulse is off cooldown. You will send out a pulse around you, which deals BLACK damage to all humans. \
+		The Pulse has a cooldown of 8 seconds.</b>")
+
 /mob/living/simple_animal/hostile/abnormality/yin/New(loc, ...)
 	. = ..()
 	if(YangCheck())
@@ -109,27 +130,28 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/yin/Moved(atom/OldLoc, Dir, override = TRUE)
-	if(!COOLDOWN_FINISHED(src, pulse) || SSlobotomy_events.yin_downed)
-		return ..()
-	var/turfs_to_check = view(2, src)
-	for(var/mob/living/L in turfs_to_check)
-		if(L == src)
-			continue
-		if(L.status_flags & GODMODE)
-			continue
-		if(faction_check(L.faction, faction_override))
-			continue
-		if(L.stat >= DEAD)
-			continue
-		COOLDOWN_START(src, pulse, pulse_cooldown)
-		INVOKE_ASYNC(src, PROC_REF(Pulse))
-		return ..()
-	for(var/obj/vehicle/sealed/mecha/M in turfs_to_check)
-		if(!M.occupants || length(M.occupants) == 0)
-			continue
-		COOLDOWN_START(src, pulse, pulse_cooldown)
-		INVOKE_ASYNC(src, PROC_REF(Pulse))
-		return ..()
+	if(!IsCombatMap())
+		if(!COOLDOWN_FINISHED(src, pulse) || SSlobotomy_events.yin_downed)
+			return ..()
+		var/turfs_to_check = view(2, src)
+		for(var/mob/living/L in turfs_to_check)
+			if(L == src)
+				continue
+			if(L.status_flags & GODMODE)
+				continue
+			if(faction_check(L.faction, faction_override))
+				continue
+			if(L.stat >= DEAD)
+				continue
+			COOLDOWN_START(src, pulse, pulse_cooldown)
+			INVOKE_ASYNC(src, PROC_REF(Pulse))
+			return ..()
+		for(var/obj/vehicle/sealed/mecha/M in turfs_to_check)
+			if(!M.occupants || length(M.occupants) == 0)
+				continue
+			COOLDOWN_START(src, pulse, pulse_cooldown)
+			INVOKE_ASYNC(src, PROC_REF(Pulse))
+			return ..()
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/yin/death(gibbed)
@@ -150,7 +172,7 @@
 		if(SSlobotomy_events.yang_downed)
 			death()
 			return
-	adjustBruteLoss(-maxHealth)
+	adjustBruteLoss(-maxHealth, forced = TRUE)
 	ChangeResistances(list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, PALE_DAMAGE = 1))
 	SSlobotomy_events.yin_downed = FALSE
 	icon_state = icon_breach
@@ -170,7 +192,6 @@
 				continue
 			AD.qliphoth_change(-1, user)
 			break
-	return
 
 /mob/living/simple_animal/hostile/abnormality/yin/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
@@ -180,22 +201,29 @@
 /mob/living/simple_animal/hostile/abnormality/yin/FailureEffect(mob/living/carbon/human/user, work_type, pe)
 	. = ..()
 	datum_reference.qliphoth_change(-1, user)
-	return
+
+/mob/living/simple_animal/hostile/abnormality/yin/proc/PulseOrLaser(user)
+	if(!IsCombatMap())
+		FireLaser(user)
+	else
+		if(COOLDOWN_FINISHED(src, pulse) || SSlobotomy_events.yin_downed)
+			COOLDOWN_START(src, pulse, pulse_cooldown)
+			INVOKE_ASYNC(src, PROC_REF(Pulse))
 
 /mob/living/simple_animal/hostile/abnormality/yin/attacked_by(obj/item/I, mob/living/user)
 	. = ..()
-	FireLaser(user)
-	return
+	PulseOrLaser(user)
 
 /mob/living/simple_animal/hostile/abnormality/yin/attack_hand(mob/living/carbon/human/M)
 	. = ..()
-	FireLaser(M)
-	return
+	PulseOrLaser(M)
 
 /mob/living/simple_animal/hostile/abnormality/yin/attack_animal(mob/living/simple_animal/M)
 	. = ..()
-	FireLaser(M)
-	return
+	PulseOrLaser(M)
+
+/mob/living/simple_animal/hostile/abnormality/yin/OpenFire()
+	FireLaser(target)
 
 /mob/living/simple_animal/hostile/abnormality/yin/bullet_act(obj/projectile/P, def_zone, piercing_hit = FALSE)
 	apply_damage(P.damage, P.damage_type)
@@ -205,8 +233,7 @@
 		return .
 	if(!isliving(P.firer) && !ismecha(P.firer))
 		return .
-	FireLaser(P.firer)
-	return .
+	PulseOrLaser(P.firer)
 
 /mob/living/simple_animal/hostile/abnormality/yin/AttackingTarget(atom/attacked_target)
 	return FALSE
@@ -221,7 +248,6 @@
 			hit = HurtInTurf(OT, hit, pulse_damage, BLACK_DAMAGE, null, TRUE, faction_override, TRUE)
 			new /obj/effect/temp_visual/small_smoke/yin_smoke/short(OT)
 		sleep(3)
-	return
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/FireLaser(mob/target)
 	if(busy || !COOLDOWN_FINISHED(src, beam) || SSlobotomy_events.yin_downed)
@@ -291,7 +317,6 @@
 		M.Turn(angle-90)
 		DP.transform = M
 		MoveDragon(DP, temp_path)
-	return
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/MoveDragon(obj/effect/yinyang_dragon/DP, list/path = list())
 	set waitfor = FALSE
@@ -303,7 +328,6 @@
 		DragonFlip(DP)
 		sleep(1)
 	qdel(DP)
-	return
 
 /mob/living/simple_animal/hostile/abnormality/yin/proc/DragonFlip(obj/effect/yinyang_dragon/DP)
 	for(var/obj/machinery/computer/abnormality/AC in range(2, DP))
@@ -353,7 +377,7 @@
 	. = ..()
 	for(var/atom/at in src)
 		qdel(at)
-	return
+
 /obj/effect/yinyang_dragon/dragon_head
 	icon_state = "dragon_head"
 

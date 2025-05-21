@@ -7,19 +7,41 @@ Keep things balanced if they aren't going to be admin only.  - Coxswain
 
 // Rise of The Riblin - Mcrib
 /datum/ego_datum/weapon/mcrib
-	item_path = /obj/item/gun/ego_gun/pistol/mcrib
+	item_path = /obj/item/ego_weapon/ranged/pistol/mcrib
 	cost = 12
 
 /datum/ego_datum/armor/mcrib
 	item_path = /obj/item/clothing/suit/armor/ego_gear/zayin/mcrib
 	cost = 12
 
-
 //Teth
+/datum/ego_datum/weapon/an_ego
+	item_path = /obj/item/ego_weapon/an_ego
+	cost = 20
+
+/datum/ego_datum/armor/an_ego
+	item_path = /obj/item/clothing/suit/armor/ego_gear/teth/an_ego
+	cost = 20
 
 //He
 
 //Waw
+//Skub - Pro-Skub, Anti-Skub
+/datum/ego_datum/weapon/pro_skub
+	item_path = /obj/item/ego_weapon/pro_skub
+	cost = 50
+
+/datum/ego_datum/weapon/anti_skub
+	item_path = /obj/item/ego_weapon/ranged/anti_skub
+	cost = 50
+
+/datum/ego_datum/armor/pro_skub
+	item_path = /obj/item/clothing/suit/armor/ego_gear/waw/pro_skub
+	cost = 50
+
+/datum/ego_datum/armor/anti_skub
+	item_path = /obj/item/clothing/suit/armor/ego_gear/waw/anti_skub
+	cost = 50
 
 //Aleph
 // Buff Rudolta - Ultimate Christmas

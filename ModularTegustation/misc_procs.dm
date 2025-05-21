@@ -9,7 +9,6 @@
 /datum/proc/try_take_abnormality(mob/dead/observer/possessing_player, mob/abnormality)
 	if(!SSlobotomy_corp.enable_possession) // uhhhh, how did you even access this proc?
 		to_chat(usr, span_userdanger("Abnormality possession is not enabled!"))
-		message_admins(span_adminnotice("[possessing_player.key] has accessed the try_take_abnormality proc whilst possession is disabled."))
 		return
 
 	if(!possessing_player.ckey) // safety check
@@ -36,6 +35,16 @@
 
 	message_admins(span_adminnotice("[possessing_player.key] has possessed [abnormality.name]."))
 	log_admin("[possessing_player.key] has possessed [abnormality.name].")
+
+	if(SSmaptype.chosen_trait == FACILITY_TRAIT_PLAYABLES) //Most convenient way I could think of off the top of my head.
+		if(LAZYLEN(SSlobotomy_corp.all_abnormality_datums))
+			for(var/datum/abnormality/A in SSlobotomy_corp.all_abnormality_datums)
+				if(A.abno_radio)
+					continue
+				if(isnull(A.current))
+					A.abno_radio = TRUE
+					continue
+				A.current.AbnoRadio()
 
 	abnormality.key = possessing_player.key
 	abnormality.client?.init_verbs()

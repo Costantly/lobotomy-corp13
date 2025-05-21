@@ -31,6 +31,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/lust
 
 	ego_list = list(
 		/datum/ego_datum/weapon/coiling,
@@ -38,8 +39,35 @@
 	)
 	gift_type =  /datum/ego_gifts/coiling
 	abnormality_origin = ABNORMALITY_ORIGIN_ORIGINAL
+
+	observation_prompt = "I am seated at a banquet. <br>\
+		The tablecloth is of the finest red velvet, and seated across from me is the abnormality Eris.<br>\
+		\"Well, how is it?\" <br>The monster, disguised as a human asks me. <br>\
+		There is a sweet, revolting scent in the air. <br>\
+		Raw meat and organs are piled high on the serving plates, being attacked by the occasional fly. <br>The monster in front of me dines with knife and fork.<br>\
+		A human head is on prominent display on my plate.<br> It belongs to someone who was assigned to work on \"Eris\", not too long ago.<br>\
+		\"Not hungry? Perhaps you'd like to visit my boudoir?\"<br>\
+		Vile, disgusting. <br>I want to get out of here."
+	observation_choices = list(
+		"Run" = list(TRUE, "I get up from the table, make an excuse, and bolt for the door as fast as I can. <br>\
+			Surprisingly, it's not locked. <br>I hear the imitation of a young woman's voice on my way out. <br>\
+			\"Come back soon, sweetie!\"<br> \"You're always invited to dinner, and i'll be sure to serve you one day!\""),
+		"Accept her proposal" = list(FALSE, "How bad can it be? <br>I follow Eris as she leads me into a room. <br>\
+			Hours later, Eris dines with another stranger. <br>My head is resting on that very same plate."),
+	)
+
 	var/girlboss_level = 0
 
+/mob/living/simple_animal/hostile/abnormality/eris/Login()
+	. = ..()
+	to_chat(src, "<h1>You are Eris, A Tank Role Abnormality.</h1><br>\
+		<b>|Humanoid Disguise|: You are only able to attack humans who only have a very low amount of health, or if they are dead.<br>\
+		If they attack a human who fulfills the above conditions, you will devor them, and gain a stack of 'Girl Boss'<br>\
+		<br>\
+		|Dine with me...|: Every second, you heal ALL targets that you can see.<br>\
+		Your healing increases depending on the amount of 'Girl Boss' you have.<br>\
+		<br>\
+		|Elegant Form|: When you are attacked by a human, deal WHITE damage to the attack. This damage is increase depending on your 'Girl Boss' stacks.</b>")
 
 //Okay, but here's the breach on death
 /mob/living/simple_animal/hostile/abnormality/eris/Initialize()
@@ -99,10 +127,10 @@
 	return FALSE
 
 /mob/living/simple_animal/hostile/abnormality/eris/AttackingTarget(atom/attacked_target)
-	if(ishuman(target))
-		var/mob/living/H = target
+	if(ishuman(attacked_target))
+		var/mob/living/H = attacked_target
 		if(H.stat >= SOFT_CRIT)
-			Dine(target)
+			Dine(attacked_target)
 			return
 	..()
 

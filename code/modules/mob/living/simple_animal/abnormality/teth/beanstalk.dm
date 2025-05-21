@@ -18,6 +18,7 @@
 	base_pixel_x = -16
 	work_damage_amount = 7
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
 	ego_list = list(
 		/datum/ego_datum/weapon/bean,
@@ -26,6 +27,15 @@
 	)
 	gift_type = /datum/ego_gifts/bean
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+	observation_prompt = "You remember an employee was obsessed with this abnormality. <br>\"\
+		If you reach the top, you'll find what you've been looking for!\", He'd tell every employee. <br>\
+		One day he did climb the beanstalk, and never came back down. <br>Perhaps he's doing okay up there."
+	observation_choices = list( //TODO: Make this event a bit special
+		"Chop it down" = list(TRUE, "If something's too big to understand, it's too big to be allowed to exist. The axe bites into the stem..."),
+		"Climb the beanstalk" = list(FALSE, "You begin to climb the beanstalk, but no matter how much you climb there's always more stalk. You peer at the clouds, squinting your eyes, but still can't see anyone..."),
+	)
+
 	var/climbing = FALSE
 
 //Performing instinct work at >4 fortitude starts a special work

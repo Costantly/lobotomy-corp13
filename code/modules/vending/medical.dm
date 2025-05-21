@@ -12,6 +12,7 @@
 					/obj/item/reagent_containers/glass/bottle/ethanol = 5,
 					/obj/item/healthanalyzer = 4,
 					/obj/item/wrench/medical = 1,
+					/obj/item/prosthetictool = 1,
 					/obj/item/stack/sticky_tape/surgical = 3,
 					/obj/item/healthanalyzer/wound = 4,
 					/obj/item/stack/medical/ointment = 2,
@@ -59,6 +60,7 @@
 					/obj/item/reagent_containers/glass/bottle/multiver = 2,
 					/obj/item/reagent_containers/glass/bottle/syriniver = 2,
 					/obj/item/reagent_containers/glass/bottle/epinephrine = 3,
+					/obj/item/reagent_containers/hypospray/medipen/salbutamol = 10, // LOBOTOMYCORPORATION ADDITION
 					/obj/item/reagent_containers/glass/bottle/morphine = 4,
 					/obj/item/reagent_containers/glass/bottle/potass_iodide = 1,
 					/obj/item/reagent_containers/glass/bottle/salglu_solution = 3,

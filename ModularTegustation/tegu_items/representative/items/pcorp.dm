@@ -28,7 +28,7 @@
 	STR.max_w_class = WEIGHT_CLASS_BULKY
 	STR.max_combined_w_class = 100
 	STR.set_holdable(list(
-		/obj/item/gun/ego_gun,
+		/obj/item/ego_weapon/ranged,
 		/obj/item/ego_weapon,
 	))
 
@@ -130,9 +130,11 @@
 	icon_state = "tackledolphin"
 	w_class = WEIGHT_CLASS_BULKY
 	drag_slowdown = 1
+	var/component_type = /datum/component/storage/concrete
 
 /obj/item/clothing/gloves/pcorp/ComponentInitialize()
 	. = ..()
+	AddComponent(component_type)
 	var/datum/component/storage/STR = GetComponent(/datum/component/storage)
 	STR.max_items = 3
 	STR.max_w_class = WEIGHT_CLASS_BULKY
@@ -146,14 +148,46 @@
 	icon_state = "pcorp"
 	w_class = WEIGHT_CLASS_BULKY
 	drag_slowdown = 1
+	var/component_type = /datum/component/storage/concrete
 
 /obj/item/clothing/gloves/pcorpbig/ComponentInitialize()
 	. = ..()
+	AddComponent(component_type)
 	var/datum/component/storage/STR = GetComponent(/datum/component/storage)
-	STR.max_items = 3
+	STR.max_items = 1
 	STR.max_w_class = WEIGHT_CLASS_BULKY
 	STR.max_combined_w_class = 100
-	STR.set_holdable(GLOB.small_ego)
+	STR.set_holdable(list(
+		/obj/item/ego_weapon,
+	))
 
+// Food
+/obj/item/food/canned/pcorp_icecream
+	name = "p-corp canned ice cream"
+	desc = "P corp's specialty canned ice cream."
+	icon_state = "pcorp_icecream"
+	trash_type = /obj/item/trash/can/food/pcorp_icecream
+	food_reagents = list(/datum/reagent/consumable/nutriment = 4, /datum/reagent/medicine/sal_acid = 5)
+	tastes = list("strawberry" = 1, "mint" = 1, "chocolate" = 1,"butterscotch" = 1)
+	foodtypes = DAIRY | SUGAR
 
+/obj/item/food/canned/pcorp_burger
+	name = "p-corp canned burger"
+	desc = "P corp's specialty canned burger."
+	icon_state = "burgercan"
+	trash_type = /obj/item/trash/can/food/pcorp_burger
+	bite_consumption = 3
+	food_reagents = list(/datum/reagent/consumable/nutriment = 2, /datum/reagent/consumable/nutriment/protein = 5, /datum/reagent/consumable/nutriment/vitamin = 1)
+	tastes = list("bun" = 2, "beef patty" = 4)
+	foodtypes = GRAIN | MEAT
 
+// Food Trash
+/obj/item/trash/can/food/pcorp_icecream
+	name = "canned ice cream"
+	icon = 'icons/obj/food/food.dmi'
+	icon_state = "pcorp_icecream_empty"
+
+/obj/item/trash/can/food/pcorp_burger
+	name = "canned burger"
+	icon = 'icons/obj/food/food.dmi'
+	icon_state = "burgercan_empty"

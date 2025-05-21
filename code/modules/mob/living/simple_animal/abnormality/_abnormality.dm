@@ -60,6 +60,8 @@
 	var/success_boxes = null
 	/// How much PE you have to produce for neutral result, if not null or 0.
 	var/neutral_boxes = null
+	/// Check to see if the abnormality hates goods or can't get them.
+	var/good_hater = FALSE
 	/// List of ego equipment datums
 	var/list/ego_list = list()
 	/// EGO Gifts
@@ -80,11 +82,7 @@
 	var/harvest_phrase_third = "%PERSON harvests... something... into %VESSEL."
 	// Dummy chemicals - called if chem_type is null.
 	var/list/dummy_chems = list(
-		/datum/reagent/abnormality/nutrition,
-		/datum/reagent/abnormality/cleanliness,
-		/datum/reagent/abnormality/consensus,
-		/datum/reagent/abnormality/amusement,
-		/datum/reagent/abnormality/violence,
+		/datum/reagent/abnormality/sin/emptiness,	//Set to a useless dummy chem rn. Should actually be replaced on every abno
 	)
 	// Increased Abno appearance chance
 	/// Assoc list, you do [path] = [probability_multiplier] for each entry
@@ -93,6 +91,9 @@
 	var/portrait = "UNKNOWN"
 	var/core_icon = ""
 	var/core_enabled = TRUE
+
+	/// If an abnormality should not be possessed even if possessibles are enabled, mainly for admins.
+	var/do_not_possess = FALSE
 
 	// secret skin variables ahead
 
@@ -108,6 +109,8 @@
 	var/secret_icon_state
 	/// An icon state assigned when an abnormality is alive
 	var/secret_icon_living
+	// An icon state assigned when an abnormality gets suppressed in its secret form
+	var/secret_icon_dead
 	/// An icon file assigned to the abnormality in its secret form, usually should not be needed to change
 	var/secret_icon_file
 
@@ -115,6 +118,23 @@
 	var/secret_horizontal_offset = 0
 	/// Offset for secret skins in the Y axis
 	var/secret_vertical_offset = 0
+
+	/// Final Observation stuffs
+	/// The prompt we get alongside our choices for observing it
+	var/observation_prompt = "The abnormality is watching you. What will you do?"
+	/**
+	 * observation_choices is made in the format of:
+	 * "Choice" = list(TRUE or FALSE [depending on if the answer is correct], "Response"),
+	 */
+	var/list/observation_choices = list(
+		"Approach" = list(TRUE, "You approach the abnormality... and obtain a gift from it."),
+		"Leave" = list(TRUE, "You leave the abnormality... and before you notice a gift is in your hands."),
+	)
+	/// Is there a currently on-going observation?
+	var/observation_in_progress = FALSE
+
+	// rcorp stuff
+	var/rcorp_team
 
 /mob/living/simple_animal/hostile/abnormality/Initialize(mapload)
 	SHOULD_CALL_PARENT(TRUE)
@@ -150,8 +170,13 @@
 	else
 		gift_message += "\nYou are granted a gift by [src]!"
 
-	if(secret_chance && (prob(1)))
+	if(secret_chance && (prob(1) || SSmaptype.chosen_trait == FACILITY_TRAIT_JOKE_ABNOS))
 		InitializeSecretIcon()
+
+	//Abnormalities have no name here. And we don't want nonsentient ones to breach
+	if(SSmaptype.maptype == "limbus_labs")
+		name = "Limbus Company Specimen"
+		faction = list("neutral")
 
 /mob/living/simple_animal/hostile/abnormality/proc/InitializeSecretIcon()
 	SHOULD_CALL_PARENT(TRUE) // if you ever need to override this proc, consider adding onto it instead or not using all the variables given
@@ -171,6 +196,9 @@
 
 	if(secret_vertical_offset)
 		base_pixel_y = secret_vertical_offset
+
+	if(secret_icon_dead)
+		icon_dead = secret_icon_dead
 
 /mob/living/simple_animal/hostile/abnormality/Destroy()
 	SHOULD_CALL_PARENT(TRUE)
@@ -221,8 +249,7 @@
 	if(!(status_flags & GODMODE))
 		to_chat(user, span_notice("Now isn't the time!"))
 		return
-	var/obj/item/chemical_extraction_attachment/attachment = locate() in datum_reference.console.contents
-	if(!attachment)
+	if(datum_reference.console.mechanical_upgrades["abnochem"] == 0)
 		to_chat(user, span_notice("This abnormality's cell is not properly equipped for substance extraction."))
 		return
 	if(world.time < chem_cooldown_timer)
@@ -317,7 +344,6 @@
 /mob/living/simple_animal/hostile/abnormality/proc/PostSpawn()
 	SHOULD_CALL_PARENT(TRUE)
 	HandleStructures()
-	return
 
 // Moves structures already in its datum; Overrides can spawn structures here.
 /mob/living/simple_animal/hostile/abnormality/proc/HandleStructures()
@@ -441,6 +467,9 @@
 	else // its a list, we gotta pick one
 		var/list/damage_types = work_damage_type
 		damage.icon_state = pick(damage_types)
+	var/damage_type = damage.icon_state
+	if(GLOB.damage_type_shuffler?.is_enabled && IsColorDamageType(damage_type))
+		damage.icon_state = GLOB.damage_type_shuffler.mapping_offense[damage_type]
 
 // Dictates whereas this type of work can be performed at the moment or not
 /mob/living/simple_animal/hostile/abnormality/proc/AttemptWork(mob/living/carbon/human/user, work_type)
@@ -471,6 +500,8 @@
 	toggle_ai(AI_ON) // Run.
 	status_flags &= ~GODMODE
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_ABNORMALITY_BREACH, src)
+	if(istype(datum_reference))
+		deadchat_broadcast(" has breached containment.", "<b>[src.name]</b>", src, get_turf(src))
 	FearEffect()
 	return TRUE
 
@@ -497,6 +528,8 @@
 
 /mob/living/simple_animal/hostile/abnormality/proc/IsContained() //Are you in a cell and currently contained?? If so stop.
 //Contained checks for: If the abnorm is godmoded AND one of the following: It does not have a qliphoth meter OR has qliphoth remaining OR no qliphoth but can't breach
+	if(!datum_reference) //They were never contained in the first place
+		return FALSE
 	if((status_flags & GODMODE) && (!datum_reference.qliphoth_meter_max || datum_reference.qliphoth_meter || (!datum_reference.qliphoth_meter && !can_breach)))
 		return TRUE
 	return FALSE
@@ -509,6 +542,68 @@
 
 /mob/living/simple_animal/hostile/abnormality/proc/GetPortrait()
 	return portrait
+
+/mob/living/simple_animal/hostile/abnormality/proc/FinalObservation(mob/living/carbon/human/user)
+	if(!datum_reference.observation_ready) //They didn't refresh the panel
+		to_chat(user, span_notice("This final observation has already been completed."))
+		return
+	if(gift_type && !istype(user.ego_gift_list[gift_type.slot], /datum/ego_gifts/empty))
+		if(istype(user.ego_gift_list[gift_type.slot], gift_type))
+			to_chat(user, span_warning("You have already recieved a gift from this abnormality. Do not be greedy!"))
+			return
+		to_chat(user, span_warning("You already have a gift in the [gift_type.slot] slot, dissolve it first!"))
+		return
+
+	if(observation_in_progress)
+		to_chat(user, span_notice("Someone is already observing [src]!"))
+		return
+	observation_in_progress = TRUE
+	var/answer = final_observation_alert(user, "[observation_prompt]", "Final Observation of [src]", shuffle(observation_choices), timeout = 60 SECONDS)
+	if(answer == "timed out")
+		ObservationResult(user, reply = answer)
+	else
+		var/list/answer_vars = observation_choices[answer]
+		ObservationResult(user, answer_vars[1], answer_vars[2])
+
+	observation_in_progress = FALSE
+
+/mob/living/simple_animal/hostile/abnormality/proc/ObservationResult(mob/living/carbon/human/user, success = FALSE, reply = "")
+	if(success) //Successful, could override for longer observations as well.
+		final_observation_alert(user, "[reply]", "OBSERVATION SUCCESS", list("Ok"), timeout = 20 SECONDS) //Some of these take a long time to read
+		if(gift_type)
+			user.Apply_Gift(new gift_type)
+			playsound(get_turf(user), 'sound/machines/synth_yes.ogg', 30 , FALSE)
+	else
+		if(reply != "timed out")
+			final_observation_alert(user, "[reply]", "OBSERVATION FAIL", list("Ok"), timeout = 20 SECONDS)
+		playsound(get_turf(user), 'sound/machines/synth_no.ogg', 30 , FALSE)
+	datum_reference.observation_ready = FALSE
+
+
+/mob/living/simple_animal/hostile/abnormality/proc/CreateAbnoCore()//this is called by abnormalities on Destroy()
+	var/obj/structure/abno_core/C = new(get_turf(src))
+	C.name = initial(name) + " Core"
+	C.desc = "The core of [initial(name)]"
+	C.icon_state = core_icon
+	C.contained_abno = src.type
+	C.threat_level = threat_level
+	C.ego_list += ego_list
+	switch(GetRiskLevel())
+		if(1)
+			return
+		if(2)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/teth.dmi'
+		if(3)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/he.dmi'
+		if(4)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/waw.dmi'
+		if(5)
+			C.icon = 'ModularTegustation/Teguicons/abno_cores/aleph.dmi'
+
+/mob/living/simple_animal/hostile/abnormality/spawn_gibs()
+	if(blood_volume <= 0)
+		return
+	return new /obj/effect/gibspawner/generic(drop_location(), src, get_static_viruses())
 
 // Actions
 /datum/action/innate/abnormality_attack
@@ -554,22 +649,3 @@
 	button_icon_state = button_icon_toggle_deactivated
 	UpdateButtonIcon()
 	active = FALSE
-
-/mob/living/simple_animal/hostile/abnormality/proc/CreateAbnoCore()//this is called by abnormalities on Destroy()
-	var/obj/structure/abno_core/C = new(get_turf(src))
-	C.name = initial(name) + " Core"
-	C.desc = "The core of [initial(name)]"
-	C.icon_state = core_icon
-	C.contained_abno = src.type
-	C.threat_level = threat_level
-	switch(GetRiskLevel())
-		if(1)
-			return
-		if(2)
-			C.icon = 'ModularTegustation/Teguicons/abno_cores/teth.dmi'
-		if(3)
-			C.icon = 'ModularTegustation/Teguicons/abno_cores/he.dmi'
-		if(4)
-			C.icon = 'ModularTegustation/Teguicons/abno_cores/waw.dmi'
-		if(5)
-			C.icon = 'ModularTegustation/Teguicons/abno_cores/aleph.dmi'

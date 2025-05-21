@@ -18,6 +18,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/pride
 	ego_list = list(
 		/datum/ego_datum/weapon/loyalty,
 		/datum/ego_datum/weapon/praetorian,
@@ -38,6 +39,25 @@
 		/mob/living/simple_animal/hostile/abnormality/queen_bee = 5,
 	)
 	//She has a Quad Artillery Cannon
+
+	observation_prompt = "I toil endlessly for the queen. <br>\
+		Break everything that threatens the hive. <br>\
+		Shoot anything that moves that isn't a bee. <br>\
+		Unquestioningly loyal, I follow my orders to the letter. <br>\
+		I even feel excited whenever I get a new order. <br>\
+		Why am I doing this all again?"
+	observation_choices = list(
+		"I fight to survive" = list(TRUE, "Bees have a natural instinct to fight for their queen. <br>\
+			It is not something as complicated as human emotion. <br>\
+			Rather, it is a hormone produced by the queen. <br>\
+			I will die the moment I leave the queendom.<br>\
+			There is no other option but to remain unquestionably loyal."),
+		"I fight out of loyalty" = list(TRUE, "Bees have a natural instinct to fight for their queen. <br>\
+			It is not something as complicated as human emotion. <br>\
+			Rather, it is a hormone produced by the queen. <br>\
+			I will die the moment I leave the queendom.<br>\
+			There is no other option but to remain unquestionably loyal."),
+	)
 
 	var/fire_cooldown_time = 3 SECONDS	//She has 4 cannons, fires 4 times faster than the artillery bees
 	var/fire_cooldown
@@ -261,22 +281,6 @@
 	attack_verb_simple = "bite"
 	attack_sound = 'sound/weapons/bite.ogg'
 	speak_emote = list("buzzes")
-
-/mob/living/simple_animal/hostile/soldier_bee/Initialize()
-	. = ..()
-	if(SSmaptype.maptype == "limbus_labs")
-		faction = list("neutral")
-
-/mob/living/simple_animal/hostile/soldier_bee/Login()
-	. = ..()
-	if(SSmaptype.maptype == "limbus_labs")
-		faction = list("hostile")
-
-/mob/living/simple_animal/hostile/soldier_bee/Logout()
-	. = ..()
-	if(SSmaptype.maptype == "limbus_labs")
-		faction = list("neutral")
-
 
 /* Artillery bees */
 /mob/living/simple_animal/hostile/artillery_bee

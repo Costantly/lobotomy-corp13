@@ -30,6 +30,7 @@
 	)
 	work_damage_amount = 7
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/pride
 
 	ego_list = list(
 		/datum/ego_datum/weapon/alleyway,
@@ -39,6 +40,15 @@
 	gift_type =  /datum/ego_gifts/alleyway
 	light_color = "FFFFFFF"
 	light_power = -10
+
+	observation_prompt = "\"Natureless creatures roam the night, you should find shelter.\" <br>\
+		The watchman beckons you over. <br>You..."
+	observation_choices = list(
+		"Approach" = list(TRUE, "Good. <br>It's not safe to roam the woods at night.<br>\
+			Come now, I will guide you home."),
+		"Run away" = list(FALSE, "You don't get far before you start hearing howling and shrieking. <br>\
+			Numerous talons, claws, and fangs bite into you all at once. <br>Now you will know why you fear the night."),
+	)
 
 	// Speech Lines
 	speak_chance = 4

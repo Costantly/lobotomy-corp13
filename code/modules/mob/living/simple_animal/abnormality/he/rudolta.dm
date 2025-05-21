@@ -12,7 +12,7 @@
 	health = 1200
 	pixel_x = -16
 	base_pixel_x = -16
-	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
+	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2, FIRE = 1.5)
 	stat_attack = HARD_CRIT
 	can_breach = TRUE
 	threat_level = HE_LEVEL
@@ -27,6 +27,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 	friendly_verb_continuous = "scorns"
 	friendly_verb_simple = "scorns"
 
@@ -36,6 +37,21 @@
 	)
 	gift_type =  /datum/ego_gifts/christmas
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+	//Try not to make other observations this long - This is by PM though so, we have to use it. -Coxswain
+	observation_prompt = "I heard about a man who could give you anything you want once a year. <br>Good kids have a better chance of seeing him. <br>\
+		A man who carries giant sack on his back. <br>A man who can go anywhere in the world with his reindeer-pulled sled. <br>\
+		Alex got a present. <br>Even though he was a naughty kid. <br>It was unfair. <br>I could not accept it. <br>The next Christmas, I went to Alex's. <br>\
+		If that man comes only for Alex this time again, I will ask him why had he not come to me. <br>\
+		That night, when everyone was sleeping. <br>I waited for the man, sitting next to sleeping Alex. <br>\
+		Sometimes, for someone, an absurd fairy tale is a silver lining of hope. <br>When I met Santa, I imagined dismembering him. <br>... <br>\
+		In front of me is Santa. <br>My ideal. <br>People don't call it Santa. <br>Something is twitching inside of that sack. I......"
+	observation_choices = list(
+		"Did not open the sack" = list(TRUE, "Inside of the sack is a desire. <br>\
+			A hope that I've been waiting for since when I was very young. <br>I never opened the sack. <br>Did your wish come true?"),
+		"Opened the sack" = list(FALSE, "There was something that I have been longing for my entire life. <br>\
+			Like Pandora's Box, it will never go back into the sack."),
+	)
+
 	var/pulse_cooldown
 	var/pulse_cooldown_time = 1.8 SECONDS
 	var/pulse_damage = 20

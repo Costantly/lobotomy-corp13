@@ -17,6 +17,7 @@
 	)
 	work_damage_amount = 7
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/envy
 	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
 
 	ego_list = list(
@@ -25,6 +26,15 @@
 	)
 	gift_type = /datum/ego_gifts/snapshot
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+//TODO: Resprite + redo of this
+	observation_prompt = "The portrait has been in our family's possession for a long time. <br>\
+		They say it was of a very important relative of ours, but we do not recognize anyone present. <br>I've always hated the picture, why couldn't anyone else see it was just biding its time, waiting to strike?"
+	observation_choices = list(
+		"Destroy the picture" = list(TRUE, "One night, when everyone else was asleep, I snuck out of my room and found myself before that horrible thing. <br>\
+			Retrieving a lighter from my pocket I flicked it on and held it to the painting... <br>\
+			It turned out I was right, it was waiting to attack and I got into its striking range when no one else was around..."),
+	)
 
 //Initialize
 /mob/living/simple_animal/hostile/abnormality/someones_portrait/PostSpawn()

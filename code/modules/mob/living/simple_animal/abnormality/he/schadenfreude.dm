@@ -30,6 +30,7 @@
 	)
 	work_damage_amount = 7
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
 	ego_list = list(
 		/datum/ego_datum/weapon/gaze,
@@ -38,7 +39,15 @@
 	gift_type =  /datum/ego_gifts/gaze
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 
-	var/seen	//Are you being looked at right now?
+	observation_prompt = "You put on the blindfold and entered the containment unit. <br>You can feel the metal box's gaze through the thick fabric."
+	observation_choices = list(
+		"Feel for the wall" = list(TRUE, "You turn to the wall and feel for it until you find your way back to the door. <br>\
+			The box can't ever be more than a box, it can only exist as something real in the gaze of others. <br>Perhaps you're more alike than you think."),
+		"Take off the blindfold" = list(FALSE, "You remove the blindfold and wait a moment for your eyes to adjust to the light, your gaze meets the eye in the keyhole's. <br>\
+			The box comes to life with saws and blades, but all it is for - is to catch your attention."),
+	)
+
+	var/seen //Are you being looked at right now?
 	var/solo_punish	//Is an agent alone on the Z level, but not overall?
 	var/total_players
 

@@ -1,6 +1,6 @@
 // Green dawn
 /mob/living/simple_animal/hostile/ordeal/green_bot
-	name = "doubt"
+	name = "doubt alpha"
 	desc = "A slim robot with a spear in place of its hand."
 	icon = 'ModularTegustation/Teguicons/32x48.dmi'
 	icon_state = "green_bot"
@@ -47,14 +47,16 @@
 		return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/ordeal/green_bot/AttackingTarget()
+/mob/living/simple_animal/hostile/ordeal/green_bot/AttackingTarget(atom/attacked_target)
+	if(finishing)
+		return
 	. = ..()
 	if(.)
-		if(!istype(target, /mob/living/carbon/human))
+		if(!istype(attacked_target, /mob/living/carbon/human))
 			return
-		if(SSmaptype.maptype == "city")
+		if(SSmaptype.maptype in SSmaptype.citymaps)
 			return
-		var/mob/living/carbon/human/TH = target
+		var/mob/living/carbon/human/TH = attacked_target
 		if(TH.health < 0)
 			finishing = TRUE
 			TH.Stun(4 SECONDS)
@@ -96,6 +98,7 @@
 // Subtypes
 
 /mob/living/simple_animal/hostile/ordeal/green_bot/syringe
+	name = "doubt beta"
 	desc = "A slim robot with a syringe in place of its hand."
 	icon_state = "green_bot_b"
 	icon_living = "green_bot_b"
@@ -103,12 +106,14 @@
 	melee_damage_lower = 14
 	melee_damage_upper = 16
 
-/mob/living/simple_animal/hostile/ordeal/green_bot/syringe/AttackingTarget()
+/mob/living/simple_animal/hostile/ordeal/green_bot/syringe/AttackingTarget(atom/attacked_target)
+	if(finishing)
+		return
 	. = ..()
 	if(.)
-		if(!istype(target, /mob/living/carbon/human))
+		if(!istype(attacked_target, /mob/living/carbon/human))
 			return
-		var/mob/living/carbon/human/H = target
+		var/mob/living/carbon/human/H = attacked_target
 		H.add_movespeed_modifier(/datum/movespeed_modifier/grab_slowdown/aggressive)
 		addtimer(CALLBACK(H, TYPE_PROC_REF(/mob, remove_movespeed_modifier), /datum/movespeed_modifier/grab_slowdown/aggressive), 4 SECONDS, TIMER_UNIQUE | TIMER_OVERRIDE)
 
@@ -119,6 +124,7 @@
 	..()
 
 /mob/living/simple_animal/hostile/ordeal/green_bot/fast
+	name = "doubt gamma"
 	desc = "A slim robot with two spears."
 	icon_state = "green_bot_c"
 	icon_living = "green_bot_c"

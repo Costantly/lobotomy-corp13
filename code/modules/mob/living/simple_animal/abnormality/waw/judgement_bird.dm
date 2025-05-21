@@ -4,6 +4,7 @@
 	icon = 'ModularTegustation/Teguicons/48x64.dmi'
 	icon_state = "judgement_bird"
 	icon_living = "judgement_bird"
+	icon_dead = "judgement_bird_dead"
 	core_icon = "jbird_egg"
 	portrait = "judgement_bird"
 	faction = list("hostile", "Apocalypse")
@@ -11,6 +12,7 @@
 
 	pixel_x = -8
 	base_pixel_x = -8
+	del_on_death = FALSE
 
 	ranged = TRUE
 	minimum_distance = 6
@@ -33,6 +35,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = PALE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/wrath
 
 	attack_action_types = list(/datum/action/innate/abnormality_attack/judgement)
 
@@ -46,6 +49,14 @@
 	grouped_abnos = list(
 		/mob/living/simple_animal/hostile/abnormality/big_bird = 3,
 		/mob/living/simple_animal/hostile/abnormality/punishing_bird = 3,
+	)
+
+	observation_prompt = "\"Long Bird\" who lived in the forest didn't want to let creatures to be eaten by monsters. <br>\
+		His initial goal was pure, at least. <br>The forest began to be saturated by darkness. <br>His long vigil is saturated with memories and regrets."
+	observation_choices = list(
+		"Console the bird" = list(TRUE, "Long Bird put down his scales, that had been with him for a long time. <br>\
+			The long-lasting judgement finally ends. <br>Long Bird slowly realizes the secrets behind the monster, and he waits. <br>For the forest that he will never take back."),
+		"Leave him be" = list(FALSE, "Long Bird sees through you, even though he is blind. <br>He is weighing your sins."),
 	)
 
 	var/judgement_cooldown = 10 SECONDS
@@ -68,6 +79,8 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/judgement_bird/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	return OpenFire()
 
 /mob/living/simple_animal/hostile/abnormality/judgement_bird/OpenFire()
@@ -89,31 +102,53 @@
 	playsound(get_turf(src), 'sound/abnormalities/judgementbird/pre_ability.ogg', 50, 0, 2)
 	SLEEP_CHECK_DEATH(2 SECONDS)
 	playsound(get_turf(src), 'sound/abnormalities/judgementbird/ability.ogg', 75, 0, 7)
-	for(var/mob/living/L in livinginrange(judgement_range, src))
-		if(faction_check_mob(L, FALSE))
-			continue
-		if(L.stat == DEAD)
-			continue
-		new /obj/effect/temp_visual/judgement(get_turf(L))
-		L.deal_damage(judgement_damage, PALE_DAMAGE)
+	if(SSmaptype.maptype == "limbus_labs")
+		for(var/obj/structure/obstacle in view(2, src))
+			obstacle.take_damage(judgement_damage, PALE_DAMAGE)
+		for(var/mob/living/L in oview(judgement_range, src))//Listen I need jbird to not kill people through walls if hes going to play nice
+			if(faction_check_mob(L, FALSE))
+				continue
+			if(L.stat == DEAD)
+				continue
+			new /obj/effect/temp_visual/judgement(get_turf(L))
+			L.deal_damage(judgement_damage, PALE_DAMAGE)
 
-		if(L.stat == DEAD)	//Gotta fucking check again in case it kills you. Real moment
-			if(!IsCombatMap())
-				var/turf/T = get_turf(L)
-				if(locate(/obj/structure/jbird_noose) in T)
-					T = pick_n_take(T.reachableAdjacentTurfs())//if a noose is on this tile, it'll still create another one. You probably shouldn't be letting this many people die to begin with
-					L.forceMove(T)
-				var/obj/structure/jbird_noose/N = new(get_turf(L))
-				N.buckle_mob(L)
-				playsound(get_turf(L), 'sound/abnormalities/judgementbird/kill.ogg', 75, 0, 7)
-				playsound(get_turf(L), 'sound/abnormalities/judgementbird/hang.ogg', 100, 0, 7)
-				var/mob/living/simple_animal/hostile/runawaybird/V = new(get_turf(L))
-				birdlist+=V
-				V = new(get_turf(L))
-				birdlist+=V
+	else
+		for(var/mob/living/L in urange(judgement_range, src))
+			if(faction_check_mob(L, FALSE))
+				continue
+			if(L.stat == DEAD)
+				continue
+			new /obj/effect/temp_visual/judgement(get_turf(L))
+			L.deal_damage(judgement_damage, PALE_DAMAGE)
+
+			if(L.stat == DEAD)	//Gotta fucking check again in case it kills you. Real moment
+				if(!IsCombatMap())
+					var/turf/T = get_turf(L)
+					if(locate(/obj/structure/jbird_noose) in T)
+						T = pick_n_take(T.reachableAdjacentTurfs())//if a noose is on this tile, it'll still create another one. You probably shouldn't be letting this many people die to begin with
+						L.forceMove(T)
+					var/obj/structure/jbird_noose/N = new(get_turf(L))
+					N.buckle_mob(L)
+					playsound(get_turf(L), 'sound/abnormalities/judgementbird/kill.ogg', 75, 0, 7)
+					playsound(get_turf(L), 'sound/abnormalities/judgementbird/hang.ogg', 100, 0, 7)
+					var/mob/living/simple_animal/hostile/runawaybird/V = new(get_turf(L))
+					birdlist+=V
+					V = new(get_turf(L))
+					birdlist+=V
+
+	for(var/obj/vehicle/V in urange(judgement_range, src))
+		for(var/mob/living/occupant in V.occupants)
+			if(faction_check_mob(occupant, FALSE))
+				continue
+			if(occupant.stat == DEAD)
+				continue
+			new /obj/effect/temp_visual/judgement(get_turf(V))
+			occupant.deal_damage(judgement_damage, PALE_DAMAGE)
 
 	icon_state = icon_living
 	judging = FALSE
+	return
 
 /mob/living/simple_animal/hostile/abnormality/judgement_bird/NeutralEffect(mob/living/carbon/human/user, work_type, pe)
 	. = ..()
@@ -146,6 +181,8 @@
 /mob/living/simple_animal/hostile/abnormality/judgement_bird/death(gibbed)
 	for(var/mob/living/V in birdlist)
 		V.death()
+	animate(src, alpha = 0, time = 10 SECONDS)
+	QDEL_IN(src, 10 SECONDS)
 	..()
 
 //Runaway birds - Mini Simple Smile, 2 spawned after Jbird kills a player, and 2 on spawn.
@@ -158,6 +195,7 @@
 	pass_flags = PASSTABLE
 	is_flying_animal = TRUE
 	density = FALSE
+	status_flags = MUST_HIT_PROJECTILE
 	health = 100
 	maxHealth = 100
 	melee_damage_lower = 5
@@ -176,12 +214,18 @@
 	retreat_distance = 3
 	minimum_distance = 1
 
-/mob/living/simple_animal/hostile/runawaybird/AttackingTarget()
+/mob/living/simple_animal/hostile/nosferatu_mob/OpenFire(atom/A)
+	visible_message(span_danger("<b>[src]</b> taunts [A]!"))
+	ranged_cooldown = world.time + ranged_cooldown_time
+
+/mob/living/simple_animal/hostile/runawaybird/AttackingTarget(atom/attacked_target)
 	. = ..()
-	if(ishuman(target))
-		var/mob/living/carbon/human/L = target
+	if(ishuman(attacked_target))
+		var/mob/living/carbon/human/L = attacked_target
 		L.Knockdown(20)
 		var/obj/item/held = L.get_active_held_item()
+		if(SSmaptype.maptype == "office")
+			return
 		L.dropItemToGround(held) //Drop weapon
 
 /mob/living/simple_animal/hostile/runawaybird/patrol_select()

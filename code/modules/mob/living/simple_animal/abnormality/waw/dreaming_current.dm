@@ -26,6 +26,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gluttony
 
 	can_breach = TRUE
 	start_qliphoth = 2
@@ -40,6 +41,15 @@
 
 	grouped_abnos = list(
 		/mob/living/simple_animal/hostile/abnormality/siltcurrent = 2
+	)
+
+	observation_prompt = "My mom and dad took me to this place when I was very small, it smells strange and the people in it only wear white. <br>\
+		Mom says she and dad will come back for me very soon. <br>\
+		Today one of the men in the white clothing offers me the purple candy, it's grape-flavoured he says. <br>Grape is my favourite."
+	observation_choices = list(
+		"Eat the candy" = list(TRUE, "It's grape flavour, the grape is my favourite. <br>\
+			When I eat the grape candy I imagine myself swimming in an ocean of colour. <br>Today, I think I'm going to go to the Sea..."),
+		"Don't eat the candy" = list(FALSE, "I don't eat the candy given to me. <br>When will mom and dad come? <br>Why aren't they here? <br>It doesn't stop hurting, <br>I'm scared..."),
 	)
 
 	var/list/movement_path = list()
@@ -70,7 +80,9 @@
 	QDEL_NULL(soundloop)
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/dreaming_current/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/dreaming_current/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	return OpenFire()
 
 /mob/living/simple_animal/hostile/abnormality/dreaming_current/Move()

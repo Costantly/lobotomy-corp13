@@ -17,6 +17,7 @@
 	)
 	work_damage_amount = 20			//Unlikely to hurt you but if she ever does she'll fuck you
 	work_damage_type = RED_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 
 	ego_list = list(
 		/datum/ego_datum/weapon/fury,
@@ -25,6 +26,14 @@
 	gift_type = /datum/ego_gifts/fury
 	abnormality_origin = ABNORMALITY_ORIGIN_WONDERLAB
 
+	observation_prompt = "This abnormality has a notorious reputation for being particularly dry to work with. <br>It's hard to tell what it's thinking or what work it prefers. <br>\
+		What type of work will you attempt?"
+	observation_choices = list( // Matches Red Queen's real preferred work.
+		ABNORMALITY_WORK_INSTINCT = list(FALSE, "You narrowly dodge the card-guillotine coming for your neck, that was close, let's try something else."),
+		ABNORMALITY_WORK_INSIGHT = list(FALSE, "You narrowly dodge the card-guillotine coming for your neck, that was close, let's try something else."),
+		ABNORMALITY_WORK_ATTACHMENT = list(FALSE, "You narrowly dodge the card-guillotine coming for your neck, that was close, let's try something else."),
+		ABNORMALITY_WORK_REPRESSION = list(FALSE, "You narrowly dodge the card-guillotine coming for your neck, that was close, let's try something else."),
+	)
 	var/liked
 
 /mob/living/simple_animal/hostile/abnormality/red_queen/Initialize(mapload)
@@ -32,6 +41,10 @@
 	//What does she like?
 	//Pick it once so people can find out
 	liked = pick(ABNORMALITY_WORK_INSTINCT, ABNORMALITY_WORK_INSIGHT, ABNORMALITY_WORK_ATTACHMENT, ABNORMALITY_WORK_REPRESSION)
+
+/mob/living/simple_animal/hostile/abnormality/red_queen/PostSpawn()
+	. = ..()
+	observation_choices[liked] = list(TRUE, "You are granted an audience with the red queen. <br>Today, you were able to to satisfy her unpredictable whims")
 
 /mob/living/simple_animal/hostile/abnormality/red_queen/PostWorkEffect(mob/living/carbon/human/user, work_type, pe)
 	if(work_type != liked)

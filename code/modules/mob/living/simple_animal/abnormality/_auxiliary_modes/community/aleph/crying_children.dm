@@ -149,6 +149,8 @@
 		return FALSE
 	if(!died.ckey)
 		return FALSE
+	if(died.z != z)
+		return FALSE
 	death_counter += 1
 	if(death_counter >= 2)
 		death_counter = 0
@@ -260,24 +262,24 @@
 		Combusting_Courage()
 	return
 
-/mob/living/simple_animal/hostile/abnormality/crying_children/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/crying_children/AttackingTarget(atom/attacked_target)
 	if(!can_act)
 		return FALSE
 	if(!client)
 		if(desperate && (courage_cooldown <= world.time) && prob(30))
 			return Combusting_Courage()
 		if(sorrow_cooldown <= world.time && prob(25))
-			return Wounds_Of_Sorrow(target)
+			return Wounds_Of_Sorrow(attacked_target)
 
 	if(prob(35))
-		return Bygone_Illusion(target)
+		return Bygone_Illusion(attacked_target)
 
 	// Distorted Illusion
 	can_act = FALSE
 	icon_state = "[icon_phase]_salvador"
 	. = ..()
-	if(isliving(target))
-		var/mob/living/L = target
+	if(isliving(attacked_target))
+		var/mob/living/L = attacked_target
 		L.apply_lc_burn(5*burn_mod)
 	SLEEP_CHECK_DEATH(10)
 	icon_state = "[icon_phase]_idle"
@@ -393,7 +395,7 @@
 // Decrease charge for every 20% HP lost
 /mob/living/simple_animal/hostile/abnormality/crying_children/adjustHealth(amount, updating_health = TRUE, forced = FALSE)
 	var/oldhealth = health
-	..()
+	. = ..()
 	for(var/i = 1, i < 4, i++)
 		if(health < (maxHealth * 0.2 * i) && oldhealth >= (maxHealth * 0.2 * i))
 			charge -= 10
@@ -462,7 +464,7 @@
 	icon_state = "[icon_phase]_idle"
 	desperate = TRUE
 	maxHealth = 4000
-	damage_coeff = list(RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1)
+	ChangeResistances(list(RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1))
 	revive(full_heal = TRUE, admin_revive = FALSE)
 	ChangeMoveToDelay(4)
 	burn_mod = 2
@@ -497,7 +499,7 @@
 	toggle_ai(AI_OFF)
 
 /mob/living/simple_animal/hostile/child/adjustHealth(amount, updating_health = TRUE, forced = FALSE)
-	..()
+	. = ..()
 	if(!tagged)
 		toggle_ai(initial(src.AIStatus))
 		for(var/mob/living/carbon/human/H in view(src, 10)) // Immediately attacks on getting tagged
@@ -506,7 +508,7 @@
 			if(!target)
 				target = H
 		if(target in view(1, src))
-			AttackingTarget()
+			AttackingTarget(target)
 		tagged = TRUE
 
 // Unseeing

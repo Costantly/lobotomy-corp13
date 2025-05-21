@@ -32,6 +32,8 @@
 
 	access = list(ACCESS_COMMAND) // LC13:To-Do
 	minimal_access = list(ACCESS_COMMAND)
+	departments = DEPARTMENT_COMMAND
+
 	mapexclude = list("mini")
 	job_important = "You are the Extraction Officer. Your job is to manage the EGO console, Extraction purchase console, and power generation system. Your main goal is to ensure Agents are well-equipped with EGO."
 
@@ -51,6 +53,8 @@
 	ADD_TRAIT(outfit_owner, TRAIT_WORK_FORBIDDEN, JOB_TRAIT)
 	ADD_TRAIT(outfit_owner, TRAIT_ATTRIBUTES_VISION, JOB_TRAIT)
 	outfit_owner.grant_language(/datum/language/bong, TRUE, FALSE, LANGUAGE_MIND) //So they can understand the bong-bong but not speak it
+	if(SSmaptype.chosen_trait == FACILITY_TRAIT_ABNO_BLITZ)
+		outfit_owner.adjust_all_attribute_levels(60)
 
 /datum/outfit/job/command/extraction
 	name = "Extraction Officer"
@@ -90,3 +94,8 @@
 	name = "Records Officer"
 	jobtype = /datum/job/command/records
 	suit =  /obj/item/clothing/suit/armor/records
+
+	backpack_contents = list(
+		/obj/item/portacopier,
+		/obj/item/portablepredict,
+	)

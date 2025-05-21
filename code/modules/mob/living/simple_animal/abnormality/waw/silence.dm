@@ -15,6 +15,7 @@
 	start_qliphoth = 1
 	work_damage_amount = 10
 	work_damage_type = PALE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gloom
 
 	ego_list = list(
 		/datum/ego_datum/weapon/thirteen,
@@ -22,6 +23,14 @@
 	)
 	gift_type = /datum/ego_gifts/thirteen
 	abnormality_origin = ABNORMALITY_ORIGIN_ARTBOOK
+
+	observation_prompt = "Time's wasting. <br>Time's running out... <br>They are nothing but meaningless tantrums. <br>\
+		The watch will not only take your lost time back, but also give you even more time."
+	observation_choices = list(
+		"Use the watch" = list(TRUE, "The price will follow to your decision. <br>It is designed this way."),
+		"Do not use the watch" = list(FALSE, "Actually, you have no right to refuse this gift. <br>\
+			Whether you want it or not, we all know that you have to take it."),
+	)
 
 	var/meltdown_cooldown_time = 13 MINUTES
 	var/meltdown_cooldown

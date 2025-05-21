@@ -27,6 +27,7 @@
 	)
 	work_damage_amount = 12
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/sloth
 
 	ego_list = list(
 		/datum/ego_datum/weapon/hypocrisy,
@@ -36,6 +37,25 @@
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
 	gift_type =  /datum/ego_gifts/hypocrisy
 	gift_message = "Your ears seem to have grown longer. Weird."
+
+	observation_prompt = "The containment unit is overrun with plant-life, in spite of the fact its artifical floors and walls could never have hoped to support life. <br>\
+		At the heart of the minituare forest you see a lush green tree with heavy, ripened fruit and a peaceful-looking face upon its trunk. <br>\
+		\"Hello, have you come here to recieve my blessing, too?\" <br>\
+		The voice on the wind (there is no wind) spoke, carrying a sweet, flowery scent asked. \"I just want to help you all, could you bring your friends to me as well?\" "
+	observation_choices = list(
+		"Accept the blessing and refuse" = list(TRUE, "\"You're a bad child, I don't need someone like you.\" <br>\
+			Blessings should be given earnestly, not treated as an obligation. <br>You leave the chamber, pleased with yourself."),
+		"Refuse the blessing" = list(FALSE, "\"If you say you've never had need of anyone's blessing, then that's a lie.\" The tree said, frowning deeply. <br>\
+			\"... if you don't need my blessing then you're a bad person. <br>\
+			There's nothing for you here, leave.\" <br>\
+			You leave the verdant containment unit behind, the tree waits for someone else to fall into its snare."),
+		"Accept the blessing and do as it asks" = list(FALSE, "You venture out and find some of your most trusting colleagues. <br>\
+			\"Come with me, I have something wonderous to show you all\", you tell them as you bring them to stand before the tree, that same calm visage etched into its trunk. <br>\
+			\"You're a good child, aren't you? Thank you for bringing these children to me.\" <br>\
+			It says as you all stare rapturously at the bulbs about to flower. \"Let me gift you with something...\" <br>\
+			I feel something sprout from my body..."),
+	)
+
 	var/origin_cooldown = 0 //null when compared to numbers is a eldritch concept so world.time cannot be more or less.
 	var/static/list/blessed = list() //keeps track of status effected individuals
 	var/static/list/minions = list() //keeps track of minions if suppressed forcefully
@@ -198,6 +218,8 @@
 	return FALSE
 
 /mob/living/simple_animal/hostile/parasite_tree_sapling/AttackingTarget(atom/attacked_target)
+	if(!target)
+		GiveTarget(attacked_target)
 	return OpenFire()
 
 /mob/living/simple_animal/hostile/parasite_tree_sapling/OpenFire()

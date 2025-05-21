@@ -36,6 +36,136 @@
 			else
 				walk_to(SA, 0)
 
+	//Portable Photocopier
+/obj/item/portacopier
+	name = "porta copier"
+	desc = "A compact photocopier that will print any paper it is used on. \
+	Must be fed replacement paper once in a while."
+	icon = 'ModularTegustation/Teguicons/teguitems.dmi'
+	icon_state = "gadget3"
+	var/paperstock = 1
+	w_class = WEIGHT_CLASS_SMALL
+	slot_flags = ITEM_SLOT_BELT | ITEM_SLOT_POCKETS
+
+/obj/item/portacopier/attackby(obj/item/W, mob/user)
+	if(istype(W, /obj/item/paper))
+		if(paperstock <= 6)
+			to_chat(user, span_notice("[src] whirrs and buzzes."))
+			playsound(get_turf(src), 'sound/effects/refill.ogg', 50, TRUE)
+			qdel(W)
+			paperstock++
+			return
+	return ..()
+
+/obj/item/portacopier/afterattack(atom/target, mob/user, proximity_flag)
+	. = ..()
+	// Adjacent thing.
+	if(proximity_flag == 1)
+		if(istype(target, /obj/item/paper))
+			if(paperstock > 0)
+				PrintPaperCopy(target)
+				paperstock--
+				to_chat(user, span_notice("[src] whirrs and taps quietly like a typewriter."))
+				playsound(get_turf(src), 'sound/effects/servostep.ogg', 50, TRUE)
+				return
+			else
+				to_chat(user, span_notice("[src] makes a mechanical chunk, sound like its run out of something."))
+				return
+
+/obj/item/portacopier/proc/PrintPaperCopy(obj/item/paper/paper_copy)
+	. = TRUE
+	if(!paper_copy)
+		return FALSE
+	var/obj/item/paper/copied_paper = new(get_turf(src))
+	copied_paper.info = "<font color = #000000>"
+
+	var/copied_info = paper_copy.info
+	copied_info = replacetext(copied_info, "<font face=\"[PEN_FONT]\" color=", "<font face=\"[PEN_FONT]\" nocolor=")	//state of the art techniques in action
+	copied_info = replacetext(copied_info, "<font face=\"[CRAYON_FONT]\" color=", "<font face=\"[CRAYON_FONT]\" nocolor=")	//This basically just breaks the existing color tag, which we need to do because the innermost tag takes priority.
+	copied_paper.info += copied_info
+	copied_paper.info += "</font>"
+	copied_paper.name = paper_copy.name
+	copied_paper.update_icon()
+	copied_paper.stamps = paper_copy.stamps
+	if(paper_copy.stamped)
+		copied_paper.stamped = paper_copy.stamped.Copy()
+	copied_paper.copy_overlays(paper_copy, TRUE)
+
+	/*
+	* Portable Prediction Device
+	* I feel strange about this device since its
+	* function is redundant. But that might
+	* be intentional if this is a level 1
+	* thing.
+	*/
+/obj/item/portablepredict
+	name = "portable prediction device"
+	desc = "A portable mini computer that can be used on \
+		a abnormality and a agent to see workrate chances.\
+		Needs to be recharged at a printer."
+	icon = 'ModularTegustation/Teguicons/teguitems.dmi'
+	icon_state = "gadget3"
+	w_class = WEIGHT_CLASS_SMALL
+	slot_flags = ITEM_SLOT_BELT | ITEM_SLOT_POCKETS
+	var/mob/living/simple_animal/hostile/abnormality/target_abno
+	var/mob/living/carbon/human/target_agent
+	var/print_charges = 1
+
+/obj/item/portablepredict/afterattack(atom/target, mob/user, proximity_flag)
+	. = ..()
+	// Adjacent thing.
+	if(proximity_flag == 1)
+		var/mob/living/carbon/human/H = user
+		if(ishuman(H))
+			if(H?.mind?.assigned_role == "Records Officer")
+				if(isliving(target))
+					RegisterTarget(target, user)
+			else
+				to_chat(user, span_notice("[src] requires a Records Officer to activate."))
+
+/obj/item/portablepredict/attack_obj(obj/O, mob/living/user)
+	if(istype(O, /obj/machinery/photocopier))
+		if(print_charges < 3)
+			print_charges = 3
+			to_chat(user, span_notice("[src] whirrs and taps quietly like a typewriter."))
+			playsound(get_turf(src), 'sound/effects/servostep.ogg', 50, TRUE)
+			return
+	return ..()
+
+/obj/item/portablepredict/proc/RegisterTarget(mob/living/L, mob/living/carbon/human/user)
+	if(L.stat == DEAD)
+		return
+	if(print_charges <= 0)
+		to_chat(user, span_notice("[src] has run out of charges."))
+		return
+	if(ishuman(L))
+		target_agent = L
+	if(isabnormalitymob(L))
+		target_abno = L
+	if(target_agent && target_abno)
+		CalculateChance(target_abno.datum_reference, target_agent, user)
+		target_agent = null
+		target_abno = null
+	playsound(get_turf(src), 'sound/items/syringeproj.ogg', 50, TRUE)
+
+/obj/item/portablepredict/proc/CalculateChance(datum/abnormality/A, mob/living/carbon/human/target, mob/living/carbon/human/user)
+	if(QDELETED(A) || QDELETED(target))
+		return
+	to_chat(user, span_notice("[src] prints out a slip of paper."))
+	print_charges--
+
+	var/obj/item/paper/printed_paper = new(get_turf(src))
+	printed_paper.name = "Employee Workchance Calculations [A.name]+[target]"
+	printed_paper.info = "<tt><font color = #000000>\
+	[A.name]+[target]<br>\
+	Run_Employee_[pick("Previous_Reports","Work_Footage","Medical_History")]<br>\
+	Instinct:---[A.get_work_chance(ABNORMALITY_WORK_INSTINCT, target)]<br> \
+	Insight:----[A.get_work_chance(ABNORMALITY_WORK_INSIGHT, target)]<br> \
+	Attachment:-[A.get_work_chance(ABNORMALITY_WORK_ATTACHMENT, target)]<br> \
+	Repression:-[A.get_work_chance(ABNORMALITY_WORK_REPRESSION, target)]</font></tt>"
+	printed_paper.update_icon()
+	user.put_in_inactive_hand(printed_paper)
+
 	//Dosage Estimator
 /obj/item/dosage_est
 	name = "Dosage Estimator"
@@ -200,10 +330,25 @@
 		check1c = H.physiology.black_mod
 		check1d = H.physiology.pale_mod
 		if(suit)
-			check1a = 1 - (H.getarmor(null, RED_DAMAGE) / 100)
-			check1b = 1 - (H.getarmor(null, WHITE_DAMAGE) / 100)
-			check1c = 1 - (H.getarmor(null, BLACK_DAMAGE) / 100)
-			check1d = 1 - (H.getarmor(null, PALE_DAMAGE) / 100)
+			var/red_armor = 1 - (H.getarmor(null, RED_DAMAGE) / 100)
+			var/white_armor = 1 - (H.getarmor(null, WHITE_DAMAGE) / 100)
+			var/black_armor = 1 - (H.getarmor(null, BLACK_DAMAGE) / 100)
+			var/pale_armor = 1 - (H.getarmor(null, PALE_DAMAGE) / 100)
+			if(GLOB.damage_type_shuffler?.is_enabled)
+				var/list/temp = list()
+				var/datum/damage_type_shuffler/shuffler = GLOB.damage_type_shuffler
+				temp[shuffler.mapping_offense[RED_DAMAGE]] = red_armor
+				temp[shuffler.mapping_offense[WHITE_DAMAGE]] = white_armor
+				temp[shuffler.mapping_offense[BLACK_DAMAGE]] = black_armor
+				temp[shuffler.mapping_offense[PALE_DAMAGE]] = pale_armor
+				red_armor = temp[RED_DAMAGE]
+				white_armor = temp[WHITE_DAMAGE]
+				black_armor = temp[BLACK_DAMAGE]
+				pale_armor = temp[PALE_DAMAGE]
+			check1a *= red_armor
+			check1b *= white_armor
+			check1c *= black_armor
+			check1d *= pale_armor
 		if(H.job)
 			check1e = H.job
 	else
@@ -219,7 +364,13 @@
 		if(isabnormalitymob(mon))
 			var/mob/living/simple_animal/hostile/abnormality/abno = mon
 			check1e = THREAT_TO_NAME[abno.threat_level]
-
+		if(GLOB.damage_type_shuffler?.is_enabled)
+			var/list/temp = list(RED_DAMAGE = check1a, WHITE_DAMAGE = check1b, BLACK_DAMAGE = check1c, PALE_DAMAGE = check1d)
+			var/datum/damage_type_shuffler/shuffler = GLOB.damage_type_shuffler
+			check1a = temp[shuffler.mapping_defense[RED_DAMAGE]]
+			check1b = temp[shuffler.mapping_defense[WHITE_DAMAGE]]
+			check1c = temp[shuffler.mapping_defense[BLACK_DAMAGE]]
+			check1d = temp[shuffler.mapping_defense[PALE_DAMAGE]]
 	var/output = "--------------------\n[check1e ? check1e+" [target]" : "[target]"]\nHP [target.health]/[target.maxHealth]\nR [check1a] W [check1b] B [check1c] P [check1d]\n--------------------"
 	to_chat(user, span_notice("[output]"))
 	deep_scan_log = output
@@ -289,6 +440,7 @@
 	attack_verb_simple = list("attack", "bash", "batter", "bludgeon", "whack")
 	toolspeed = 1
 	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, RAD = 0, FIRE = 100, ACID = 100)
+	custom_price = 300
 	var/mode = RAK_HP_MODE
 
 /obj/item/safety_kit/attack_self(mob/user)
@@ -383,7 +535,7 @@
 			. += span_warning("This will disable regenerators for a short period afterwards.")
 
 /obj/item/safety_kit/proc/clerk_check(mob/living/carbon/human/H)
-	if(istype(H) && (H?.mind?.assigned_role == "Clerk"))
+	if(istype(H) && (H?.mind?.assigned_role in list("Clerk", "Agent Support Clerk", "Facility Support Clerk")))
 		return TRUE
 	return FALSE
 
@@ -450,6 +602,14 @@
 	mid_length = 2 SECONDS
 	volume = 20
 
+/obj/item/lobotomizer/suicide_act(mob/living/carbon/user)
+	. = ..()
+	user.visible_message(span_suicide("[user] changes \the [src]'s setting from 'Lobotomize' to 'Decimate'! It looks like [user.p_theyre()] trying to commit suicide!"))
+	var/obj/item/organ/brain/brain = user.getorganslot(ORGAN_SLOT_BRAIN)
+	qdel(brain)
+	playsound(user, 'sound/weapons/circsawhit.ogg', 20, TRUE, -1)
+	return BRUTELOSS
+
 //Clerkbot Spawner
 /obj/item/clerkbot_gadget
 	name = "Instant Clerkbot Constructor"
@@ -464,11 +624,11 @@
 	if(!istype(user) || !(user?.mind?.assigned_role in GLOB.service_positions))
 		to_chat(user, span_notice("The Gadget's light flashes red. You aren't a clerk. Check the label before use."))
 		return
-	new /mob/living/simple_animal/hostile/clerkbot(get_turf(user))
+	var/mob/living/simple_animal/hostile/clerkbot/bot = new(get_turf(user))
+	forceMove(bot)
 	to_chat(user, span_nicegreen("The Gadget turns warm and sparks."))
-	qdel(src)
 
-	//Clerkbot spawned by the Clerkbot Spawner
+/// Clerkbot spawned by the Clerkbot Spawner
 /mob/living/simple_animal/hostile/clerkbot
 	name = "A Well Rounded Clerkbot"
 	desc = "Trusted and loyal best friend."
@@ -499,11 +659,12 @@
 	speech_span = SPAN_ROBOT
 
 /mob/living/simple_animal/hostile/clerkbot/Initialize()
-	..()
-	QDEL_IN(src, (120 SECONDS))
 	if(prob(50))
 		icon_state = "clerkbot1"
 		icon_living = "clerkbot1"
+
+	QDEL_IN(src, (120 SECONDS))
+	return ..()
 
 /mob/living/simple_animal/hostile/clerkbot/Login()
 	. = ..()
@@ -512,12 +673,12 @@
 	to_chat(src, "<b>WARNING:THIS CREATURE IS TEMPORARY AND WILL DELETE ITSELF AFTER A GIVEN TIME!</b>")
 
 /mob/living/simple_animal/hostile/clerkbot/Destroy()
-	new /obj/item/clerkbot_gadget(get_turf(src))
+	for(var/obj/item as anything in contents)
+		item.forceMove(get_turf(src))
 	return ..()
 
 /mob/living/simple_animal/hostile/clerkbot/spawn_gibs()
 	new /obj/effect/gibspawner/robot(drop_location(), src)
-
 
 /// Info Page Printer (Does not print info sheets)
 

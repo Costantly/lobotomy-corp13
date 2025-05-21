@@ -22,7 +22,7 @@
 	)
 	work_damage_amount = 6
 	work_damage_type = RED_DAMAGE
-	chem_type = /datum/reagent/abnormality/woe
+	chem_type = /datum/reagent/abnormality/sin/envy
 	damage_coeff = list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 2, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	faction = list("hostile")
 	can_breach = TRUE
@@ -34,6 +34,20 @@
 	)
 	gift_type =  /datum/ego_gifts/match
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "I thought it was cold. \
+		It got warm before I even realize it. The match nailed to my heart doesn't stop burning. \
+		The match that never caught a fire before now burns to ash. Maybe is a price for taking my body, to burn so bright and fiery. \
+		Let's run when I can burn. I have been suffering and will suffer. But why you are still happy? \
+		I know the menace I have become. If nothing will change, I at least want to see you suffering."
+	observation_choices = list(
+		"Do not go to her" = list(TRUE, "I stopped. I can see her in the distance. \
+			\"Maybe you are thinking I am some kind of lighthouse.\" \
+			\"At least, I hope you realize my ash is all that remains after this flame consumes the all of me.\""),
+		"Go to her" = list(FALSE, "Come to me. \
+			You who will soon become ashes just like me."),
+	)
+
 	/// Restrict movement when this is set to TRUE
 	var/exploding = FALSE
 	/// Current cooldown for the players
@@ -70,7 +84,7 @@
 	var/highestcount = 0
 	for(var/turf/T in GLOB.department_centers)
 		var/targets_at_tile = 0
-		for(var/mob/living/L in view(10, T))
+		for(var/mob/living/L in ohearers(10, T))
 			if(!faction_check_mob(L) && L.stat != DEAD)
 				targets_at_tile++
 		if(targets_at_tile > highestcount)
@@ -81,16 +95,13 @@
 	else
 		patrol_path = get_path_to(src, target_center, TYPE_PROC_REF(/turf, Distance_cardinal), 0, 200)
 
-/mob/living/simple_animal/hostile/abnormality/scorched_girl/MeleeAction()
-	return OpenFire()
-
 /mob/living/simple_animal/hostile/abnormality/scorched_girl/OpenFire()
 	if(client)
 		explode()
 		return
 
 	var/amount_inview = 0
-	for(var/mob/living/carbon/human/H in view(7, src))
+	for(var/mob/living/carbon/human/H in ohearers(7, src))
 		if(!faction_check_mob(H) && H.stat != DEAD)
 			amount_inview += 1
 	if(prob(amount_inview*20))
@@ -108,7 +119,15 @@
 	return FALSE
 
 /mob/living/simple_animal/hostile/abnormality/scorched_girl/AttackingTarget(atom/attacked_target)
-	explode()
+	if(client)
+		explode()
+		return
+	var/amount_inview = 0
+	for(var/mob/living/carbon/human/H in ohearers(7, src))
+		if(!faction_check_mob(H) && H.stat != DEAD)
+			amount_inview += 1
+	if(prob(amount_inview * 20))
+		explode()
 	return
 
 /mob/living/simple_animal/hostile/abnormality/scorched_girl/proc/explode()
@@ -130,6 +149,9 @@
 		H.deal_damage(boom_damage, RED_DAMAGE)
 		if(H.health < 0)
 			H.gib()
+	if(SSmaptype.maptype == "limbus_labs")
+		for(var/obj/structure/obstacle in view(2, src))
+			obstacle.take_damage(boom_damage, RED_DAMAGE)
 	new /obj/effect/temp_visual/explosion(get_turf(src))
 	var/datum/effect_system/smoke_spread/S = new
 	S.set_up(7, get_turf(src))

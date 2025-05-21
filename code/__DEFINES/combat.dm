@@ -50,6 +50,8 @@
 #define BLACK_DAMAGE		"black"
 /// Deals brute damage in percents.
 #define PALE_DAMAGE			"pale"
+/// Fake damage used for hostile ai targetting
+#define AGGRO_DAMAGE		"aggro"
 
 //bitflag damage defines used for suicide_act
 #define BRUTELOSS 	            	(1<<0)
@@ -78,6 +80,7 @@
 #define CANUNCONSCIOUS	(1<<2)
 #define CANPUSH			(1<<3)
 #define GODMODE			(1<<4)
+#define MUST_HIT_PROJECTILE (1<<5)
 
 //Health Defines
 #define HEALTH_THRESHOLD_CRIT 0

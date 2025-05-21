@@ -12,6 +12,7 @@
 	health = 2000
 	pixel_x = -16
 	base_pixel_x = -16
+	blood_volume = 0
 	melee_damage_type = BLACK_DAMAGE
 	melee_damage_lower = 35
 	melee_damage_upper = 45
@@ -42,6 +43,25 @@
 	)
 	work_damage_amount = 8
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gluttony
+
+	observation_prompt = "(I hear something) <br>\
+		The wicked queen is speaking with the magic mirror again and frowns when its answer remains unchanged. <br>\
+		(I see something) <br>\
+		I see her take an apple from next to me and imbue it with a poison that can kill with but a drop. <br>\
+		She takes on the guise of a wizened old hag and places the poisoned apple back next to me and heads out, a small amount of its poison leaves an impression upon me. <br>\
+		(I feel something) <br>\
+		I feel her cast me aside, taking a bite of my white flesh to prove her genuinity as Snow White bit the poisoned apple's red flesh. <br>\
+		Her plan was a success - her behated Snow White has fallen into a death-like state. <br>\
+		Is that all I was for? <br>To bring pain to others whilst never experiencing it myself? <br>\
+		I'm beginning to rot and feel pests and other lowly creatures make a meal out of me..."
+	observation_choices = list(
+		"Don't accept the end" = list(TRUE, "The impression of poison brings pause to the pests and even they no longer wish to remain with me. <br>\
+			Petrified roots grow from within me and I gain some sense of being ambulatory. <br>I know now how long I had laid but I refuse to remain still. <br>\
+			I shall find vengeance. <br>Bring me snow white..."),
+		"Rot into nothing" = list(FALSE, "An apple culminates when it shrivels up and attracts lesser creatures. <br>I'm just an apple, I can't change a thing."),
+	)
+
 	var/barrier_cooldown
 	var/barrier_cooldown_time = 4 SECONDS
 	var/barrage_cooldown
@@ -123,7 +143,8 @@
 
 /mob/living/simple_animal/hostile/abnormality/ebony_queen/BreachEffect(mob/living/carbon/human/user, breach_type)
 	. = ..()
-	addtimer(CALLBACK(src, PROC_REF(TryTeleport)), 5)
+	if(breach_type != BREACH_MINING)
+		addtimer(CALLBACK(src, PROC_REF(TryTeleport)), 5)
 
 /mob/living/simple_animal/hostile/abnormality/ebony_queen/Move()
 	if(!can_act)
@@ -137,7 +158,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/ebony_queen/MoveToTarget(list/possible_targets)
 	if(!can_act)
-		return
+		return TRUE
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/ebony_queen/DestroySurroundings()
@@ -146,6 +167,7 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/ebony_queen/death(gibbed)
+	icon = 'ModularTegustation/Teguicons/abno_cores/waw.dmi'
 	density = FALSE
 	animate(src, alpha = 0, time = 5 SECONDS)
 	QDEL_IN(src, 5 SECONDS)
@@ -182,19 +204,22 @@
 	if(!can_act)
 		return
 
+	if(!target)
+		GiveTarget(attacked_target)
+
 	if(client)
 		OpenFire()
 		return
 
-	if(target) // You'd think this should be "attacked_target" but no this shit still uses target I hate it.
-		if(ismecha(target))
+	if(attacked_target) // You'd think this should be "attacked_target" but no this shit still uses target I hate it. // Now uses attacked_target I love it.
+		if(ismecha(attacked_target))
 			if(burst_cooldown <= world.time && prob(50))
 				thornBurst()
 			else
 				OpenFire()
 			return
-		else if(isliving(target))
-			var/mob/living/L = target
+		else if(isliving(attacked_target))
+			var/mob/living/L = attacked_target
 			if(L.stat != DEAD)
 				if(burst_cooldown <= world.time && prob(50))
 					thornBurst()
@@ -273,20 +298,21 @@
 	qdel(src)
 
 	//Special attacks; there are four of them
-/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/rootStab(target) //single target
+/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/rootStab(atom/attack_target) //single target
 	if(!can_act)
 		return
 	can_act = FALSE
 	playsound(get_turf(src), 'sound/creatures/venus_trap_hurt.ogg', 75, 0, 5)
 	icon_state = "ebonyqueen_attack2"
+	var/turf/T = get_turf(attack_target)
 	SLEEP_CHECK_DEATH(1)
-	new /obj/effect/temp_visual/root(get_turf(target), src)
+	new /obj/effect/temp_visual/root(T, src)
 	SLEEP_CHECK_DEATH(4)
 	icon_state = icon_living
 	SLEEP_CHECK_DEATH(2)
 	can_act = TRUE
 
-/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/thornBarrier(target) //barrier of thorns
+/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/thornBarrier(atom/attack_target) //barrier of thorns
 	if(barrier_cooldown > world.time || !can_act)
 		return
 	barrier_cooldown = world.time + barrier_cooldown_time
@@ -294,7 +320,16 @@
 	playsound(get_turf(src), 'sound/abnormalities/ebonyqueen/charge.ogg', 175, 0, 5) //very quiet sound file
 	icon_state = "ebonyqueen_attack3"
 	SLEEP_CHECK_DEATH(7.75)
-	var/turf/target_turf = get_turf(target)
+	//check if target still exists after the sleep and bail if not
+	if(QDELETED(attack_target))
+		if(!client && FindTarget())
+			attack_target = target
+		else
+			icon_state = icon_living
+			SLEEP_CHECK_DEATH(3)
+			can_act = TRUE
+			return
+	var/turf/target_turf = get_turf(attack_target)
 	SLEEP_CHECK_DEATH(0.25) //slight offset
 	for(var/turf/T in RANGE_TURFS(1, target_turf))
 		new /obj/effect/temp_visual/root(T, src)
@@ -327,7 +362,7 @@
 	SLEEP_CHECK_DEATH(3)
 	can_act = TRUE
 
-/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/rootBarrage(target) //line attack
+/mob/living/simple_animal/hostile/abnormality/ebony_queen/proc/rootBarrage(atom/attack_target) //line attack
 	if(barrage_cooldown > world.time || !can_act)
 		return
 	barrage_cooldown = world.time + barrage_cooldown_time
@@ -335,7 +370,17 @@
 	playsound(get_turf(src), 'sound/abnormalities/ebonyqueen/strongcharge.ogg', 75, 0, 5)
 	icon_state = "ebonyqueen_attack1"
 	SLEEP_CHECK_DEATH(7)
-	var/turf/target_turf = get_ranged_target_turf_direct(src, target, barrage_range)
+	//check if target still exists after the sleep and bail if not
+	if(QDELETED(attack_target))
+		if(!client && FindTarget())
+			attack_target = target
+		else
+			icon_state = icon_living
+			SLEEP_CHECK_DEATH(3)
+			can_act = TRUE
+			return
+
+	var/turf/target_turf = get_ranged_target_turf_direct(src, attack_target, barrage_range)
 	var/count = 0
 	for(var/turf/T in getline(get_turf(src), target_turf))
 		if(T.density)

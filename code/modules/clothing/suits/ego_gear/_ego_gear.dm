@@ -28,6 +28,8 @@
 		var/obj/effect/proc_holder/ability/neck_ability/NA = new(null, neck)
 		var/datum/action/spell_action/ability/item/N = NA.action
 		N.SetItem(src)
+	if(SSmaptype.chosen_trait == FACILITY_TRAIT_CALLBACK)
+		w_class = WEIGHT_CLASS_NORMAL			//Callback to when we had stupid 10 Egos in bag
 
 /obj/item/clothing/suit/armor/ego_gear/mob_can_equip(mob/living/M, mob/living/equipper, slot, disable_warning = FALSE, bypass_equip_delay_self = FALSE)
 	if(!ishuman(M))
@@ -36,7 +38,7 @@
 	if(slot_flags & slot) // Equipped to right slot, not just in hands
 		if(!CanUseEgo(H))
 			return FALSE
-		if(equip_slowdown > 0)
+		if(equip_slowdown > 0 && (M == equipper || !equipper))
 			if(!do_after(H, equip_slowdown, target = H))
 				return FALSE
 	return ..()
@@ -60,6 +62,18 @@
 			return
 		neckwear.Destroy()
 
+/obj/item/clothing/suit/armor/ego_gear/pickup(mob/user)
+	. = ..()
+	if(!user.has_movespeed_modifier(/datum/movespeed_modifier/too_many_armors) && ishuman(user))
+		var/obj/item/clothing/suit/armor/ego_gear/equipped_armor = user.get_item_by_slot(ITEM_SLOT_OCLOTHING)
+		if(istype(equipped_armor))
+			if((SSmaptype.maptype in SSmaptype.citymaps) || (SSmaptype.maptype in SSmaptype.combatmaps))
+				return
+			else
+				var/list/slowdown_free_roles = list("Clerk", "Agent Support Clerk", "Facility Support Clerk", "Extraction Officer")
+				if(!(user.mind.assigned_role in slowdown_free_roles))
+					user.add_or_update_variable_movespeed_modifier(/datum/movespeed_modifier/too_many_armors)
+
 /obj/item/clothing/suit/armor/ego_gear/dropped(mob/user)
 	. = ..()
 	if(hat)
@@ -72,6 +86,8 @@
 		if(!istype(neckwear, neck))
 			return
 		neckwear.Destroy()
+	if(user.has_movespeed_modifier(/datum/movespeed_modifier/too_many_armors))
+		user.remove_movespeed_modifier(/datum/movespeed_modifier/too_many_armors)
 
 /obj/item/clothing/suit/armor/ego_gear/proc/CanUseEgo(mob/living/carbon/human/user)
 	if(!ishuman(user))
@@ -98,7 +114,13 @@
 /obj/item/clothing/suit/armor/ego_gear/examine(mob/user)
 	. = ..()
 	if(LAZYLEN(attribute_requirements))
-		. += "<span class='notice'>It has <a href='?src=[REF(src)];list_attributes=1'>certain requirements</a> for the wearer.</span>"
+		if(!ishuman(user))	//You get a notice if you are a ghost or otherwise
+			. += span_notice("It has <a href='byond://?src=[REF(src)];list_attributes=1'>certain requirements</a> for the wearer.")
+		else if(CanUseEgo(user))	//It's green if you can use it
+			. += span_nicegreen("It has <a href='byond://?src=[REF(src)];list_attributes=1'>certain requirements</a> for the wearer.")
+		else				//and red if you cannot use it
+			. += span_danger("You cannot use this EGO!")
+			. += span_danger("It has <a href='byond://?src=[REF(src)];list_attributes=1'>certain requirements</a> for the wearer.")
 
 /obj/item/clothing/suit/armor/ego_gear/Topic(href, href_list)
 	. = ..()
@@ -144,3 +166,7 @@
 	var/mob/living/carbon/human/H = usr
 	H.update_inv_wear_suit()
 	H.update_body()
+
+/datum/movespeed_modifier/too_many_armors
+	variable = TRUE
+	multiplicative_slowdown = 1.5 //Roughly 1/3 speed for holding too many armors

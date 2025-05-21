@@ -15,6 +15,8 @@
 	del_on_death = FALSE
 	melee_damage_type = BLACK_DAMAGE
 	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.2)
+	speak_emote = list("states")
+	speech_span = SPAN_ROBOT
 	melee_damage_lower = 20
 	melee_damage_upper = 25
 	move_to_delay = 3
@@ -36,6 +38,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = BLACK_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/envy
 
 	ego_list = list(
 		/datum/ego_datum/weapon/replica,
@@ -48,6 +51,26 @@
 	grouped_abnos = list(
 		/mob/living/simple_animal/hostile/abnormality/nothing_there = 1.5,
 		/mob/living/simple_animal/hostile/abnormality/nobody_is = 1.5,
+	)
+
+	observation_prompt = "This dark place might be a factory. <br>\
+		A sharp mechanical noise zips through the air. <br>\
+		Illuminating eyes are fixed on you. <br>\
+		A robot slowly approaches. <br>\
+		It appears to be incomplete, as suggested by the bare wires protruding with each movement. <br>\
+		Is that leakage antifreeze, or blood? <br>\
+		While you were wondering, the terminal on its chest flashed to life. <br>\
+		Looks like you can write something."
+	observation_choices = list(
+		"Hello" = list(TRUE, "The robot lifts both arms with some struggle. <br>\
+			The terminal prints out its words: <br>\
+			<Welcome, Dear Guest. Have you enjoyed the town tour? \
+			We’d like you to have a souvenir. :-)> <br>\
+			A smile is displayed on the terminal, <br>\
+			but in the robot’s gestures, you feel a plea for help."),
+		"Goodbye" = list(FALSE, "The terminal’s light goes red, and warnings start to blare. <br>\
+			The robot shakes intensely as if in pain. <br>\
+			<Farewell. <br>Farewell, <br>FarewellFarewellFarewellFarewellFarewellFarewellFarewellFarewellFarewell>"),
 	)
 
 	var/can_act = TRUE
@@ -108,7 +131,10 @@
 	if(!heart)
 		return Life()//PRANKED!
 	can_act = FALSE
+	icon = 'ModularTegustation/Teguicons/abno_cores/he.dmi'
 	icon_state = icon_dead
+	pixel_x = -16
+	base_pixel_x = -16
 	animate(src, alpha = 0, time = 10 SECONDS)
 	QDEL_IN(src, 10 SECONDS)
 	if(istype(heart, /mob/living/simple_animal/hostile/kqe_heart))
@@ -195,8 +221,10 @@
 	if(!can_act)
 		return FALSE
 	if ((grab_cooldown <= world.time) && prob(35) && (!client))//checks for client since you can still use the claw if you click nearby
-		var/turf/target_turf = get_turf(target)
+		var/turf/target_turf = get_turf(attacked_target)
 		return ClawGrab(target_turf)
+	if(!target)
+		GiveTarget(attacked_target)
 	return Whip_Attack()
 
 /mob/living/simple_animal/hostile/abnormality/kqe/proc/Whip_Attack()
@@ -207,7 +235,7 @@
 	SLEEP_CHECK_DEATH(10)
 	for(var/turf/T in view(2, src))
 		new /obj/effect/temp_visual/smash_effect(T)
-		HurtInTurf(T, list(), melee_damage_upper, RED_DAMAGE, check_faction = TRUE, hurt_mechs = TRUE)
+		HurtInTurf(T, list(), melee_damage_upper, RED_DAMAGE, check_faction = TRUE, hurt_mechs = TRUE, hurt_structure = TRUE)
 	icon_state = "kqe_prepare2"
 	SLEEP_CHECK_DEATH(3)
 	icon_state = icon_living
@@ -313,6 +341,7 @@
 	damage_coeff = list(RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
 	speed = 5
 	density = TRUE
+	faction = list("hostile", "KQE")
 	var/mob/living/simple_animal/hostile/abnormality/kqe/abno_host//This is KQE!
 
 /mob/living/simple_animal/hostile/kqe_heart/Move()

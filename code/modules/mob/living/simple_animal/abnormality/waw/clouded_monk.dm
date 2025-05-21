@@ -34,6 +34,7 @@
 	)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
+	chem_type = /datum/reagent/abnormality/sin/gluttony
 
 	ego_list = list(
 		/datum/ego_datum/weapon/amrita,
@@ -42,6 +43,11 @@
 	gift_type =  /datum/ego_gifts/amrita
 	gift_message = "But if you were to consume them, perhaps, you would display more sarira than Buddha himself..."
 	abnormality_origin = ABNORMALITY_ORIGIN_LOBOTOMY
+
+	observation_prompt = "Are you a monk?"
+	observation_choices = list(
+		"I am no longer a monk" = list(TRUE, "A demon shall never reach Heaven."),
+	)
 
 	var/datum/looping_sound/cloudedmonk_ambience/soundloop
 	var/charging = FALSE
@@ -54,6 +60,7 @@
 	var/charge_damage = 350
 	var/eaten = FALSE
 	var/damage_taken
+	var/slam_damage = 100
 
 	attack_action_types = list(
 		/datum/action/innate/abnormality_attack/toggle/monk_charge,
@@ -154,6 +161,7 @@
 		damage_taken += .
 	if(damage_taken >= 200 && !charge_ready)
 		charge_ready = TRUE
+		to_chat(src, span_userdanger("YOU ARE READY TO CHARGE!"))
 
 /mob/living/simple_animal/hostile/abnormality/clouded_monk/Goto(target, delay, minimum_distance)
 	if(revving_charge || charging)
@@ -162,7 +170,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/clouded_monk/MoveToTarget(list/possible_targets)
 	if(revving_charge || charging)
-		return FALSE
+		return TRUE
 	return ..()
 
 /mob/living/simple_animal/hostile/abnormality/clouded_monk/Move()
@@ -173,11 +181,11 @@
 		DestroySurroundings() //to break tables ssin the way
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/clouded_monk/AttackingTarget()
+/mob/living/simple_animal/hostile/abnormality/clouded_monk/AttackingTarget(atom/attacked_target)
 	if(revving_charge || charging)
 		return
 	if(monk_charge_cooldown <= world.time && prob(33) && !client && charge_ready)
-		TripleCharge(target)
+		TripleCharge(attacked_target)
 		return
 	. = ..()
 
@@ -234,13 +242,29 @@
 	SLEEP_CHECK_DEATH(get_dist(src, T) * movespeed)
 	EndCharge()
 
-/mob/living/simple_animal/hostile/abnormality/clouded_monk/proc/EndCharge()
+/mob/living/simple_animal/hostile/abnormality/clouded_monk/proc/EndCharge(bump = FALSE)
 	if(!charging)
 		return
 	charging = FALSE
 	revving_charge = FALSE
 	walk(src, 0) // cancel the movement
 	icon_state = icon_aggro
+
+	if (!bump && SSmaptype.maptype == "rcorp")
+		var/turf/T = get_turf(src)
+		for(var/turf/TF in range(2, T))//Smash AOE visual
+			new /obj/effect/temp_visual/smash_effect(TF)
+		for(var/mob/living/L in range(2, T))//damage applied to targets in range
+			if(faction_check_mob(L))
+				continue
+			if(L.z != z)
+				continue
+			visible_message(span_boldwarning("[src] slams [L]!"))
+			to_chat(L, span_userdanger("[src] slams you!"))
+			var/turf/LT = get_turf(L)
+			new /obj/effect/temp_visual/kinetic_blast(LT)
+			L.apply_damage(slam_damage,RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+			playsound(L, 'sound/creatures/lc13/lovetown/slam.ogg', 75, 1)
 
 /mob/living/simple_animal/hostile/abnormality/clouded_monk/proc/ResetCharge()
 	monk_charge_cooldown = world.time + monk_charge_cooldown_time
@@ -271,11 +295,12 @@
 							playsound(src, 'sound/abnormalities/clouded_monk/eat_groggy.ogg', 75, 1)
 				else
 					L.adjustRedLoss(charge_damage/10)
-				EndCharge()
+				EndCharge(TRUE)
 				ResetCharge()
 		else if(isvehicle(A))
 			var/obj/vehicle/V = A
-			V.take_damage(charge_damage/10, RED_DAMAGE)
+			V.take_damage(charge_damage*1.5, RED_DAMAGE)
 			for(var/mob/living/occupant in V.occupants)
 				to_chat(occupant, span_userdanger("Your [V.name] is bit by [src]!"))
+			EndCharge(FALSE)
 	return ..()
